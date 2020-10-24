@@ -1,0 +1,4 @@
+[submodule "third-part/cpp-common"]
+	path = third-part/cpp-common
+	url = git@bitbucket.org:iie4dev/cpp-common.git
+	branch = dev
