@@ -46,19 +46,5 @@ else()
         )
 endif()
 
-#find_library(LIB_MAGIC libmagic.a third-part/magic/lib)
-
-include_directories(third-part/magic/include)
-
-add_executable(file_rel_type
-    main.cpp
-    src/ParseMagicFile.cpp
-    src/ParseMagicFile.h
-    src/MagicEntry.cpp
-    src/MagicEntry.h
-    )
-
-target_link_libraries(file_rel_type
-    cpp-common-static
-#    ${LIB_MAGIC}
-    )
+add_subdirectory(src)
+add_subdirectory(tests)
