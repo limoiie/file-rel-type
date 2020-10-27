@@ -70,6 +70,7 @@ enum ref_type_format_t {
     FILE_FMT_DOUBLE,
 };
 
+inline
 auto map_type() -> std::list<std::tuple<std::string, ref_type_t, ref_type_format_t>> const& {
     static auto m = std::list<std::tuple<std::string, ref_type_t, ref_type_format_t>>{
             {"invalid",    FILE_INVALID,    FILE_FMT_NONE},
@@ -126,6 +127,7 @@ auto map_type() -> std::list<std::tuple<std::string, ref_type_t, ref_type_format
     return m;
 }
 
+inline
 auto map_name_type() -> std::map<std::string, ref_type_t> const& {
     auto const& meta_data = map_type();
     static auto name_type_mapping = std::map<std::string, ref_type_t>();
