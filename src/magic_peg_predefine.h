@@ -10,8 +10,12 @@
 #include <tao/pegtl/contrib/analyze.hpp>
 #include <tao/pegtl/contrib/integer.hpp>
 #include <tao/pegtl/contrib/if_then.hpp>
-#include <magic_type.h>
-#include <pegtl-helper/ascii.hpp>
+
+#include "magic_type.h"
+
+#include "pegtl-helper/ascii.hpp"
+#include "pegtl-helper/integer.hpp"
+#include "pegtl-helper/exact.hpp"
 
 namespace np_operator
 {
@@ -54,6 +58,9 @@ namespace np_type
 
     namespace np_deref_type
     {
+        struct deref_type_sign_symbol
+                : one< 'u', 'U' > {
+        };
         struct deref_type_
                 : seq<
                         plus< alpha >,
@@ -65,9 +72,6 @@ namespace np_type
         };
         struct deref_signed_type
                 : deref_type_ {
-        };
-        struct deref_type_sign_symbol
-                : one< u, U > {
         };
         struct deref_normal_type
                 : if_then_else<
@@ -84,6 +88,16 @@ namespace np_type
                 > {
         };
     }
+
+}
+
+namespace np_flag
+{
+    using namespace alphabet;
+
+    struct deref_mask_flag
+            : one< W, w, C, c, T, t, B, b, H, h, L, l, J, s, r > {
+    };
 
 }
 

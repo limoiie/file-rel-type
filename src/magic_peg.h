@@ -135,10 +135,6 @@ namespace np_deref_mask
             : helper::integer::signed_integer {
     };
 
-    struct deref_mask_flag
-            : one< 'W', 'w', 'C', 'c', 'T', 't', 'B', 'b', 'H', 'h', 'L', 'l', 'J', 's', 'r' > {
-    };
-
     struct deref_str_mask_sep
             : one< '/' > {
     };
@@ -148,7 +144,7 @@ namespace np_deref_mask
                     opt<deref_str_mask_sep>,
                     sor<
                             deref_mask_num,
-                            deref_mask_flag
+                            np_flag::deref_mask_flag
                     >
             > {
     };
