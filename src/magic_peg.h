@@ -30,10 +30,14 @@ struct continue_level
 
 /// region-end continue level
 
+struct number
+        : helper::integer::signed_integer {
+};
+
 namespace np_offset
 {
     struct offset_base_num
-            : helper::integer::signed_integer {
+            : number {
     };
 
     namespace np_indirect
@@ -45,7 +49,7 @@ namespace np_offset
             };
 
             struct offset_indirect_mask_num
-                    : helper::integer::signed_integer {
+                    : number {
             };
 
             struct offset_indirect_mask_indirect_num
@@ -132,7 +136,7 @@ namespace np_deref_type
 namespace np_deref_mask
 {   /// region de-reference mask (additional computation)
     struct deref_mask_num
-            : helper::integer::signed_integer {
+            : number {
     };
 
     struct deref_str_mask_sep
