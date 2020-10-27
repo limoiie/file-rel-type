@@ -11,6 +11,10 @@
 
 using namespace tao::pegtl;
 
+struct __
+        : star< space > {
+};
+
 struct ___
         : plus< space > {
 };

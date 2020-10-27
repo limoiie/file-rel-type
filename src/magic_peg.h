@@ -211,14 +211,14 @@ namespace np_description
 struct magic_line
         : contrib::exact<
                 continue_level,
-                opt< ___ >,
+                __,
                 np_offset::offset,
                 ___,
                 np_deref_type::deref_type,
                 opt< np_deref_mask::deref_mask >,
                 ___,
                 np_relation::relation,
-                opt< ___ >,
+                __,
                 opt< np_description::description >,
                 if_then_else<
                         np_type_code::type_code_start,
