@@ -16,6 +16,8 @@
 
 using namespace tao::pegtl;
 
+using namespace tao::pegtl::contrib;
+
 //namespace unescape_act {
 //    template< typename Rule >
 //    struct [[maybe_unused]] my_action
@@ -56,10 +58,6 @@ using namespace tao::pegtl;
 
 namespace type_whole
 {
-    struct whole_type :
-            must<np_deref_type::deref_type, tao::pegtl::eof> {
-    };
-
     template<typename Rule>
     struct [[maybe_unused]] my_action
             : nothing<Rule> {
@@ -82,7 +80,7 @@ namespace type_whole
     bool is_signed(std::string const &str) {
         auto ret = false;
         tao::pegtl::memory_input in(str, __FUNCTION__);
-        tao::pegtl::parse<type_whole::whole_type, my_action>(in, ret);
+        tao::pegtl::parse<exact<np_deref_type::deref_type>, my_action>(in, ret);
         return ret;
     }
 
@@ -117,10 +115,6 @@ namespace type_whole
 
 namespace test_type_mask
 {
-    struct full_type_mask
-            : must<np_deref_mask::deref_mask, tao::pegtl::eof> {
-    };
-
     TEST(TestMagicPeg, test_type_mask) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_type_mask ..." << std::endl;
         auto cases = std::list<std::pair<std::string, bool>>{
@@ -130,7 +124,7 @@ namespace test_type_mask
         };
 
         for (auto const &pair : cases) {
-            auto const out = match_with<test_type_mask::full_type_mask>(pair.first);
+            auto const out = match_with<exact<np_deref_mask::deref_mask>>(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -139,10 +133,6 @@ namespace test_type_mask
 
 namespace test_offset
 {
-    struct full_offset
-            : must<np_offset::offset, tao::pegtl::eof> {
-    };
-
     TEST(TestMagicPeg, test_magic_offset) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_magic_offset ..." << std::endl;
         auto cases = std::list<std::pair<std::string, bool>>{
@@ -166,7 +156,7 @@ namespace test_offset
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto const out = match_with<test_offset::full_offset>(pair.first);
+            auto const out = match_with<exact<np_offset::offset>>(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -175,10 +165,6 @@ namespace test_offset
 
 namespace test_relation
 {
-    struct full_relation
-            : seq<np_relation::relation, tao::pegtl::eof> {
-    };
-
     TEST(TestMagicPeg, test_magic_relation) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_magic_relation ..." << std::endl;
         auto cases = std::list<std::pair<std::string, bool>>{
@@ -196,7 +182,7 @@ namespace test_relation
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto const out = match_with<test_relation::full_relation>(pair.first);
+            auto const out = match_with<exact<np_relation::relation>>(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }

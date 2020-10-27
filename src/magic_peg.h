@@ -16,6 +16,7 @@
 
 #include "pegtl-helper/ascii.hpp"
 #include "pegtl-helper/integer.hpp"
+#include "pegtl-helper/exact.hpp"
 
 using namespace tao::pegtl;
 
@@ -208,7 +209,7 @@ namespace np_description
 
 
 struct magic_line
-        : must<
+        : contrib::exact<
                 continue_level,
                 opt< ___ >,
                 np_offset::offset,
@@ -223,8 +224,7 @@ struct magic_line
                         np_type_code::type_code_start,
                         np_type_code::type_code,
                         success
-                >,
-                tao::pegtl::eof
+                >
         > {
 };
 
