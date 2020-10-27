@@ -38,7 +38,6 @@ namespace np_offset
 
     namespace np_indirect
     {
-
         namespace np_indirect_mask
         {
             struct offset_indirect_mask_operator
@@ -55,7 +54,6 @@ namespace np_offset
                             offset_indirect_mask_num,
                             one< ')' >
                     > {
-
             };
 
             struct offset_indirect_mask
@@ -84,6 +82,7 @@ namespace np_offset
                         offset_indirect_absolute_num
                 > {
         };
+
         struct offset_indirect
                 : seq<
                         one< '(' >,
@@ -93,6 +92,7 @@ namespace np_offset
                         one< ')' >
                 > {
         };
+
     }
 
     struct offset_
@@ -134,12 +134,15 @@ namespace np_deref_mask
     struct deref_mask_num
             : helper::integer::signed_integer {
     };
+
     struct deref_mask_flag
             : one< 'W', 'w', 'C', 'c', 'T', 't', 'B', 'b', 'H', 'h', 'L', 'l', 'J', 's', 'r' > {
     };
+
     struct deref_str_mask_sep
             : one< '/' > {
     };
+
     struct deref_mask_item
             : seq<
                     opt<deref_str_mask_sep>,
@@ -149,12 +152,14 @@ namespace np_deref_mask
                     >
             > {
     };
+
     struct deref_mask
             : seq<
                     np_operator::mask_operator,
                     plus< deref_mask_item >
             > {
     };
+
 }
 
 namespace np_relation
@@ -166,21 +171,26 @@ namespace np_relation
                     escaped_oct_char
             > {
     };
+
     struct relation_plain
             : internal::rematch< print, not_at< word_edge > > {
     };
+
     struct relation_character
             : if_then_else< one< '\\' >, relation_escaped, relation_plain > {
     };
+
     struct relation_value
             : internal::plus< relation_character > {
     };
+
     struct relation
             : seq<
                     opt< np_operator::compare_operator >,
                     relation_value
             > {
     };
+
 }
 
 namespace np_type_code
