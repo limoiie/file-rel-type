@@ -6,7 +6,10 @@ add_executable(file_rel_type
     ParseMagicFile.h
     MagicEntry.cpp
     MagicEntry.h
-    magic_peg.h)
+    magic_peg.h
+    magic_peg_predefine.h
+    pegtl-helper/integer.hpp
+    )
 
 target_link_libraries(file_rel_type
     cpp-common-static
