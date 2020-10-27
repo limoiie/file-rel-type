@@ -10,9 +10,9 @@
 namespace TAO_PEGTL_NAMESPACE::contrib
 {
 
-    template<class Rule>
+    template<class... Rule>
     struct exact
-            : must< Rule, tao::pegtl::eof > {
+            : must< Rule..., tao::pegtl::eof > {
     };
 
 }
