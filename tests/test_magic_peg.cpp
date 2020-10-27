@@ -147,10 +147,16 @@ namespace test_offset
         std::cout << "Testing test_magic_offset ..." << std::endl;
         auto cases = std::list<std::pair<std::string, bool>>{
                 {"&10",           true},
+                {"&0x10",           true},
                 {"&(10)",         true},
+                {"&(0x10)",         true},
                 {"&(10.l-10)",    true},
+                {"&(0x10.l-10)",    true},
+                {"&(10.l-0x10)",    true},
                 {"&(&10.l-10)",   true},
                 {"&(&10.l-(10))", true},
+                {"&(&0x10.l-(10))", true},
+                {"&(&10.l-(0x10))", true},
                 {"&&10",          false},
                 {"(9.b+19)",      true},
                 {"(9b+19)",       false},
@@ -236,8 +242,8 @@ namespace test_magic_line
     TEST(TestMagicPeg, test_magic_line) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_magic_line ..." << std::endl;
         auto cases = std::list<std::pair<std::string, bool>>{
-//                {">0x24\t\tstring\t\t>\\0\tmusician: \"%s\"", true},
-//                {">>>>0x4D\tbeshort\t\t0x000\t(2GDM v", true},
+                {">0x24\t\tstring\t\t>\\0\tmusician: \"%s\"", true},
+                {">>>>0x4D\tbeshort\t\t0x000\t(2GDM v", true},
                 {">>>(16.s)\tulelong\t\t>0\t\\b, at 0x%x", true},
                 {">>>>(16.s+4)\tulelong\t\t>0\t%u bytes", true},
                 {">>>>>(&-8.l)\tstring\t\tRIFF", true},

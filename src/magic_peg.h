@@ -32,7 +32,7 @@ struct continue_level
 namespace np_offset
 {
     struct offset_base_num
-            : signed_rule_new {
+            : helper::integer::signed_integer {
     };
 
     namespace np_indirect
@@ -45,7 +45,7 @@ namespace np_offset
             };
 
             struct offset_indirect_mask_num
-                    : signed_rule_new {
+                    : helper::integer::signed_integer {
             };
 
             struct offset_indirect_mask_indirect_num
@@ -131,7 +131,7 @@ namespace np_deref_type
 namespace np_deref_mask
 {   /// region de-reference mask (additional computation)
     struct deref_mask_num
-            : unsigned_rule_old {
+            : helper::integer::signed_integer {
     };
     struct deref_mask_flag
             : one< 'W', 'w', 'C', 'c', 'T', 't', 'B', 'b', 'H', 'h', 'L', 'l', 'J', 's', 'r' > {
