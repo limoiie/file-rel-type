@@ -12,8 +12,6 @@
 #include <magic_peg.h>
 #include <magic_peg_predefine.h>
 
-#include <pegtl-helper/exact.hpp>
-
 #include "../test_pegtl_helper.hpp"
 
 using namespace tao::pegtl;
