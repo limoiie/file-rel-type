@@ -82,9 +82,9 @@ namespace np_type
         };
         struct deref_special_type
                 : sor<
-                        string< u, s, e >,
-                        string< n, a, m, e >,
-                        string< d, e, r >
+                        TAO_PEGTL_STRING( "use" ),
+                        TAO_PEGTL_STRING( "name" ),
+                        TAO_PEGTL_STRING( "der" )
                 > {
         };
     }
