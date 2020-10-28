@@ -10,6 +10,7 @@ add_executable(file_rel_type
     magic_peg_predefine.h
     pegtl-helper/integer.hpp
     pegtl-helper/exact.hpp
+    magic_peg_builder.hpp
     )
 
 target_link_libraries(file_rel_type

@@ -6,6 +6,7 @@ add_executable(test_all
     test_magic_peg.cpp
     test_pegtl_helper.hpp
     pegtl-helper/test_integer.cpp
+    test_magic_peg_builder.cpp
     )
 
 target_link_libraries(
