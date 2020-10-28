@@ -145,7 +145,7 @@ namespace np_deref_mask
 
     struct deref_mask_item
             : seq<
-                    opt<deref_str_mask_sep>,
+                    opt< deref_str_mask_sep >,
                     sor<
                             deref_mask_num,
                             np_flag::deref_mask_flag

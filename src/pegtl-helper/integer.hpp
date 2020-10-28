@@ -16,7 +16,8 @@
 
 using namespace tao::pegtl;
 
-namespace tao::pegtl::helper::integer {
+namespace tao::pegtl::helper::integer
+{
 
     struct sign
             : one< '+', '-' > {
@@ -28,7 +29,7 @@ namespace tao::pegtl::helper::integer {
 
     struct signed_decimal
             : seq<
-                    opt<sign>,
+                    opt< sign >,
                     unsigned_decimal
             > {
     };
@@ -46,7 +47,7 @@ namespace tao::pegtl::helper::integer {
 
     struct signed_hex_0x
             : seq<
-                    opt<sign>,
+                    opt< sign >,
                     unsigned_hex_0x
             > {
     };
@@ -60,7 +61,7 @@ namespace tao::pegtl::helper::integer {
 
     struct signed_integer
             : seq<
-                    opt<sign>,
+                    opt< sign >,
                     unsigned_integer
             > {
     };
