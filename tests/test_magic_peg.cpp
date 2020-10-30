@@ -136,21 +136,21 @@ namespace test_offset
     TEST(TestMagicPeg, test_magic_offset) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_magic_offset ..." << std::endl;
         auto cases = std::list<std::pair<std::string, bool>>{
-                {"&10",           true},
+                {"&10",             true},
                 {"&0x10",           true},
-                {"&(10)",         true},
+                {"&(10)",           true},
                 {"&(0x10)",         true},
-                {"&(10.l-10)",    true},
+                {"&(10.l-10)",      true},
                 {"&(0x10.l-10)",    true},
                 {"&(10.l-0x10)",    true},
-                {"&(&10.l-10)",   true},
-                {"&(&10.l-(10))", true},
+                {"&(&10.l-10)",     true},
+                {"&(&10.l-(10))",   true},
                 {"&(&0x10.l-(10))", true},
                 {"&(&10.l-(0x10))", true},
-                {"&&10",          false},
-                {"(9.b+19)",      true},
-                {"(9b+19)",       false},
-                {"(&-8.l)",       true}
+                {"&&10",            false},
+                {"(9.b+19)",        true},
+                {"(9b+19)",         false},
+                {"(&-8.l)",         true}
         };
 
         for (auto const &pair : cases) {

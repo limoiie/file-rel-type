@@ -43,7 +43,7 @@ namespace np_type
     namespace np_indirect_type
     {
         struct offset_indirect_type_sign_symbol_
-                : one< '.' , ',' > {
+                : one< '.', ',' > {
         };
         struct offset_indirect_type_
                 : one< l, L, m, h, s, H, S, c, b, C, B, e, f, g, E, F, G, i, I, q, Q > {
@@ -82,9 +82,9 @@ namespace np_type
         };
         struct deref_special_type
                 : sor<
-                        TAO_PEGTL_STRING( "use" ),
-                        TAO_PEGTL_STRING( "name" ),
-                        TAO_PEGTL_STRING( "der" )
+                        TAO_PEGTL_STRING("use"),
+                        TAO_PEGTL_STRING("name"),
+                        TAO_PEGTL_STRING("der")
                 > {
         };
     }
