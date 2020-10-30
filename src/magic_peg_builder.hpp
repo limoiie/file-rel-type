@@ -20,16 +20,16 @@ namespace peg::magic::action
     };
 
     template< class Rule >
-    struct build_action
+    struct action_magic
             : tao::pegtl::nothing< Rule > {
     };
 
     template<>
-    struct build_action< signed_integer > {
+    struct action_magic< signed_integer > {
     };
 
     template<>
-    struct build_action< number > {
+    struct action_magic< number > {
         template< class ActionInput >
         static void apply(ActionInput const& in, offset_state& st) {
             std::cout << "number is: " << in.string() << std::endl;

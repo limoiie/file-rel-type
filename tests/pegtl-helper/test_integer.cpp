@@ -9,7 +9,6 @@
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/unescape.hpp>
 
-#include <magic_peg.h>
 #include <magic_peg_predefine.h>
 
 #include "../test_pegtl_helper.hpp"
@@ -200,7 +199,7 @@ TEST(TestInteger, test_unsigned_hex) { // NOLINT(cert-err58-cpp)
     for (auto const& pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        auto out = match_with<exact<unsigned_hex_0x>>(pair.first);
+        auto out = match_with<exact<unsigned_0x_hex>>(pair.first);
         ASSERT_EQ(out, pair.second);
     }
 }
@@ -211,7 +210,7 @@ TEST(TestInteger, test_signed_hex) { // NOLINT(cert-err58-cpp)
     for (auto const& pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        auto out = match_with<exact<signed_hex_0x>>(pair.first);
+        auto out = match_with<exact<signed_0x_hex>>(pair.first);
         ASSERT_EQ(out, pair.second);
     }
 }
