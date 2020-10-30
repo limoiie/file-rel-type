@@ -152,14 +152,14 @@ namespace tao::pegtl::helper::integer
         };
 
         template< class Int >
-        struct trait_action_to_decimal {
+        struct trait_to_integer {
             template< class Rule >
-            struct action_to_decimal
+            struct to_integer
                     : maybe_nothing {
             };
 
             template<>
-            struct action_to_decimal< sign > {
+            struct to_integer< sign > {
                 template< class ActionInput >
                 static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
                     st.is_negative = in.peek_char() == '-';
@@ -168,7 +168,7 @@ namespace tao::pegtl::helper::integer
             };
 
             template<>
-            struct action_to_decimal< digits > {
+            struct to_integer< digits > {
                 template< class ActionInput >
                 static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
                     if (!internal::accumulate_digits< Int, 10 >(st.val, in.string_view())) {
@@ -179,7 +179,7 @@ namespace tao::pegtl::helper::integer
             };
 
             template<>
-            struct action_to_decimal< xdigits > {
+            struct to_integer< xdigits > {
                 template< class ActionInput >
                 static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
                     if (!internal::accumulate_digits< Int, 16 >(st.val, in.string_view())) {
@@ -190,7 +190,7 @@ namespace tao::pegtl::helper::integer
             };
 
             template<>
-            struct action_to_decimal< unsigned_decimal > {
+            struct to_integer< unsigned_decimal > {
                 template< class ActionInput >
                 static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
                     // nothing to do cause the action on `digits` has already converted the value
@@ -200,7 +200,7 @@ namespace tao::pegtl::helper::integer
             };
 
             template<>
-            struct action_to_decimal< signed_decimal > {
+            struct to_integer< signed_decimal > {
                 template< class ActionInput >
                 static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
                     static_assert(std::is_signed_v< Int >);
@@ -212,22 +212,22 @@ namespace tao::pegtl::helper::integer
             };
 
             template<>
-            struct action_to_decimal< unsigned_0x_hex >
-                    : action_to_decimal< unsigned_decimal > {
+            struct to_integer< unsigned_0x_hex >
+                    : to_integer< unsigned_decimal > {
             };
 
             template<>
-            struct action_to_decimal< signed_0x_hex >
-                    : action_to_decimal< signed_decimal > {
+            struct to_integer< signed_0x_hex >
+                    : to_integer< signed_decimal > {
             };
 
             template<>
-            struct action_to_decimal< unsigned_integer >
+            struct to_integer< unsigned_integer >
                     : maybe_nothing {
             };
 
             template<>
-            struct action_to_decimal< signed_integer >
+            struct to_integer< signed_integer >
                     : maybe_nothing {
             };
 
