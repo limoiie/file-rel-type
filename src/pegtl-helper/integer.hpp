@@ -23,38 +23,44 @@ namespace tao::pegtl::helper::integer
             : one< '+', '-' > {
     };
 
+    struct digits : plus< digit > {
+    };
+
+    struct xdigits : plus< xdigit > {
+    };
+
     struct unsigned_decimal
-            : plus< digit > {
+            : seq< digits > {  // NOTE: do NOT REMOVE the action `seq`. it because base classes are not taken into
+        // consideration by the C++ language when choosing a specialisation. see also the
+        // official doc page doc/Actions-and-States.md#Specialising for more information
     };
 
     struct signed_decimal
+            : seq< opt< sign >, digits > {
+    };
+
+    struct prefix_0x
+            : string< '0', 'x' > {
+    };
+
+    struct unsigned_0x_hex
             : seq<
-                    opt< sign >,
-                    unsigned_decimal
+                    prefix_0x,
+                    xdigits
             > {
     };
 
-    struct hex
-            : plus< xdigit > {
-    };
-
-    struct unsigned_hex_0x
-            : seq<
-                    string< '0', 'x' >,
-                    hex
-            > {
-    };
-
-    struct signed_hex_0x
+    struct signed_0x_hex
             : seq<
                     opt< sign >,
-                    unsigned_hex_0x
+                    prefix_0x,
+                    xdigits
             > {
     };
 
     struct unsigned_integer
             : sor<
-                    unsigned_hex_0x,
+                    unsigned_0x_hex,
                     unsigned_decimal
             > {
     };
@@ -70,55 +76,148 @@ namespace tao::pegtl::helper::integer
     {
         namespace internal
         {
-            [[nodiscard]] constexpr bool is_digit(const char c) noexcept {
-                return tao::pegtl::internal::is_digit(c);
+            template< int radix >
+            struct radix_trait {
+            };
+
+            template<>
+            struct radix_trait< 10 > {
+                constexpr static int radix = 10;
+
+                constexpr static int convert(char const digit) {
+                    return digit - '0';
+                }
+
+                [[nodiscard]] constexpr static bool is_digit(char const c) {
+                    return '0' <= c && c <= '9';
+                }
+
+            };
+
+            template<>
+            struct radix_trait< 16 > {
+                constexpr static int radix = 16;
+
+                constexpr static int convert(char const digit) {
+                    if (digit >= '0' && digit <= '9') return digit - '0';
+                    return tolower(digit) - 'a' + 10;
+                }
+
+                [[nodiscard]] constexpr static bool is_digit(char const c) noexcept {
+                    return ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F') || radix_trait< 10 >::is_digit(c);
+                }
+
+            };
+
+            template< class Integer, int Radix, Integer Maximum = (std::numeric_limits< Integer >::max)() >
+            [[nodiscard]] constexpr bool accumulate_digit(Integer &result, char const digit) noexcept {
+                // Assumes that digit is a digit as per is_digit(); returns false on overflow.
+
+                static_assert(std::is_integral_v< Integer >);
+
+                using radix_t = radix_trait< Radix >;
+
+                constexpr Integer cut_off = Maximum / radix_t::radix;
+                constexpr Integer cut_lim = Maximum % radix_t::radix;
+
+                const Integer c = radix_t::convert(digit);
+
+                if ((result > cut_off) || ((result == cut_off) && (c > cut_lim))) {
+                    return false;
+                }
+                result *= radix_t::radix;
+                result += c;
+                return true;
             }
 
-            template< typename Integer, Integer Maximum = (std::numeric_limits< Integer >::max)() >
-            [[nodiscard]] constexpr bool accumulate_digit(Integer &result, const char digit) noexcept {
-                return tao::pegtl::internal::accumulate_digit(result, digit);
-            }
-
-            template< typename Integer, Integer Maximum = (std::numeric_limits< Integer >::max)() >
+            template< class Integer, int Radix, Integer Maximum = (std::numeric_limits< Integer >::max)() >
             [[nodiscard]] constexpr bool accumulate_digits(Integer &result, const std::string_view input) noexcept {
-                return tao::pegtl::internal::accumulate_digits(result, input);
+                for (char const c : input) {
+                    if (!accumulate_digit< Integer, Radix, Maximum >(result, c)) {
+                        return false;
+                    }
+                }
+                return true;
             }
 
-            template< typename Integer, Integer Maximum = (std::numeric_limits< Integer >::max)() >
-            [[nodiscard]] constexpr bool convert_positive(Integer &result, const std::string_view input) noexcept {
-                return tao::pegtl::internal::convert_positive(result, input);
-            }
-
-            template< typename Signed >
-            [[nodiscard]] constexpr bool convert_negative(Signed &result, const std::string_view input) noexcept {
-                return tao::pegtl::internal::convert_negative(result, input);
-            }
-
-            template< typename Unsigned, Unsigned Maximum = (std::numeric_limits< Unsigned >::max)() >
-            [[nodiscard]] constexpr bool convert_unsigned(Unsigned &result, const std::string_view input) noexcept {
-                return tao::pegtl::internal::convert_unsigned(result, input);
-            }
-
-            template< typename Signed >
-            [[nodiscard]] constexpr bool convert_signed(Signed &result, const std::string_view input) noexcept {
-                return tao::pegtl::internal::convert_signed(result, input);
-            }
         }
 
         template< class Int >
-        struct to_decimal {
-            template< class ActionInput >
-            static void apply(ActionInput const &in, Int &val) {
-
-            }
-        };
-
-        struct to_hex {
+        struct state_to_decimal {
+            Int val{ 0 };
+            bool is_negative{ false };
 
         };
 
-        struct to_integer {
+        template< class Int >
+        struct trait_action_to_decimal {
+            template< class Rule >
+            struct action_to_decimal
+                    : maybe_nothing {
+            };
 
+            template<>
+            struct action_to_decimal< sign > {
+                template< class ActionInput >
+                static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
+                    st.is_negative = in.peek_char() == '-';
+                }
+
+            };
+
+            template<>
+            struct action_to_decimal< digits > {
+                template< class ActionInput >
+                static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
+                    if (!internal::accumulate_digits< Int, 10 >(st.val, in.string_view())) {
+                        throw parse_error("dec digits has overflow", in);
+                    }
+                }
+
+            };
+
+            template<>
+            struct action_to_decimal< xdigits > {
+                template< class ActionInput >
+                static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
+                    if (!internal::accumulate_digits< Int, 16 >(st.val, in.string_view())) {
+                        throw parse_error("hex digits has overflow", in);
+                    }
+                }
+
+            };
+
+            template<>
+            struct action_to_decimal< unsigned_decimal > {
+                template< class ActionInput >
+                static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
+                    // nothing to do cause the action on `digits` has already converted the value
+                    static_assert(std::is_unsigned_v< Int >);
+                }
+
+            };
+
+            template<>
+            struct action_to_decimal< signed_decimal > {
+                template< class ActionInput >
+                static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
+                    static_assert(std::is_signed_v< Int >);
+                    if (st.is_negative) {
+                        st.val = ~st.val + 1;
+                    }
+                }
+
+            };
+
+            template<>
+            struct action_to_decimal< unsigned_0x_hex >
+                    : action_to_decimal< unsigned_decimal > {
+            };
+
+            template<>
+            struct action_to_decimal< signed_0x_hex >
+                    : action_to_decimal< signed_decimal > {
+            };
         };
 
     }
