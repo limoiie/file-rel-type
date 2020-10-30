@@ -14,9 +14,10 @@
 namespace peg::magic::action
 {
     using namespace tao::pegtl::helper::integer;
+    using namespace tao::pegtl::helper::integer::action;
 
     struct offset_state {
-        int num;
+        long long int base_offset;
     };
 
     template< class Rule >
@@ -25,15 +26,15 @@ namespace peg::magic::action
     };
 
     template<>
-    struct action_magic< signed_integer > {
-    };
+    struct action_magic< np_offset::np_indirect::offset_indirect_absolute_num >
+            : to_integer_switcher< long long int > {
+        using int_t = long long int;
 
-    template<>
-    struct action_magic< number > {
-        template< class ActionInput >
-        static void apply(ActionInput const& in, offset_state& st) {
-            std::cout << "number is: " << in.string() << std::endl;
+        template< typename ParseInput >
+        static void success(const ParseInput & /*unused*/, state_to_decimal< int_t > &s, offset_state &state) {
+            state.base_offset = s.val;
         }
+
     };
 
 }

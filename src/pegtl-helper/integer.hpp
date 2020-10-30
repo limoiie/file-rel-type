@@ -59,7 +59,6 @@ namespace tao::pegtl::helper::integer
     };
 
 
-
     struct unsigned_integer
             : sor<
                     unsigned_0x_hex,
@@ -234,6 +233,12 @@ namespace tao::pegtl::helper::integer
         };
 
     }
+
+    template< class Int >
+    using to_integer_switcher = change_action_and_state<
+            action::trait_to_integer< Int >::template to_integer,
+            action::state_to_decimal< Int >
+    >;
 
 }
 
