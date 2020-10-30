@@ -58,6 +58,8 @@ namespace tao::pegtl::helper::integer
             > {
     };
 
+
+
     struct unsigned_integer
             : sor<
                     unsigned_0x_hex,
@@ -66,9 +68,9 @@ namespace tao::pegtl::helper::integer
     };
 
     struct signed_integer
-            : seq<
-                    opt< sign >,
-                    unsigned_integer
+            : sor<
+                    signed_0x_hex,
+                    signed_decimal
             > {
     };
 
@@ -218,6 +220,17 @@ namespace tao::pegtl::helper::integer
             struct action_to_decimal< signed_0x_hex >
                     : action_to_decimal< signed_decimal > {
             };
+
+            template<>
+            struct action_to_decimal< unsigned_integer >
+                    : maybe_nothing {
+            };
+
+            template<>
+            struct action_to_decimal< signed_integer >
+                    : maybe_nothing {
+            };
+
         };
 
     }
