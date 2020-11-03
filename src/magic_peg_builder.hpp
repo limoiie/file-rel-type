@@ -31,7 +31,7 @@ namespace peg::magic::action
         using int_t = long long int;
 
         template< typename ParseInput >
-        static void success(const ParseInput & /*unused*/, state_to_decimal< int_t > &s, offset_state &state) {
+        static void success(const ParseInput & /*unused*/, state_to_integer< int_t > &s, offset_state &state) {
             state.base_offset = s.val;
         }
 

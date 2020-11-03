@@ -83,7 +83,7 @@ namespace tao::pegtl::helper::integer
 
             template<>
             struct radix_trait< 10 > {
-                constexpr static int radix = 10;
+                [[maybe_unused]] constexpr static int radix = 10;
 
                 constexpr static int convert(char const digit) {
                     return digit - '0';
@@ -97,7 +97,7 @@ namespace tao::pegtl::helper::integer
 
             template<>
             struct radix_trait< 16 > {
-                constexpr static int radix = 16;
+                [[maybe_unused]] constexpr static int radix = 16;
 
                 constexpr static int convert(char const digit) {
                     if (digit >= '0' && digit <= '9') return digit - '0';
@@ -118,8 +118,8 @@ namespace tao::pegtl::helper::integer
 
                 using radix_t = radix_trait< Radix >;
 
-                constexpr Integer cut_off = Maximum / radix_t::radix;
-                constexpr Integer cut_lim = Maximum % radix_t::radix;
+                constexpr Integer cut_off = Maximum / Radix;
+                constexpr Integer cut_lim = Maximum % Radix;
 
                 const Integer c = radix_t::convert(digit);
 
@@ -144,7 +144,7 @@ namespace tao::pegtl::helper::integer
         }
 
         template< class Int >
-        struct state_to_decimal {
+        struct state_to_integer {
             Int val{ 0 };
             bool is_negative{ false };
 
@@ -160,7 +160,7 @@ namespace tao::pegtl::helper::integer
             template<>
             struct to_integer< sign > {
                 template< class ActionInput >
-                static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
+                static void apply(ActionInput const &in, state_to_integer< Int > &st) {
                     st.is_negative = in.peek_char() == '-';
                 }
 
@@ -169,7 +169,7 @@ namespace tao::pegtl::helper::integer
             template<>
             struct to_integer< digits > {
                 template< class ActionInput >
-                static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
+                static void apply(ActionInput const &in, state_to_integer< Int > &st) {
                     if (!internal::accumulate_digits< Int, 10 >(st.val, in.string_view())) {
                         throw parse_error("dec digits has overflow", in);
                     }
@@ -180,7 +180,7 @@ namespace tao::pegtl::helper::integer
             template<>
             struct to_integer< xdigits > {
                 template< class ActionInput >
-                static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
+                static void apply(ActionInput const &in, state_to_integer< Int > &st) {
                     if (!internal::accumulate_digits< Int, 16 >(st.val, in.string_view())) {
                         throw parse_error("hex digits has overflow", in);
                     }
@@ -191,7 +191,7 @@ namespace tao::pegtl::helper::integer
             template<>
             struct to_integer< unsigned_decimal > {
                 template< class ActionInput >
-                static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
+                static void apply(ActionInput const &in, state_to_integer< Int > &st) {
                     // nothing to do cause the action on `digits` has already converted the value
                     static_assert(std::is_unsigned_v< Int >);
                 }
@@ -201,7 +201,7 @@ namespace tao::pegtl::helper::integer
             template<>
             struct to_integer< signed_decimal > {
                 template< class ActionInput >
-                static void apply(ActionInput const &in, state_to_decimal< Int > &st) {
+                static void apply(ActionInput const &in, state_to_integer< Int > &st) {
                     static_assert(std::is_signed_v< Int >);
                     if (st.is_negative) {
                         st.val = ~st.val + 1;
@@ -235,9 +235,9 @@ namespace tao::pegtl::helper::integer
     }
 
     template< class Int >
-    using to_integer_switcher = change_action_and_state<
-            action::trait_to_integer< Int >::template to_integer,
-            action::state_to_decimal< Int >
+    using to_integer_switcher = change_action_and_states<          // here I choose ..._states instead of ..._state,
+            action::trait_to_integer< Int >::template to_integer,  // it because the later requires the constructor of
+            action::state_to_integer< Int >                        // lib state
     >;
 
 }

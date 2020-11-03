@@ -24,7 +24,7 @@ void test_pattern(std::list<std::pair<std::string, Int>> const& cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
         memory_input in(pair.first, __FUNCTION__);
-        state_to_decimal< Int > st;
+        state_to_integer< Int > st;
 
         parse< Rule, trait_to_integer< Int >::template to_integer >(in, st);
         ASSERT_EQ(st.val, pair.second);
