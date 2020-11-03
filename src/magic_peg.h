@@ -36,10 +36,6 @@ struct number
 
 namespace np_offset
 {
-    struct offset_base_num
-            : number {
-    };
-
     namespace np_indirect
     {
         namespace np_indirect_mask
@@ -71,12 +67,10 @@ namespace np_offset
             };
         }
 
-        struct offset_indirect_absolute_num
-                : np_offset::offset_base_num {
+        struct offset_indirect_absolute_num : number {
         };
 
-        struct offset_indirect_relative_num
-                : np_offset::offset_base_num {
+        struct offset_indirect_relative_num : number {
         };
 
         struct offset_indirect_num
@@ -99,9 +93,12 @@ namespace np_offset
 
     }
 
+    struct offset_absolute : number {
+    };
+
     struct offset_
             : sor<
-                    offset_base_num,
+                    offset_absolute,
                     np_indirect::offset_indirect
             > {
     };
