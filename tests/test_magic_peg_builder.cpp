@@ -35,7 +35,12 @@ TEST(TestMagicPegBuilder, test_build_number) { // NOLINT(cert-err58-cpp)
 
         auto st = peg::magic::action::offset_state{ INT_MIN };
         tao::pegtl::memory_input in(pair.first, __FUNCTION__);
-        parse< number, peg::magic::action::action_magic >(in, st);
-//        ASSERT_EQ(st.num, pair.second);
+
+        parse<
+                np_offset::np_indirect::offset_indirect_absolute_num,
+                peg::magic::action::action_magic
+        >(in, st);
+
+        ASSERT_EQ(st.base_offset, pair.second);
     }
 }
