@@ -140,7 +140,7 @@ namespace peg::magic::action
         }
 
         friend
-        bool operator!=(exp const& lhs, exp const& rhs) {
+        bool operator!=(exp const &lhs, exp const &rhs) {
             return !(lhs == rhs);
         }
 
@@ -225,6 +225,7 @@ namespace peg::magic::action
 
     struct unop_relative;
     struct unop_deference;
+    struct unop_inverse;
 
     struct unop : public exp {
         struct builder {
@@ -235,6 +236,8 @@ namespace peg::magic::action
                         return std::make_shared< unop_relative >(inner);
                     case '*':
                         return std::make_shared< unop_deference >(inner, ps...);
+                    case '~':
+                        return std::make_shared< unop_inverse >(inner);
                     default:
                         throw std::runtime_error(std::string("Unknown unop: ").append(std::string() + op));
                 }
@@ -310,6 +313,30 @@ namespace peg::magic::action
 
     };
 
+    struct unop_inverse : public unop {
+        explicit unop_inverse(std::shared_ptr< exp > const &inner)
+                : unop(inner) {
+        }
+
+        bool operator==(unop_inverse const &other) const {
+            return unop::equal_to(other);
+        }
+
+    protected:
+        [[nodiscard]] bool equal_to(const exp &other) const override {
+            if (auto const *n = dynamic_cast<unop_inverse const *>(&other)) {
+                return *this == *n;
+            }
+            return false;
+        }
+
+    public:
+        std::shared_ptr< val > compute(std::shared_ptr< ctx_exp_t > const &ctx) override {
+            return nullptr; // todo: impl
+        }
+
+    };
+
     struct offset_state {
         std::stack< std::shared_ptr< exp>> stk;
         std::stack< char > stk_op;
@@ -369,12 +396,21 @@ namespace peg::magic::action
 
     };
 
-    template<>
-    struct action_magic< np_offset::np_indirect::np_indirect_mask::offset_indirect_mask_operator > {
+    struct action_push_operator {
         template< typename ActionInput >
         static void apply(const ActionInput &in, offset_state &st) {
-            st.stk_op.push(in.string_view()[0]);
+            st.stk_op.push(in.peek_char());
         }
+    };
+
+    template<>
+    struct action_magic< np_operator::mask_base_operator >
+            : action_push_operator {
+    };
+
+    template<>
+    struct action_magic< np_operator::mask_aux_operator >
+            : action_push_operator {
     };
 
     template<>
@@ -404,7 +440,14 @@ namespace peg::magic::action
             st.stk.pop();
             auto opt = st.stk_op.top();
             st.stk_op.pop();
+
             st.stk.push(binop::builder::make_ptr(opt, left, right));
+            if (!st.stk_op.empty() && st.stk_op.top() == '~') {
+                st.stk_op.pop();
+                auto inner = st.stk.top();
+                st.stk.pop();
+                st.stk.push(unop::builder::make_ptr('~', inner));
+            }
         }
     };
 
