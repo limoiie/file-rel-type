@@ -322,16 +322,141 @@ namespace peg::magic::action
     };
 
     template<>
-    struct action_magic< np_offset::np_indirect::offset_indirect_absolute_num >
+    struct action_magic< number_ >
             : to_integer_switcher< long long int > {
         using int_t = long long int;
 
         template< typename ParseInput >
-        static void success(const ParseInput & /*unused*/, state_to_integer< int_t > &s, offset_state &state) {
-            state.base_offset = s.val;
+        static void success(const ParseInput & /*unused*/, state_to_integer< int_t > &s, offset_state &st) {
+            st.stk.push(num::builder::make_ptr(
+                    {FILE_LONG, false},
+                    var::builder::make((uint64_t) s.val)
+            ));
         }
 
     };
+
+    template<>
+    struct action_magic< np_offset::np_indirect::offset_indirect_absolute_num >
+            : maybe_nothing {  // follow action<number_>
+    };
+
+    template<>
+    struct action_magic< np_offset::np_indirect::offset_indirect_relative_num > {
+        using int_t = long long int;
+
+        template< typename ActionInput >
+        static void apply(const ActionInput & /*unused*/, offset_state &st) {
+            auto inner = st.stk.top();
+            st.stk.pop();
+            st.stk.push(unop::builder::make_ptr('&', inner));
+        }
+
+    };
+
+    template<>
+    struct action_magic< np_offset::np_indirect::offset_indirect_num >
+            : maybe_nothing {  // delegate to action<offset_indirect_[absolute/relative]_num>
+    };
+
+    template<>
+    struct action_magic< np_offset::np_indirect::offset_indirect_type >
+            : np_type::np_indirect_type::to_typ_switcher {
+        template< typename ParseInput >
+        static void success(const ParseInput & /*unused*/, np_type::action::state_to_deref_typ &s, offset_state &st) {
+            st.typ = std::make_shared< val_typ_t >(s.typ);
+        }
+
+    };
+
+    template<>
+    struct action_magic< np_offset::np_indirect::np_indirect_mask::offset_indirect_mask_operator > {
+        template< typename ActionInput >
+        static void apply(const ActionInput &in, offset_state &st) {
+            st.stk_op.push(in.string_view()[0]);
+        }
+    };
+
+    template<>
+    struct action_magic< np_offset::np_indirect::np_indirect_mask::offset_indirect_mask_absolute_num >
+            : maybe_nothing { // follow action<number_>
+    };
+
+    template<>
+    struct action_magic< np_offset::np_indirect::np_indirect_mask::offset_indirect_mask_indirect_num > {
+        template< typename ActionInput >
+        static void apply(const ActionInput & /*unused*/, offset_state &st) {
+            auto inner = st.stk.top();
+            st.stk.pop();
+            inner = st.typ ? unop::builder::make_ptr('*', inner, *st.typ)
+                           : unop::builder::make_ptr('*', inner);
+            st.stk.push(inner);
+        }
+    };
+
+    template<>
+    struct action_magic< np_offset::np_indirect::np_indirect_mask::offset_indirect_mask > {
+        template< typename ActionInput >
+        static void apply(const ActionInput & /*unused*/, offset_state &st) {
+            auto right = st.stk.top();
+            st.stk.pop();
+            auto left = st.stk.top();
+            st.stk.pop();
+            auto opt = st.stk_op.top();
+            st.stk_op.pop();
+            st.stk.push(binop::builder::make_ptr(opt, left, right));
+        }
+    };
+
+/*
+    template<>
+    struct action_magic<np_offset::offset_absolute>
+            : maybe_nothing { // follow action<number_>
+    };
+*/
+
+    template<>
+    struct action_magic< np_offset::np_indirect::offset_indirect > {
+        template< typename ActionInput >
+        static void apply(const ActionInput & /*unused*/, offset_state &st) {
+            auto inner = st.stk.top();
+            st.stk.pop();
+            inner = st.typ ? unop::builder::make_ptr('*', inner, *st.typ)
+                           : unop::builder::make_ptr('*', inner);
+            st.stk.push(inner);
+        }
+    };
+
+/*
+    template<>
+    struct action_magic< np_offset::offset_ >
+            : maybe_nothing { // follow action<offset_[absolute/indirect]>
+    };
+*/
+
+/*
+    template<>
+    struct action_magic< np_offset::offset_absolute_ >
+            : maybe_nothing { // follow action<offset_>
+    };
+*/
+
+    template<>
+    struct action_magic< np_offset::offset_relative_ > {
+        template< typename ActionInput >
+        static void apply(const ActionInput & /*unused*/, offset_state &st) {
+            auto inner = st.stk.top();
+            st.stk.pop();
+            st.stk.push(unop::builder::make_ptr('&', inner));
+        }
+    };
+
+/*
+    template<>
+    struct action_magic< offset >
+            :maybe_nothing { // follow action<offset_[relative/absolute]_>
+    };
+*/
 
 }
 
