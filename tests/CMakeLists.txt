@@ -6,7 +6,7 @@ add_executable(test_all
     test_magic_peg.cpp
     test_pegtl_helper.hpp
     pegtl-helper/test_integer.cpp
-    test_magic_peg_builder.cpp
+    test_magic_peg_builder/test_offset_builder.cpp
     pegtl-helper/test_integer_action.cpp
     test_magic_peg_predefine_action.cpp
     )
