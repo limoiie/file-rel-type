@@ -7,7 +7,9 @@ add_executable(test_all
     test_pegtl_helper.hpp
     pegtl-helper/test_integer.cpp
     test_magic_peg_builder.cpp
-    pegtl-helper/test_integer_action.cpp)
+    pegtl-helper/test_integer_action.cpp
+    test_magic_peg_predefine_action.cpp
+    )
 
 target_link_libraries(
     test_all PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main
