@@ -78,7 +78,7 @@ namespace peg::magic::action
 */
 
     template<>
-    struct action_magic< np_offset::np_indirect::offset_indirect_type >
+    struct action_magic< np_offset::np_indirect::abbrev_sign_typ >
             : np_type::np_indirect_type::to_typ_switcher {
         template< typename ParseInput >
         static void success(const ParseInput & /*unused*/, np_type::action::state_to_deref_typ &s, state_magic_build &st) {
@@ -193,6 +193,14 @@ namespace peg::magic::action
             :maybe_nothing { // follow action<offset_[relative/absolute]_>
     };
 */
+
+    template<>
+    struct action_magic<np_type::np_deref_type::formal_special_typ> {
+    };
+
+    template<>
+    struct action_magic<np_type::np_deref_type::formal_sign_normal_typ> {
+    };
 
 }
 

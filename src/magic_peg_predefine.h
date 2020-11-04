@@ -50,16 +50,18 @@ namespace np_type
 
     namespace np_indirect_type
     {
-        struct offset_indirect_type_sign_symbol_
+        struct abbrev_sign
                 : one< '.', ',' > {
         };
-        struct offset_indirect_type_
+
+        struct abbrev_typ
                 : one< l, L, m, h, s, H, S, c, b, C, B, e, f, g, E, F, G, i, I, q, Q > {
         };
-        struct offset_indirect_type
+
+        struct abbrev_sign_typ
                 : seq<
-                        offset_indirect_type_sign_symbol_,  // [.,]
-                        offset_indirect_type_               // [lLmhHsS...]
+                        abbrev_sign,  // [.,]
+                        abbrev_typ    // [lLmhHsS...]
                 > {
         };
 
@@ -75,7 +77,7 @@ namespace np_type
                 }
 
                 inline
-                ref_type_t offset_indirect_type(char const c) {
+                ref_type_t abbrev_sign_typ(char const c) {
                     switch (c) {
                         case 'l':
                             return FILE_LELONG;
@@ -117,9 +119,9 @@ namespace np_type
                 }
 
                 inline
-                std::shared_ptr<val_typ_t> sign_type(char const sign, char const c) {
-                    return std::make_shared<val_typ_t>(
-                            offset_indirect_type(c),
+                std::shared_ptr< val_typ_t > sign_type(char const sign, char const c) {
+                    return std::make_shared< val_typ_t >(
+                            abbrev_sign_typ(c),
                             offset_indirect_unsigned(sign)
                     );
                 }
@@ -131,7 +133,7 @@ namespace np_type
             };
 
             template<>
-            struct action_to_deref_typ< offset_indirect_type_sign_symbol_ > {
+            struct action_to_deref_typ< abbrev_sign > {
                 template< typename ActionInput >
                 static void apply(const ActionInput &in, state_to_deref_typ &st) {
                     st.typ.is_unsigned =
@@ -141,11 +143,11 @@ namespace np_type
             };
 
             template<>
-            struct action_to_deref_typ< offset_indirect_type_ > {
+            struct action_to_deref_typ< abbrev_typ > {
                 template< typename ActionInput >
                 static void apply(const ActionInput &in, state_to_deref_typ &st) {
                     st.typ.typ =
-                            internal::offset_indirect_type(in.peek_char());
+                            internal::abbrev_sign_typ(in.peek_char());
                 }
 
             };
@@ -160,29 +162,24 @@ namespace np_type
 
     namespace np_deref_type
     {
-        struct deref_type_sign_symbol
+        struct formal_sign
                 : one< 'u', 'U' > {
         };
-        struct deref_type_
+
+        struct formal_typ
                 : seq<
                         plus< alpha >,
                         opt< plus< digit > >
                 > {
         };
-        struct deref_unsigned_type
-                : deref_type_ {
-        };
-        struct deref_signed_type
-                : deref_type_ {
-        };
-        struct deref_normal_type
-                : if_then_else<
-                        deref_type_sign_symbol,
-                        deref_unsigned_type,
-                        deref_signed_type
+
+        struct formal_sign_normal_typ
+                : seq<
+                        opt< formal_sign >,
+                        formal_typ
                 > {
         };
-        struct deref_special_type
+        struct formal_special_typ
                 : sor<
                         TAO_PEGTL_STRING("use"),
                         TAO_PEGTL_STRING("name"),

@@ -88,15 +88,15 @@ namespace np_offset
                 > {
         };
 
-        struct offset_indirect_type
-                : np_type::np_indirect_type::offset_indirect_type {
+        struct abbrev_sign_typ
+                : np_type::np_indirect_type::abbrev_sign_typ {
         };
 
         struct offset_indirect
                 : seq<
                         one< '(' >,
                         offset_indirect_num,
-                        opt< offset_indirect_type >,
+                        opt< abbrev_sign_typ >,
                         opt< np_indirect_mask::offset_indirect_mask >,
                         one< ')' >
                 > {
@@ -133,11 +133,8 @@ namespace np_offset
 
 namespace np_deref_type
 {
-    struct deref_type
-            : sor<
-                    np_type::np_deref_type::deref_special_type,
-                    np_type::np_deref_type::deref_normal_type
-            > {
+    struct formal_sign_typ
+            : np_type::np_deref_type::formal_sign_typ {
     };
 }
 
@@ -232,7 +229,7 @@ struct magic_line
                 __,
                 np_offset::offset,
                 ___,
-                np_deref_type::deref_type,
+                np_deref_type::formal_sign_typ,
                 opt< np_deref_mask::deref_mask >,
                 ___,
                 np_relation::relation,
