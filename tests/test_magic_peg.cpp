@@ -64,50 +64,44 @@ namespace type_whole
     };
 
     template<>
-    struct [[maybe_unused]] my_action<np_type::np_deref_type::deref_signed_type> {
-        // Implement an apply() function that will be called by
-        // the PEGTL every time tao::pegtl::any matches during
-        // the parsing run.
+    struct [[maybe_unused]] my_action<np_type::np_deref_type::formal_sign> {
         template<typename ActionInput>
         static void apply(const ActionInput &in, bool &out) {
-            // Get the portion of the original input that the
-            // rule matched this time as string and append it
-            // to the result string.
             out = true;
         }
     };
 
-    bool is_signed(std::string const &str) {
+    bool is_unsigned(std::string const &str) {
         auto ret = false;
         tao::pegtl::memory_input in(str, __FUNCTION__);
-        tao::pegtl::parse<exact<np_deref_type::deref_type>, my_action>(in, ret);
+        tao::pegtl::parse<exact<np_deref_type::formal_sign_typ>, my_action>(in, ret);
         return ret;
     }
 
     TEST(TestMagicPeg, test_rough_type) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_rough_type ..." << std::endl;
         auto cases = std::vector<std::pair<std::string, std::tuple<bool, bool>>>{
-                {"bestring16",  {true,  true}},
-                {"bestring",    {true,  true}},
+                {"bestring16",  {true,  false}},
+                {"bestring",    {true,  false}},
                 {"16bestring",  {false, false}},
                 {"bestring16t", {false, false}},
-                {"ubestring16", {true,  false}},
-                {"Ubestring16", {true,  false}},
+                {"ubestring16", {true,  true}},
+                {"Ubestring16", {true,  true}},
                 {"use",         {true,  false}}
         };
 
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto is_valid = true, is_signed = false;
+            auto is_valid = true, is_unsigned = false;
             try {
-                is_signed = type_whole::is_signed(pair.first);
+                is_unsigned = type_whole::is_unsigned(pair.first);
             } catch (std::exception &) {
                 is_valid = false;
             }
 
             ASSERT_EQ(is_valid, std::get<0>(pair.second));
-            ASSERT_EQ(is_signed, std::get<1>(pair.second));
+            ASSERT_EQ(is_unsigned, std::get<1>(pair.second));
         }
     }
 
