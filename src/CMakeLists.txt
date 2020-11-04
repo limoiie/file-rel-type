@@ -11,7 +11,7 @@ add_executable(file_rel_type
     pegtl-helper/integer.hpp
     pegtl-helper/exact.hpp
     magic_peg_builder.hpp
-    )
+    magic_ast/magic_ast.h)
 
 target_link_libraries(file_rel_type
     cpp-common-static

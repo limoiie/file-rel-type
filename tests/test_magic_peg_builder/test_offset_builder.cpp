@@ -19,8 +19,8 @@ using namespace tao::pegtl::contrib;
 #define PAIR(NUM) { #NUM, NUM }
 
 template< class Rule >
-peg::magic::action::offset_state parse_magic(std::string const &stmt) {
-    auto st = peg::magic::action::offset_state{};
+peg::magic::action::state_magic_build parse_magic(std::string const &stmt) {
+    auto st = peg::magic::action::state_magic_build{};
     tao::pegtl::memory_input in(stmt, __FUNCTION__);
 
     parse< exact< Rule >,
