@@ -30,8 +30,15 @@ struct continue_level
 
 /// region-end continue level
 
-struct number
+struct number_
         : helper::integer::signed_integer {
+};
+
+/**
+ * Wrap `number_` in `seq` to let the compiler see the specialization of `action` on `number_`
+ */
+struct number
+        : seq< number_ > {
 };
 
 namespace np_offset
@@ -44,14 +51,14 @@ namespace np_offset
                     : np_operator::mask_operator {
             };
 
-            struct offset_indirect_mask_num
+            struct offset_indirect_mask_absolute_num
                     : number {
             };
 
             struct offset_indirect_mask_indirect_num
                     : seq<
                             one< '(' >,
-                            offset_indirect_mask_num,
+                            number,
                             one< ')' >
                     > {
             };
@@ -60,7 +67,7 @@ namespace np_offset
                     : seq<
                             offset_indirect_mask_operator,          // [&|^+/-*%]
                             sor<
-                                    offset_indirect_mask_num,           //     [-+]?digit+
+                                    offset_indirect_mask_absolute_num,  //     [-+]?digit+
                                     offset_indirect_mask_indirect_num   // "(" [-+]?digit+ ")"
                             >
                     > {
@@ -81,11 +88,15 @@ namespace np_offset
                 > {
         };
 
+        struct offset_indirect_type
+                : np_type::np_indirect_type::offset_indirect_type {
+        };
+
         struct offset_indirect
                 : seq<
                         one< '(' >,
                         offset_indirect_num,
-                        opt< np_type::np_indirect_type::offset_indirect_type >,
+                        opt< offset_indirect_type >,
                         opt< np_indirect_mask::offset_indirect_mask >,
                         one< ')' >
                 > {
