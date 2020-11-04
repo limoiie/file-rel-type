@@ -186,6 +186,49 @@ namespace np_type
                         TAO_PEGTL_STRING("der")
                 > {
         };
+
+        struct formal_sign_typ
+                : sor<
+                        formal_special_typ,
+                        formal_sign_normal_typ
+                > {
+        };
+
+        namespace action
+        {
+            using np_type::action::state_to_deref_typ;
+
+            template< class Rule >
+            struct action_to_deref_typ
+                    : maybe_nothing {
+            };
+
+            template<>
+            struct action_to_deref_typ< formal_sign > {
+                static void apply0(state_to_deref_typ &st) {
+                    st.typ.is_unsigned = true;
+                }
+            };
+
+            template<>
+            struct action_to_deref_typ< formal_typ > {
+                template< class ActionInput >
+                static void apply(ActionInput &in, state_to_deref_typ &st) {
+                    st.typ.typ = parse_type(in.string());
+                }
+            };
+
+            template<>
+            struct action_to_deref_typ< formal_special_typ >
+                    : action_to_deref_typ< formal_typ > {
+            };
+
+        }
+
+        using to_typ_switcher = change_action_and_states<
+                action::template action_to_deref_typ,
+                action::state_to_deref_typ
+        >;
     }
 
 }
