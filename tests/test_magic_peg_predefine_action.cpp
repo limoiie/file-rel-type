@@ -49,12 +49,12 @@ namespace testing_internal
     };
 
     template< class Rule >
-    struct action_dump
+    struct [[maybe_unused]] action_dump
             : maybe_nothing {
     };
 
     template<>
-    struct action_dump< rule_dump >
+    struct [[maybe_unused]] action_dump< rule_dump >
             : np_type::np_indirect_type::to_typ_switcher {
 
         template< typename ParseInput >
@@ -98,12 +98,12 @@ namespace testing_internal
     };
 
     template< class Rule >
-    struct action_formal_dump
+    struct [[maybe_unused]] action_formal_dump
             : maybe_nothing {
     };
 
     template<>
-    struct action_formal_dump< rule_formal_dump >
+    struct [[maybe_unused]] action_formal_dump< rule_formal_dump >
             : np_type::np_deref_type::to_typ_switcher {
 
         template< typename ParseInput >
