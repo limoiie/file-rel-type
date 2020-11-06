@@ -186,11 +186,18 @@ namespace magic::ast
 
     };
 
+    struct binop_str;
+
     struct binop : public exp {
         struct builder {
             static std::shared_ptr< binop >
             make_ptr(char op, std::shared_ptr< exp > const &left, std::shared_ptr< exp > const &right) {
                 return std::shared_ptr< binop >(new binop{op, left, right});
+            }
+
+            static std::shared_ptr< binop_str >
+            make_ptr(char op, std::shared_ptr<exp> const& left, std::shared_ptr<exp> const& right, unsigned const flag) {
+                return std::make_shared<binop_str>(op, left, right, flag);
             }
         };
 
@@ -198,7 +205,7 @@ namespace magic::ast
             return nullptr;  // todo
         }
 
-    private:
+    protected:
         binop(char op, std::shared_ptr< exp > left, std::shared_ptr< exp > right)
                 : op(op), left(std::move(left)), right(std::move(right)) {
         }
@@ -220,6 +227,29 @@ namespace magic::ast
         char op;
         std::shared_ptr< exp > left;
         std::shared_ptr< exp > right;
+
+    };
+
+    struct binop_str : public binop {
+        binop_str(char op, std::shared_ptr< exp > left, std::shared_ptr< exp > right, unsigned const flag)
+                : binop(op, std::move(left), std::move(right)), flag(flag) {
+        }
+
+    public:
+        bool operator==(binop_str const& other) const {
+            return binop::equal_to(other) && flag == other.flag;
+        }
+
+    protected:
+        [[nodiscard]] bool equal_to(const exp&other) const override {
+            if (auto const* n = dynamic_cast<binop_str const*>(&other)) {
+                return *this == *n;
+            }
+            return false;
+        }
+
+    public:
+        unsigned flag;
 
     };
 
