@@ -9,10 +9,10 @@ add_executable(test_all
     test_magic_peg_builder/test_offset_builder.cpp
     pegtl-helper/test_integer_action.cpp
     test_magic_peg_predefine_action.cpp
-    )
+    test_magic_peg_builder/test_deref_type_builder.cpp)
 
 target_link_libraries(
-    test_all PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main
+    test_all PRIVATE magic GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main
 )
 
 add_test(ALLTestsInMain test_all)
