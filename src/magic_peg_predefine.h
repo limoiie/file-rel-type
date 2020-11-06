@@ -241,6 +241,71 @@ namespace np_flag
             : one< W, w, C, c, T, t, B, b, H, h, L, l, J, s, r > {
     };
 
+#define BIT(O) (1u << (O##u))
+
+    enum class str_flag_t : unsigned {
+        INDIRECT_RELATIVE = BIT(0),
+        STRING_COMPACT_WHITESPACE = BIT(0),
+        STRING_COMPACT_OPTIONAL_WHITESPACE = BIT(1),
+        STRING_IGNORE_LOWERCASE = BIT(2),
+        STRING_IGNORE_UPPERCASE = BIT(3),
+        REGEX_OFFSET_START = BIT(4),
+        STRING_TEXT_TEST = BIT(5),
+        STRING_BIN_TEST = BIT(6),
+        PSTRING_1_BE = BIT(7),
+        PSTRING_1_LE = BIT(7),
+        PSTRING_2_BE = BIT(8),
+        PSTRING_2_LE = BIT(9),
+        PSTRING_4_BE = BIT(10),
+        PSTRING_4_LE = BIT(11),
+        REGEX_LINE_COUNT = BIT(11),
+        PSTRING_LENGTH_INCLUDES_ITSELF = BIT(12),
+        STRING_TRIM = BIT(13),
+    };
+
+#define PSTRING_LEN         (PSTRING_1_BE|PSTRING_2_LE|PSTRING_2_BE|PSTRING_4_LE|PSTRING_4_BE)
+#define STRING_IGNORE_CASE  (STRING_IGNORE_LOWERCASE|STRING_IGNORE_UPPERCASE)
+
+#define STRING_DEFAULT_RANGE        100
+
+    inline
+    auto const &map_flag() {
+        static auto const m = std::map< char, str_flag_t >{
+                {r, str_flag_t::INDIRECT_RELATIVE},
+                {W, str_flag_t::STRING_COMPACT_WHITESPACE},
+                {w, str_flag_t::STRING_COMPACT_OPTIONAL_WHITESPACE},
+                {c, str_flag_t::STRING_IGNORE_LOWERCASE},
+                {C, str_flag_t::STRING_IGNORE_UPPERCASE},
+                {s, str_flag_t::REGEX_OFFSET_START},
+                {T, str_flag_t::STRING_TEXT_TEST},
+                {b, str_flag_t::STRING_BIN_TEST},
+                {B, str_flag_t::PSTRING_1_BE},
+                {B, str_flag_t::PSTRING_1_LE},
+                {H, str_flag_t::PSTRING_2_BE},
+                {h, str_flag_t::PSTRING_2_LE},
+                {L, str_flag_t::PSTRING_4_BE},
+                {l, str_flag_t::PSTRING_4_LE},
+                {J, str_flag_t::PSTRING_LENGTH_INCLUDES_ITSELF},
+                {T, str_flag_t::STRING_TRIM},
+        };
+        return m;
+    }
+
+    inline
+    auto convert_flag(char const flag) {
+        return map_flag().at(flag);
+    }
+
+    inline
+    unsigned convert_flags(std::string const& flag_string) {
+        unsigned flags = 0;
+        for (auto c : flag_string) {
+            if (c == '/') continue;
+            flags |= (unsigned) convert_flag(c);
+        }
+        return flags;
+    }
+
 }
 
 #endif //FILE_REL_TYPE_MAGIC_PEG_PREDEFINE_H
