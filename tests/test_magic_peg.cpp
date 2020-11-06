@@ -74,7 +74,7 @@ namespace type_whole
     bool is_unsigned(std::string const &str) {
         auto ret = false;
         tao::pegtl::memory_input in(str, __FUNCTION__);
-        tao::pegtl::parse<exact<np_deref_type::formal_sign_typ>, my_action>(in, ret);
+        tao::pegtl::parse<exact<np_deref_type::deref_sign_typ>, my_action>(in, ret);
         return ret;
     }
 

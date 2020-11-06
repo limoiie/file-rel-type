@@ -133,24 +133,24 @@ namespace np_offset
 
 namespace np_deref_type
 {
-    struct formal_sign_typ
+    struct deref_sign_typ
             : np_type::np_deref_type::formal_sign_typ {
     };
 }
 
 namespace np_deref_mask
 {   /// region de-reference mask (additional computation)
+    struct deref_mask_operator
+            : np_operator::mask_operator {
+    };
+
     struct deref_mask_num
             : number {
     };
 
-    struct deref_str_mask_sep
-            : one< '/' > {
-    };
-
     struct deref_mask_item
             : seq<
-                    opt< deref_str_mask_sep >,
+                    opt< one< '/' > >,
                     sor<
                             deref_mask_num,
                             np_flag::deref_mask_flag
@@ -160,7 +160,7 @@ namespace np_deref_mask
 
     struct deref_mask
             : seq<
-                    np_operator::mask_operator,
+                    deref_mask_operator,
                     plus< deref_mask_item >
             > {
     };
@@ -229,7 +229,7 @@ struct magic_line
                 __,
                 np_offset::offset,
                 ___,
-                np_deref_type::formal_sign_typ,
+                np_deref_type::deref_sign_typ,
                 opt< np_deref_mask::deref_mask >,
                 ___,
                 np_relation::relation,
