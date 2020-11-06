@@ -82,6 +82,20 @@ namespace tao::pegtl::helper::integer
             };
 
             template<>
+            struct radix_trait< 8 > {
+                [[maybe_unused]] constexpr static int radix = 8;
+
+                constexpr static int convert(char const digit) {
+                    return digit - '0';
+                }
+
+                [[nodiscard]] constexpr static bool is_digit(char const c) {
+                    return '0' <= c && c <= '7';
+                }
+
+            };
+
+            template<>
             struct radix_trait< 10 > {
                 [[maybe_unused]] constexpr static int radix = 10;
 
