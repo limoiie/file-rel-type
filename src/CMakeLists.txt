@@ -1,7 +1,6 @@
 find_package(pegtl CONFIG REQUIRED)
 
-add_executable(file_rel_type
-    main.cpp
+add_library(magic
     ParseMagicFile.cpp
     ParseMagicFile.h
     MagicEntry.cpp
@@ -11,10 +10,16 @@ add_executable(file_rel_type
     pegtl-helper/integer.hpp
     pegtl-helper/exact.hpp
     magic_peg_builder.hpp
-    magic_ast/magic_ast.h)
+    magic_ast/magic_ast.h
+    magic_type.cpp
+    )
+
+add_executable(file_rel_type
+    main.cpp
+    utils/stl_container_helper.h)
 
 target_link_libraries(file_rel_type
+    magic
     cpp-common-static
     taocpp::pegtl
-    #    ${LIB_MAGIC}
     )

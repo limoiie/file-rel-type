@@ -99,7 +99,7 @@ namespace magic::ast
             switch (type_format(typ.typ)) {
                 case FILE_FMT_STR:
                     return std::string_view(data.s) == std::string_view(rhs.data.s);
-                case FILE_FMT_NUM:
+                case FILE_FMT_INT:
                 case FILE_FMT_QUAD:
                     switch (typ_size(typ.typ)) {
                         case 1:

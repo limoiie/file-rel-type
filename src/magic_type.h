@@ -8,6 +8,7 @@
 #include <string>
 #include <list>
 #include <tuple>
+#include <map>
 
 enum ref_type_t {
     FILE_INVALID,
@@ -61,187 +62,48 @@ enum ref_type_t {
     FILE_DER
 };
 
-struct val_typ_t {
-    ref_type_t typ;
-    bool is_unsigned;
-
-    val_typ_t(ref_type_t typ, bool is_unsigned)
-            : typ(typ), is_unsigned(is_unsigned) {
-    }
-
-    static val_typ_t default_() {
-        return {
-                FILE_LONG, false
-        };
-    }
-
-    bool operator==(const val_typ_t &rhs) const {
-        return typ == rhs.typ &&
-               is_unsigned == rhs.is_unsigned;
-    }
-
-    bool operator!=(const val_typ_t &rhs) const {
-        return !(rhs == *this);
-    }
-
-};
-
 enum ref_type_format_t {
     FILE_FMT_NONE,
     FILE_FMT_STR,
-    FILE_FMT_NUM,
+    FILE_FMT_INT,
     FILE_FMT_QUAD,
     FILE_FMT_FLOAT,
     FILE_FMT_DOUBLE,
 };
 
-inline
-auto map_type() -> std::list< std::tuple< std::string, ref_type_t, ref_type_format_t>> const & {
-    static auto m = std::list< std::tuple< std::string, ref_type_t, ref_type_format_t>>{
-            {"invalid",    FILE_INVALID,    FILE_FMT_NONE},
-            {"byte",       FILE_BYTE,       FILE_FMT_NUM},
-            {"short",      FILE_SHORT,      FILE_FMT_NUM},
-            {"default",    FILE_DEFAULT,    FILE_FMT_NONE},
-            {"long",       FILE_LONG,       FILE_FMT_NUM},
-            {"string",     FILE_STRING,     FILE_FMT_STR},
-            {"date",       FILE_DATE,       FILE_FMT_STR},
-            {"beshort",    FILE_BESHORT,    FILE_FMT_NUM},
-            {"belong",     FILE_BELONG,     FILE_FMT_NUM},
-            {"bedate",     FILE_BEDATE,     FILE_FMT_STR},
-            {"leshort",    FILE_LESHORT,    FILE_FMT_NUM},
-            {"lelong",     FILE_LELONG,     FILE_FMT_NUM},
-            {"ledate",     FILE_LEDATE,     FILE_FMT_STR},
-            {"pstring",    FILE_PSTRING,    FILE_FMT_STR},
-            {"ldate",      FILE_LDATE,      FILE_FMT_STR},
-            {"beldate",    FILE_BELDATE,    FILE_FMT_STR},
-            {"leldate",    FILE_LELDATE,    FILE_FMT_STR},
-            {"regex",      FILE_REGEX,      FILE_FMT_STR},
-            {"bestring16", FILE_BESTRING16, FILE_FMT_STR},
-            {"lestring16", FILE_LESTRING16, FILE_FMT_STR},
-            {"search",     FILE_SEARCH,     FILE_FMT_STR},
-            {"medate",     FILE_MEDATE,     FILE_FMT_STR},
-            {"meldate",    FILE_MELDATE,    FILE_FMT_STR},
-            {"melong",     FILE_MELONG,     FILE_FMT_NUM},
-            {"quad",       FILE_QUAD,       FILE_FMT_QUAD},
-            {"lequad",     FILE_LEQUAD,     FILE_FMT_QUAD},
-            {"bequad",     FILE_BEQUAD,     FILE_FMT_QUAD},
-            {"qdate",      FILE_QDATE,      FILE_FMT_STR},
-            {"leqdate",    FILE_LEQDATE,    FILE_FMT_STR},
-            {"beqdate",    FILE_BEQDATE,    FILE_FMT_STR},
-            {"qldate",     FILE_QLDATE,     FILE_FMT_STR},
-            {"leqldate",   FILE_LEQLDATE,   FILE_FMT_STR},
-            {"beqldate",   FILE_BEQLDATE,   FILE_FMT_STR},
-            {"float",      FILE_FLOAT,      FILE_FMT_FLOAT},
-            {"befloat",    FILE_BEFLOAT,    FILE_FMT_FLOAT},
-            {"lefloat",    FILE_LEFLOAT,    FILE_FMT_FLOAT},
-            {"double",     FILE_DOUBLE,     FILE_FMT_DOUBLE},
-            {"bedouble",   FILE_BEDOUBLE,   FILE_FMT_DOUBLE},
-            {"ledouble",   FILE_LEDOUBLE,   FILE_FMT_DOUBLE},
-            {"leid3",      FILE_LEID3,      FILE_FMT_NUM},
-            {"beid3",      FILE_BEID3,      FILE_FMT_NUM},
-            {"indirect",   FILE_INDIRECT,   FILE_FMT_NUM},
-            {"qwdate",     FILE_QWDATE,     FILE_FMT_STR},
-            {"leqwdate",   FILE_LEQWDATE,   FILE_FMT_STR},
-            {"beqwdate",   FILE_BEQWDATE,   FILE_FMT_STR},
-            {"name",       FILE_NAME,       FILE_FMT_NONE},
-            {"use",        FILE_USE,        FILE_FMT_NONE},
-            {"clear",      FILE_CLEAR,      FILE_FMT_NONE},
-            {"der",        FILE_DER,        FILE_FMT_STR},
-            {"",           FILE_INVALID,    FILE_FMT_NONE},
-    };
-    return m;
-}
+struct val_typ_t {
+    ref_type_t typ;
+    bool is_unsigned;
+
+    val_typ_t(ref_type_t typ, bool is_unsigned);
+
+    static val_typ_t default_();
+
+    bool operator==(const val_typ_t &rhs) const;
+
+    bool operator!=(const val_typ_t &rhs) const;
+
+    [[nodiscard]] bool is_string() const;
+
+    [[nodiscard]] bool is_number() const;
+
+};
 
 inline
-auto map_name_type() -> std::map< std::string, ref_type_t > const & {
-    auto const &meta_data = map_type();
-    static auto name_type_mapping = std::map< std::string, ref_type_t >();
-    if (name_type_mapping.empty()) {
-        for (auto const &name_typ_fmt : meta_data) {
-            name_type_mapping[std::get< 0 >(name_typ_fmt)] = std::get< 1 >(name_typ_fmt);
-        }
-    }
-    return name_type_mapping;
-}
+auto map_type() -> std::list< std::tuple< std::string, ref_type_t, ref_type_format_t>> const &;
 
 inline
-auto map_type_fmt() -> std::map< ref_type_t, ref_type_format_t > const & {
-    auto const &meta_data = map_type();
-    static auto type_fmt_mapping = std::map< ref_type_t, ref_type_format_t >();
-    if (type_fmt_mapping.empty()) {
-        for (auto const& name_typ_fmt : meta_data) {
-            type_fmt_mapping[std::get< 1 >(name_typ_fmt)] = std::get< 2 >(name_typ_fmt);
-        }
-    }
-    return type_fmt_mapping;
-}
+auto map_name_type() -> std::map< std::string, ref_type_t > const &;
 
 inline
-auto parse_type(std::string const &name) {
-    auto const &mapping = map_name_type();
-    if (mapping.count(name)) {
-        return mapping.at(name);
-    }
-    return ref_type_t::FILE_INVALID;
-}
+auto map_type_fmt() -> std::map< ref_type_t, ref_type_format_t > const &;
 
-inline
-auto type_format(ref_type_t const typ) {
-    auto const& mapping = map_type_fmt();
-    if (mapping.count(typ)) {
-        return mapping.at(typ);
-    }
-    return ref_type_format_t::FILE_FMT_NONE;
-}
+ref_type_t parse_type(std::string const &name);
 
-static size_t typ_size(ref_type_t const typ) {
-    switch (typ) {
-        case FILE_BYTE:
-            return 1;
+val_typ_t parse_sign_type(std::string const &name);
 
-        case FILE_SHORT:
-        case FILE_LESHORT:
-        case FILE_BESHORT:
-            return 2;
+ref_type_format_t type_format(ref_type_t typ);
 
-        case FILE_LONG:
-        case FILE_LELONG:
-        case FILE_BELONG:
-        case FILE_MELONG:
-
-        case FILE_DATE:
-        case FILE_LEDATE:
-        case FILE_BEDATE:
-        case FILE_MEDATE:
-        case FILE_LDATE:
-        case FILE_LELDATE:
-        case FILE_BELDATE:
-        case FILE_MELDATE:
-        case FILE_FLOAT:
-        case FILE_BEFLOAT:
-        case FILE_LEFLOAT:
-            return 4;
-
-        case FILE_QUAD:
-        case FILE_BEQUAD:
-        case FILE_LEQUAD:
-        case FILE_QDATE:
-        case FILE_LEQDATE:
-        case FILE_BEQDATE:
-        case FILE_QLDATE:
-        case FILE_LEQLDATE:
-        case FILE_BEQLDATE:
-        case FILE_QWDATE:
-        case FILE_LEQWDATE:
-        case FILE_BEQWDATE:
-        case FILE_DOUBLE:
-        case FILE_BEDOUBLE:
-        case FILE_LEDOUBLE:
-            return 8;
-
-        default:
-            return (size_t)~0u;
-    }
-}
+size_t typ_size(ref_type_t typ);
 
 #endif //FILE_REL_TYPE_MAGIC_TYPE_H
