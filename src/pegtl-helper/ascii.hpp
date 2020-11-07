@@ -61,7 +61,9 @@ namespace action
         template< class ActionInput >
         static void apply(ActionInput &in, std::string &st) {
             auto byte = 0;
-            accumulate_digits< int, 8 >(byte, in.string_view());
+            if (!accumulate_digits< int, 8 >(byte, in.string_view())) {
+                throw parse_error("Invalid oct digits!", in);
+            }
             st.push_back(byte);
         }
     };
@@ -70,7 +72,9 @@ namespace action
         template< class ActionInput >
         static void apply(ActionInput &in, std::string &st) {
             auto byte = 0;
-            accumulate_digits< int, 16 >(byte, in.string_view());
+            if (!accumulate_digits< int, 16 >(byte, in.string_view())) {
+                throw parse_error("Invalid hex digits!", in);
+            }
             st.push_back(byte);
         }
     };
