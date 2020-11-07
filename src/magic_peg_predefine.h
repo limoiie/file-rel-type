@@ -173,6 +173,54 @@ namespace np_type
                 > {
         };
 
+        template< unsigned Fmt >
+        struct formal_typ_ {
+            template< class ParseInput >
+            static bool match(ParseInput &in) {
+                if (!in.empty()) {
+                    for (auto const &str_typ_fmt : map_type()) {
+                        auto const &str = std::get< 0 >(str_typ_fmt);
+                        auto const &fmt = std::get< 2 >(str_typ_fmt);
+                        auto const invalid_fmt = ((unsigned) fmt & Fmt) == 0;
+                        if (in.size() < str.size() || invalid_fmt) continue;
+                        if ((std::string_view) str == std::string_view(in.current(), str.size())) {
+                            in.bump_in_this_line(str.size());
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+        };
+
+        struct formal_str_typ
+                : formal_typ_< (unsigned) ref_type_format_t::FILE_FMT_STR > {
+        };
+
+        struct formal_num_typ_
+                : formal_typ_<
+                        (unsigned) ref_type_format_t::FILE_FMT_INT |
+                        (unsigned) ref_type_format_t::FILE_FMT_QUAD |
+                        (unsigned) ref_type_format_t::FILE_FMT_FLOAT |
+                        (unsigned) ref_type_format_t::FILE_FMT_DOUBLE
+                > {
+
+        };
+
+        struct formal_num_typ
+                : seq<
+                        opt< formal_sign >,
+                        formal_num_typ_
+                > {
+        };
+
+        struct formal_non_typ
+                : formal_typ_<
+                        (unsigned) ref_type_format_t::FILE_FMT_NONE
+                > {
+        };
+
         struct formal_sign_normal_typ
                 : seq<
                         opt< formal_sign >,
@@ -210,8 +258,7 @@ namespace np_type
                 }
             };
 
-            template<>
-            struct action_to_deref_typ< formal_typ > {
+            struct action_to_typ {
                 template< class ActionInput >
                 static void apply(ActionInput &in, state_to_deref_typ &st) {
                     st.typ.typ = parse_type(in.string());
@@ -219,8 +266,28 @@ namespace np_type
             };
 
             template<>
+            struct action_to_deref_typ< formal_typ >
+                    : action_to_typ {
+            };
+
+            template<>
             struct action_to_deref_typ< formal_special_typ >
-                    : action_to_deref_typ< formal_typ > {
+                    : action_to_typ {
+            };
+
+            template<>
+            struct action_to_deref_typ< formal_str_typ >
+                    : action_to_typ {
+            };
+
+            template<>
+            struct action_to_deref_typ< formal_num_typ_ >
+                    : action_to_typ {
+            };
+
+            template<>
+            struct action_to_deref_typ< formal_non_typ >
+                    : action_to_typ {
             };
 
         }
@@ -241,7 +308,7 @@ namespace np_flag
             : one< W, w, C, c, T, t, B, b, H, h, L, l, J, s, r > {
     };
 
-#define BIT(O) (1u << (O##u))
+//#define BIT(O) (1u << (O##u))
 
     enum class str_flag_t : unsigned {
         INDIRECT_RELATIVE = BIT(0),
@@ -297,7 +364,7 @@ namespace np_flag
     }
 
     inline
-    unsigned convert_flags(std::string const& flag_string) {
+    unsigned convert_flags(std::string const &flag_string) {
         unsigned flags = 0;
         for (auto c : flag_string) {
             if (c == '/') continue;

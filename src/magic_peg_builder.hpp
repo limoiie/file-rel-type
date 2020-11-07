@@ -220,6 +220,51 @@ namespace peg::magic::action
         }
     };
 
+    struct action_to_typ
+            : np_type::np_deref_type::to_typ_switcher {
+        template< class ParseInput >
+        static void success(ParseInput &in, np_type::action::state_to_deref_typ &s, state_magic_build &st) {
+            auto offset_exp = st.stk.top();
+            st.stk.pop();
+            st.typ = std::make_shared< val_typ_t >(s.typ);
+            auto deref_exp = unop::builder::make_ptr('*', offset_exp, s.typ);
+            st.stk.push(deref_exp);
+        }
+    };
+
+
+    template<>
+    struct action_magic< formal_str_typ >
+            : action_to_typ {
+    };
+
+    template<>
+    struct action_magic< formal_num_typ >
+            : action_to_typ {
+    };
+
+    template<>
+    struct action_magic< formal_non_typ >
+            : action_to_typ {
+    };
+
+    template<>
+    struct action_magic< deref_num_mask >
+            : action_mask {
+    };
+
+    template<>
+    struct action_magic< deref_str_mask > {
+        static void apply0(state_magic_build &st) {
+            if (!st.has_range) {
+                auto range = var::builder::make((uint32_t) STRING_DEFAULT_RANGE);
+                auto range_exp = num::builder::make_ptr(val_typ_t::default_(), range);
+                st.stk.push(range_exp);
+            }
+            action_mask::apply0(st);
+        }
+    };
+
     template<>
     struct action_magic< np_deref_mask::deref_mask_num > {
         static void apply0(state_magic_build &st) {
@@ -301,15 +346,32 @@ namespace peg::magic::action
             : internal::to_relation_string_switcher {
         template< class ParseInput >
         static void success(ParseInput &in, std::string &s, state_magic_build &st) {
-            // now this is only about string value
             auto str = var::builder::make((std::string_view) s);
             auto typ = val_typ_t{ref_type_t::FILE_STRING, false};
-            auto right = num::builder::make_ptr(typ, str);
+            auto inner = num::builder::make_ptr(typ, str);
+            st.stk.push(inner);
+        }
+    };
+
+    template<>
+    struct action_magic< np_relation::relation > {
+        static void apply0(state_magic_build &st) {
+            auto right = std_::pop(st.stk);
             auto left = std_::pop(st.stk);
             auto op = std_::pop(st.stk_op);
             auto inner = binop::builder::make_ptr(op, left, right, st.flag);
             st.stk.push(inner);
         }
+    };
+
+    template<>
+    struct action_magic< ::typ_relation::relation_str >
+            : action_magic< np_relation::relation > {
+    };
+
+    template<>
+    struct action_magic< ::typ_relation::relation_num >
+            : action_magic< np_relation::relation > {
     };
 
 }

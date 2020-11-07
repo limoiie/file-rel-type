@@ -17,6 +17,7 @@
 #include "pegtl-helper/ascii.hpp"
 #include "pegtl-helper/integer.hpp"
 #include "pegtl-helper/exact.hpp"
+#include "pegtl-helper/switcher.hpp"
 
 using namespace tao::pegtl;
 
@@ -189,6 +190,10 @@ namespace np_relation
             : internal::plus< relation_character > {
     };
 
+    struct relation_num_value
+            : number {
+    };
+
     struct relation
             : seq<
                     opt< np_operator::compare_operator >,
@@ -196,6 +201,49 @@ namespace np_relation
             > {
     };
 
+}
+
+namespace typ_relation
+{
+    using namespace np_type::np_deref_type;
+    using namespace np_deref_mask;
+
+    struct deref_num_mask
+            : seq<
+                    np_operator::mask_operator,
+                    deref_mask_num
+            > {
+    };
+
+    struct deref_str_mask
+            : seq<
+                    np_operator::mask_operator,
+                    plus< deref_mask_item >
+            > {
+    };
+
+    template< class Rule >
+    struct relation_exp
+            : seq<
+                    opt< np_operator::compare_operator >, Rule
+            > {
+    };
+
+    struct relation_str
+            : relation_exp< np_relation::relation_value > {
+    };
+
+    struct relation_num
+            : relation_exp< np_relation::relation_num_value > {
+    };
+
+    struct typ_relation
+            : tao::pegtl::switcher<
+                    formal_str_typ, seq< opt< deref_str_mask >, ___, relation_str >,
+                    formal_num_typ, seq< opt< deref_num_mask >, ___, relation_num >,
+                    formal_non_typ, seq< opt< /* success  */ >, ___, relation_str >
+            > {
+    };
 }
 
 namespace np_type_code
@@ -243,5 +291,31 @@ struct magic_line
         > {
 };
 
+
+using namespace np_type::np_deref_type;
+using namespace np_deref_mask;
+
+using namespace typ_relation;
+
+struct magic_line_new
+        : contrib::exact<
+                continue_level,
+                __,
+                np_offset::offset,
+                ___,
+                tao::pegtl::switcher<
+                        formal_str_typ, seq< opt< deref_str_mask >, ___, relation_str >,
+                        formal_num_typ, seq< opt< deref_num_mask >, ___, relation_num >,
+                        formal_non_typ, seq< opt< /* success  */ >, ___, relation_str >
+                >,
+                __,
+                opt< np_description::description >,
+                if_then_else<
+                        np_type_code::type_code_start,
+                        np_type_code::type_code,
+                        success
+                >
+        > {
+};
 
 #endif //FILE_REL_TYPE_MAGIC_PEG_H
