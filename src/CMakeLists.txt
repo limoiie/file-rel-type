@@ -16,7 +16,9 @@ add_library(magic
 
 add_executable(file_rel_type
     main.cpp
-    utils/stl_container_helper.h)
+    utils/stl_container_helper.h
+    pegtl-helper/switcher.hpp
+    )
 
 target_link_libraries(file_rel_type
     magic
