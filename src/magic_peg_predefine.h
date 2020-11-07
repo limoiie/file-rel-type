@@ -166,13 +166,6 @@ namespace np_type
                 : one< 'u', 'U' > {
         };
 
-        struct formal_typ
-                : seq<
-                        plus< alpha >,
-                        opt< plus< digit > >
-                > {
-        };
-
         template< unsigned Fmt >
         struct formal_typ_ {
             template< class ParseInput >
@@ -221,27 +214,6 @@ namespace np_type
                 > {
         };
 
-        struct formal_sign_normal_typ
-                : seq<
-                        opt< formal_sign >,
-                        formal_typ
-                > {
-        };
-        struct formal_special_typ
-                : sor<
-                        TAO_PEGTL_STRING("use"),
-                        TAO_PEGTL_STRING("name"),
-                        TAO_PEGTL_STRING("der")
-                > {
-        };
-
-        struct formal_sign_typ
-                : sor<
-                        formal_special_typ,
-                        formal_sign_normal_typ
-                > {
-        };
-
         namespace action
         {
             using np_type::action::state_to_deref_typ;
@@ -263,16 +235,6 @@ namespace np_type
                 static void apply(ActionInput &in, state_to_deref_typ &st) {
                     st.typ.typ = parse_type(in.string());
                 }
-            };
-
-            template<>
-            struct action_to_deref_typ< formal_typ >
-                    : action_to_typ {
-            };
-
-            template<>
-            struct action_to_deref_typ< formal_special_typ >
-                    : action_to_typ {
             };
 
             template<>

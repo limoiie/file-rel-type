@@ -71,7 +71,7 @@ namespace magic::ast
 
             static var make(std::string_view val, var v = {}) {
                 if (val.size() > MAX_STRING_LEN - 1) {
-                    val.substr(0, MAX_STRING_LEN - 1);
+                    val = val.substr(0, MAX_STRING_LEN - 1);
                 }
                 std::copy(val.cbegin(), val.cend(), v.s);
                 v.s[val.size()] = '\0';
@@ -200,8 +200,9 @@ namespace magic::ast
             }
 
             static std::shared_ptr< binop_str >
-            make_ptr(char op, std::shared_ptr<exp> const& left, std::shared_ptr<exp> const& right, unsigned const flag) {
-                return std::make_shared<binop_str>(op, left, right, flag);
+            make_ptr(char op, std::shared_ptr< exp > const &left, std::shared_ptr< exp > const &right,
+                     unsigned const flag) {
+                return std::make_shared< binop_str >(op, left, right, flag);
             }
         };
 
@@ -240,13 +241,13 @@ namespace magic::ast
         }
 
     public:
-        bool operator==(binop_str const& other) const {
+        bool operator==(binop_str const &other) const {
             return binop::equal_to(other) && flag == other.flag;
         }
 
     protected:
-        [[nodiscard]] bool equal_to(const exp&other) const override {
-            if (auto const* n = dynamic_cast<binop_str const*>(&other)) {
+        [[nodiscard]] bool equal_to(const exp &other) const override {
+            if (auto const *n = dynamic_cast<binop_str const *>(&other)) {
                 return *this == *n;
             }
             return false;

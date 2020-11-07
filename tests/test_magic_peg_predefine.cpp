@@ -10,18 +10,11 @@
 #include <tao/pegtl/contrib/unescape.hpp>
 
 #include <magic_peg.h>
-#include <magic_peg_predefine.h>
 
 #include "test_pegtl_helper.hpp"
 
 using namespace tao::pegtl;
-
 using namespace tao::pegtl::contrib;
-
-namespace testing_internal
-{
-
-}
 
 TEST(TestMagicPegPredefine, test_format_str_typ) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing test_format_str_typ ..." << std::endl;
@@ -42,9 +35,9 @@ TEST(TestMagicPegPredefine, test_format_str_typ) { // NOLINT(cert-err58-cpp)
 TEST(TestMagicPegPredefine, test_format_num_typ) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing test_format_num_typ ..." << std::endl;
     auto cases = std::list< std::pair< std::string, bool>>{
-            {"long", true},
-            {"ulong", true},
-            {"use", false},
+            {"long",   true},
+            {"ulong",  true},
+            {"use",    false},
             {"string", false}
     };
 

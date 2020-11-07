@@ -87,12 +87,16 @@ TEST(TestMagicPegPredefineAction, test_to_typ_switcher) { // NOLINT(cert-err58-c
 
 namespace testing_internal
 {
-    using np_type::np_deref_type::formal_sign_typ;
+    using np_type::np_deref_type::formal_str_typ;
+    using np_type::np_deref_type::formal_num_typ;
 
     struct rule_formal_dump
             : seq<
                     one< '{' >,
-                    formal_sign_typ,
+                    sor<
+                            formal_str_typ,
+                            formal_num_typ
+                    >,
                     one< '}' >
             > {
     };
@@ -118,9 +122,10 @@ namespace testing_internal
 TEST(TestMagicPegPredefineAction, test_formal_to_typ_switcher) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing test_formal_to_typ_switcher ..." << std::endl;
     auto cases = std::list< std::pair< std::string, val_typ_t>>{
-            {"{ubestring16}", {FILE_BESTRING16, true}},
             {"{bestring16}", {FILE_BESTRING16, false}},
-            {"{quad}", {FILE_QUAD, false}},
+            {"{bestring16}", {FILE_BESTRING16, false}},
+            {"{quad}",       {FILE_QUAD,       false}},
+            {"{ulong}",      {FILE_LONG,       true}},
     };
 
     for (auto const &pair : cases) {

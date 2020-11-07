@@ -132,13 +132,6 @@ namespace np_offset
     };
 }
 
-namespace np_deref_type
-{
-    struct deref_sign_typ
-            : np_type::np_deref_type::formal_sign_typ {
-    };
-}
-
 namespace np_deref_mask
 {   /// region de-reference mask (additional computation)
     struct deref_mask_operator
@@ -156,13 +149,6 @@ namespace np_deref_mask
                             deref_mask_num,
                             np_flag::deref_mask_flag
                     >
-            > {
-    };
-
-    struct deref_mask
-            : seq<
-                    deref_mask_operator,
-                    plus< deref_mask_item >
             > {
     };
 
@@ -192,13 +178,6 @@ namespace np_relation
 
     struct relation_num_value
             : number {
-    };
-
-    struct relation
-            : seq<
-                    opt< np_operator::compare_operator >,
-                    relation_value
-            > {
     };
 
 }
@@ -269,27 +248,6 @@ namespace np_description
     };
 
 }
-
-
-struct magic_line
-        : contrib::exact<
-                continue_level,
-                __,
-                np_offset::offset,
-                ___,
-                np_deref_type::deref_sign_typ,
-                opt< np_deref_mask::deref_mask >,
-                ___,
-                np_relation::relation,
-                __,
-                opt< np_description::description >,
-                if_then_else<
-                        np_type_code::type_code_start,
-                        np_type_code::type_code,
-                        success
-                >
-        > {
-};
 
 
 using namespace np_type::np_deref_type;

@@ -59,32 +59,6 @@ namespace testing_internal
 
 }
 
-TEST(TestMagicPegBuilder, test_build_deref) { // NOLINT(cert-err58-cpp)
-    using testing_internal::make_exp;
-
-    std::cout << "Testing test_build_deref ..." << std::endl;
-    auto cases = std::list< std::pair< std::string, std::pair< std::shared_ptr< magic::ast::exp >, unsigned>> >{
-            CASE("short", /, 20,),
-            CASE("long", +, 20,),
-            CASE("long", ~&, 20,),
-            CASE("ulong", +, 20,),
-            CASE("string", /, 20,),
-            CASE("string", /, 20, wl),
-            CASE("string", /, 20, /w/l),
-    };
-
-    for (auto const &pair : cases) {
-        std::cout << "  Case: " << pair.first << std::endl;
-
-        auto out = parse_magic< seq<
-                np_deref_type::deref_sign_typ,
-                opt< np_deref_mask::deref_mask >
-        > >(pair.first);
-        ASSERT_EQ(*out.stk.top(), *pair.second.first);
-        ASSERT_EQ(out.flag, pair.second.second);
-    }
-}
-
 TEST(TestMagicPegBuilder, test_build_typ_str_mask) { // NOLINT(cert-err58-cpp)
     using testing_internal::make_exp;
 

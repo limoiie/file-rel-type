@@ -207,19 +207,6 @@ namespace peg::magic::action
     };
 */
 
-    template<>
-    struct action_magic< np_deref_type::deref_sign_typ >
-            : np_type::np_deref_type::to_typ_switcher {
-        template< class ParseInput >
-        static void success(ParseInput &in, np_type::action::state_to_deref_typ &s, state_magic_build &st) {
-            auto offset_exp = st.stk.top();
-            st.stk.pop();
-            st.typ = std::make_shared< val_typ_t >(s.typ);
-            auto deref_exp = unop::builder::make_ptr('*', offset_exp, s.typ);
-            st.stk.push(deref_exp);
-        }
-    };
-
     struct action_to_typ
             : np_type::np_deref_type::to_typ_switcher {
         template< class ParseInput >
@@ -281,23 +268,6 @@ namespace peg::magic::action
         }
     };
 
-    template<>
-    struct action_magic< np_deref_mask::deref_mask > {
-        static void apply0(state_magic_build &st) {
-            // I do not process the str_flag here since the str_flag is used to control
-            // the comparison operation, which is defined in the relation part. so, I
-            // choose to handle the flag when processing the relation operator
-
-            // if no range is defined for a string type, then push the default range
-            if (st.typ->is_string() && !st.has_range) {
-                auto range = var::builder::make((uint32_t) STRING_DEFAULT_RANGE);
-                auto range_exp = num::builder::make_ptr(val_typ_t::default_(), range);
-                st.stk.push(range_exp);
-            }
-            action_mask::apply0(st);
-        }
-    };
-
     namespace internal
     {
         using tao::pegtl::helper::integer::action::internal::accumulate_digits;
@@ -353,8 +323,7 @@ namespace peg::magic::action
         }
     };
 
-    template<>
-    struct action_magic< np_relation::relation > {
+    struct action_push_binop_with_flag {
         static void apply0(state_magic_build &st) {
             auto right = std_::pop(st.stk);
             auto left = std_::pop(st.stk);
@@ -366,12 +335,12 @@ namespace peg::magic::action
 
     template<>
     struct action_magic< ::typ_relation::relation_str >
-            : action_magic< np_relation::relation > {
+            : action_push_binop_with_flag {
     };
 
     template<>
     struct action_magic< ::typ_relation::relation_num >
-            : action_magic< np_relation::relation > {
+            : action_push_binop_with_flag {
     };
 
 }
