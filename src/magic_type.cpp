@@ -7,17 +7,32 @@
 auto map_type() -> std::list< std::tuple< std::string, ref_type_t, ref_type_format_t>> const & {
     static auto m = std::list< std::tuple< std::string, ref_type_t, ref_type_format_t>>{
             {"invalid",    FILE_INVALID,    FILE_FMT_NONE},
+            {"default",    FILE_DEFAULT,    FILE_FMT_NONE},
+
             {"byte",       FILE_BYTE,       FILE_FMT_INT},
             {"short",      FILE_SHORT,      FILE_FMT_INT},
-            {"default",    FILE_DEFAULT,    FILE_FMT_NONE},
             {"long",       FILE_LONG,       FILE_FMT_INT},
-            {"string",     FILE_STRING,     FILE_FMT_STR},
-            {"date",       FILE_DATE,       FILE_FMT_STR},
             {"beshort",    FILE_BESHORT,    FILE_FMT_INT},
             {"belong",     FILE_BELONG,     FILE_FMT_INT},
-            {"bedate",     FILE_BEDATE,     FILE_FMT_STR},
             {"leshort",    FILE_LESHORT,    FILE_FMT_INT},
             {"lelong",     FILE_LELONG,     FILE_FMT_INT},
+            {"melong",     FILE_MELONG,     FILE_FMT_INT},
+            {"quad",       FILE_QUAD,       FILE_FMT_QUAD},
+            {"lequad",     FILE_LEQUAD,     FILE_FMT_QUAD},
+            {"bequad",     FILE_BEQUAD,     FILE_FMT_QUAD},
+            {"float",      FILE_FLOAT,      FILE_FMT_FLOAT},
+            {"befloat",    FILE_BEFLOAT,    FILE_FMT_FLOAT},
+            {"lefloat",    FILE_LEFLOAT,    FILE_FMT_FLOAT},
+            {"double",     FILE_DOUBLE,     FILE_FMT_DOUBLE},
+            {"bedouble",   FILE_BEDOUBLE,   FILE_FMT_DOUBLE},
+            {"ledouble",   FILE_LEDOUBLE,   FILE_FMT_DOUBLE},
+            {"leid3",      FILE_LEID3,      FILE_FMT_INT},
+            {"beid3",      FILE_BEID3,      FILE_FMT_INT},
+            {"indirect",   FILE_INDIRECT,   FILE_FMT_INT},
+
+            {"string",     FILE_STRING,     FILE_FMT_STR},
+            {"date",       FILE_DATE,       FILE_FMT_STR},
+            {"bedate",     FILE_BEDATE,     FILE_FMT_STR},
             {"ledate",     FILE_LEDATE,     FILE_FMT_STR},
             {"pstring",    FILE_PSTRING,    FILE_FMT_STR},
             {"ldate",      FILE_LDATE,      FILE_FMT_STR},
@@ -29,28 +44,16 @@ auto map_type() -> std::list< std::tuple< std::string, ref_type_t, ref_type_form
             {"search",     FILE_SEARCH,     FILE_FMT_STR},
             {"medate",     FILE_MEDATE,     FILE_FMT_STR},
             {"meldate",    FILE_MELDATE,    FILE_FMT_STR},
-            {"melong",     FILE_MELONG,     FILE_FMT_INT},
-            {"quad",       FILE_QUAD,       FILE_FMT_QUAD},
-            {"lequad",     FILE_LEQUAD,     FILE_FMT_QUAD},
-            {"bequad",     FILE_BEQUAD,     FILE_FMT_QUAD},
             {"qdate",      FILE_QDATE,      FILE_FMT_STR},
             {"leqdate",    FILE_LEQDATE,    FILE_FMT_STR},
             {"beqdate",    FILE_BEQDATE,    FILE_FMT_STR},
             {"qldate",     FILE_QLDATE,     FILE_FMT_STR},
             {"leqldate",   FILE_LEQLDATE,   FILE_FMT_STR},
             {"beqldate",   FILE_BEQLDATE,   FILE_FMT_STR},
-            {"float",      FILE_FLOAT,      FILE_FMT_FLOAT},
-            {"befloat",    FILE_BEFLOAT,    FILE_FMT_FLOAT},
-            {"lefloat",    FILE_LEFLOAT,    FILE_FMT_FLOAT},
-            {"double",     FILE_DOUBLE,     FILE_FMT_DOUBLE},
-            {"bedouble",   FILE_BEDOUBLE,   FILE_FMT_DOUBLE},
-            {"ledouble",   FILE_LEDOUBLE,   FILE_FMT_DOUBLE},
-            {"leid3",      FILE_LEID3,      FILE_FMT_INT},
-            {"beid3",      FILE_BEID3,      FILE_FMT_INT},
-            {"indirect",   FILE_INDIRECT,   FILE_FMT_INT},
             {"qwdate",     FILE_QWDATE,     FILE_FMT_STR},
             {"leqwdate",   FILE_LEQWDATE,   FILE_FMT_STR},
             {"beqwdate",   FILE_BEQWDATE,   FILE_FMT_STR},
+
             {"name",       FILE_NAME,       FILE_FMT_NONE},
             {"use",        FILE_USE,        FILE_FMT_NONE},
             {"clear",      FILE_CLEAR,      FILE_FMT_NONE},
@@ -160,6 +163,27 @@ size_t typ_size(const ref_type_t typ) {
     }
 }
 
+bool is_number_typ(ref_type_t const typ) {
+    auto const format = type_format(typ);
+    return is_number_fmt(format);
+}
+
+bool is_number_fmt(ref_type_format_t const fmt) {
+    return fmt == FILE_FMT_INT ||
+           fmt == FILE_FMT_QUAD ||
+           fmt == FILE_FMT_FLOAT ||
+           fmt == FILE_FMT_DOUBLE;
+}
+
+bool is_string_typ(ref_type_t const typ) {
+    auto const format = type_format(typ);
+    return is_string_fmt(format);
+}
+
+bool is_string_fmt(ref_type_format_t const fmt) {
+    return fmt == FILE_FMT_STR;
+}
+
 val_typ_t::val_typ_t(ref_type_t typ, bool is_unsigned)
         : typ(typ), is_unsigned(is_unsigned) {
 }
@@ -180,13 +204,9 @@ bool val_typ_t::operator!=(const val_typ_t &rhs) const {
 }
 
 bool val_typ_t::is_string() const {
-    return type_format(typ) == FILE_FMT_STR;
+    return is_string_typ(typ);
 }
 
 bool val_typ_t::is_number() const {
-    auto const format = type_format(typ);
-    return format == FILE_FMT_INT ||
-           format == FILE_FMT_QUAD ||
-           format == FILE_FMT_FLOAT ||
-           format == FILE_FMT_DOUBLE;
+    return is_number_typ(typ);
 }

@@ -10,6 +10,8 @@
 #include <tuple>
 #include <map>
 
+#define BIT(O) (1u << (O##u))
+
 enum ref_type_t {
     FILE_INVALID,
     FILE_BYTE,
@@ -63,12 +65,12 @@ enum ref_type_t {
 };
 
 enum ref_type_format_t {
-    FILE_FMT_NONE,
-    FILE_FMT_STR,
-    FILE_FMT_INT,
-    FILE_FMT_QUAD,
-    FILE_FMT_FLOAT,
-    FILE_FMT_DOUBLE,
+    FILE_FMT_NONE = BIT(0),
+    FILE_FMT_STR = BIT(1),
+    FILE_FMT_INT = BIT(2),
+    FILE_FMT_QUAD = BIT(3),
+    FILE_FMT_FLOAT = BIT(4),
+    FILE_FMT_DOUBLE = BIT(5),
 };
 
 struct val_typ_t {
@@ -97,6 +99,14 @@ auto map_name_type() -> std::map< std::string, ref_type_t > const &;
 
 inline
 auto map_type_fmt() -> std::map< ref_type_t, ref_type_format_t > const &;
+
+bool is_number_typ(ref_type_t typ);
+
+bool is_number_fmt(ref_type_format_t fmt);
+
+bool is_string_typ(ref_type_t typ);
+
+bool is_string_fmt(ref_type_format_t fmt);
 
 ref_type_t parse_type(std::string const &name);
 
