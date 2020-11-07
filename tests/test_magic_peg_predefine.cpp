@@ -1,0 +1,57 @@
+//
+// Created by ligen on 11/6/2020.
+//
+
+#include <iostream>
+
+#include <gtest/gtest.h>
+
+#include <tao/pegtl.hpp>
+#include <tao/pegtl/contrib/unescape.hpp>
+
+#include <magic_peg.h>
+#include <magic_peg_predefine.h>
+
+#include "test_pegtl_helper.hpp"
+
+using namespace tao::pegtl;
+
+using namespace tao::pegtl::contrib;
+
+namespace testing_internal
+{
+
+}
+
+TEST(TestMagicPegPredefine, test_format_str_typ) { // NOLINT(cert-err58-cpp)
+    std::cout << "Testing test_format_str_typ ..." << std::endl;
+    auto cases = std::list< std::pair< std::string, bool>>{
+            {"string",  true},
+            {"ustring", false},
+            {"long",    false}
+    };
+
+    for (auto const &pair : cases) {
+        std::cout << "  Case: " << pair.first << std::endl;
+
+        auto out = match_with< formal_str_typ >(pair.first);
+        ASSERT_EQ(out, pair.second);
+    }
+}
+
+TEST(TestMagicPegPredefine, test_format_num_typ) { // NOLINT(cert-err58-cpp)
+    std::cout << "Testing test_format_num_typ ..." << std::endl;
+    auto cases = std::list< std::pair< std::string, bool>>{
+            {"long", true},
+            {"ulong", true},
+            {"use", false},
+            {"string", false}
+    };
+
+    for (auto const &pair : cases) {
+        std::cout << "  Case: " << pair.first << std::endl;
+
+        auto out = match_with< formal_num_typ >(pair.first);
+        ASSERT_EQ(out, pair.second);
+    }
+}

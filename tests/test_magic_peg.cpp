@@ -58,14 +58,14 @@ using namespace tao::pegtl::contrib;
 
 namespace type_whole
 {
-    template<typename Rule>
+    template< typename Rule >
     struct [[maybe_unused]] my_action
-            : nothing<Rule> {
+            : nothing< Rule > {
     };
 
     template<>
-    struct [[maybe_unused]] my_action<np_type::np_deref_type::formal_sign> {
-        template<typename ActionInput>
+    struct [[maybe_unused]] my_action< np_type::np_deref_type::formal_sign > {
+        template< typename ActionInput >
         static void apply(const ActionInput &in, bool &out) {
             out = true;
         }
@@ -74,13 +74,13 @@ namespace type_whole
     bool is_unsigned(std::string const &str) {
         auto ret = false;
         tao::pegtl::memory_input in(str, __FUNCTION__);
-        tao::pegtl::parse<exact<np_deref_type::deref_sign_typ>, my_action>(in, ret);
+        tao::pegtl::parse< exact< np_deref_type::deref_sign_typ >, my_action >(in, ret);
         return ret;
     }
 
     TEST(TestMagicPeg, test_rough_type) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_rough_type ..." << std::endl;
-        auto cases = std::vector<std::pair<std::string, std::tuple<bool, bool>>>{
+        auto cases = std::vector< std::pair< std::string, std::tuple< bool, bool>> >{
                 {"bestring16",  {true,  false}},
                 {"bestring",    {true,  false}},
                 {"16bestring",  {false, false}},
@@ -100,8 +100,8 @@ namespace type_whole
                 is_valid = false;
             }
 
-            ASSERT_EQ(is_valid, std::get<0>(pair.second));
-            ASSERT_EQ(is_unsigned, std::get<1>(pair.second));
+            ASSERT_EQ(is_valid, std::get< 0 >(pair.second));
+            ASSERT_EQ(is_unsigned, std::get< 1 >(pair.second));
         }
     }
 
@@ -111,14 +111,14 @@ namespace test_type_mask
 {
     TEST(TestMagicPeg, test_type_mask) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_type_mask ..." << std::endl;
-        auto cases = std::list<std::pair<std::string, bool>>{
+        auto cases = std::list< std::pair< std::string, bool>>{
                 {"&100",    true},
                 {"/100wc",  true},
                 {"/100w/c", true},
         };
 
         for (auto const &pair : cases) {
-            auto const out = match_with<exact<np_deref_mask::deref_mask>>(pair.first);
+            auto const out = match_with< exact< np_deref_mask::deref_mask>>(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -129,7 +129,7 @@ namespace test_offset
 {
     TEST(TestMagicPeg, test_magic_offset) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_magic_offset ..." << std::endl;
-        auto cases = std::list<std::pair<std::string, bool>>{
+        auto cases = std::list< std::pair< std::string, bool>>{
                 {"&10",             true},
                 {"&0x10",           true},
                 {"&(10)",           true},
@@ -150,7 +150,7 @@ namespace test_offset
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto const out = match_with<exact<np_offset::offset>>(pair.first);
+            auto const out = match_with< exact< np_offset::offset>>(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -161,7 +161,7 @@ namespace test_relation
 {
     TEST(TestMagicPeg, test_magic_relation) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_magic_relation ..." << std::endl;
-        auto cases = std::list<std::pair<std::string, bool>>{
+        auto cases = std::list< std::pair< std::string, bool>>{
                 {R"(Text)",     true},
                 {R"(\xae\xaf)", true},
                 {R"(\0\1\2\7)", true},
@@ -176,11 +176,64 @@ namespace test_relation
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto const out = match_with<exact<np_relation::relation>>(pair.first);
+            auto const out = match_with< exact< np_relation::relation>>(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
 
+}
+
+namespace test_typ_relation
+{
+    TEST(TestMagicPeg, test_magic_relation_str) { // NOLINT(cert-err58-cpp)
+        std::cout << "Testing test_magic_relation_str ..." << std::endl;
+        auto cases = std::list< std::pair< std::string, bool>>{
+                {R"(\xae\xaf)",     true},
+                {R"(\0\1\2\7)",     true},
+                {R"(\01\12\2\1)",   true},
+                {R"(\0\1\013\17)",  true},
+                {R"(A\ Text)",      true},
+                {R"(A\ Text\\)",    true},
+                {R"(\x1be \xaf)",   false},  // must 1-2 bits hex
+                {R"(\0\1\2013\17)", false},  // must 1-3 bits oct
+                {R"(zz Text)",      false},
+                {R"(a\hzText)",     false},
+                {R"(\hzText)",      false},
+                {R"(\a zText)",     false},
+                {R"(Text\)",        false},
+        };
+
+        for (auto const &pair : cases) {
+            std::cout << "  Case: " << pair.first << std::endl;
+
+            auto out = match_with< exact< relation_str>>(pair.first);
+            ASSERT_EQ(out, pair.second);
+        }
+    }
+
+    TEST(TestMagicPeg, test_magic_typ_relation) { // NOLINT(cert-err58-cpp)
+        std::cout << "Testing test_magic_typ_relation ..." << std::endl;
+        auto cases = std::list< std::pair< std::string, bool>>{
+                {"string this-is-a-test",         true},
+                {"string this-is\\ a\\ test",         true},
+                {"string/r/W this-is\\ra-test",     true},
+                {"string/rW this-is-a-test",      true},
+                {"string/600/r/W this-is-a-test", true},
+                {"long/600 100",                  true},
+                {"ulong+600 100",                 true},
+                {"ulong~-600 100",                true},
+                {"ulong~--600 20",                true},
+                {"long/600/r/W this-is-a-test",   false},
+                {"long/600 this-is-a-test",       false},
+        };
+
+        for (auto const &pair : cases) {
+            std::cout << "  Case: " << pair.first << std::endl;
+
+            auto out = match_with< exact< ::typ_relation::typ_relation > >(pair.first);
+            ASSERT_EQ(out, pair.second);
+        }
+    }
 }
 
 namespace test_description_and_type_code
@@ -199,7 +252,7 @@ namespace test_description_and_type_code
 
     TEST(TestMagicPeg, test_magic_description_and_type_code) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_description_and_type_code ..." << std::endl;
-        auto cases = std::list<std::pair<std::string, bool>>{
+        auto cases = std::list< std::pair< std::string, bool>>{
                 {"this is a description",    true},
                 {"x|0",                      true},
                 {"this is a description|10", true},
@@ -210,7 +263,7 @@ namespace test_description_and_type_code
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto const out = match_with<full_desc_and_type_code>(pair.first);
+            auto const out = match_with< full_desc_and_type_code >(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -221,19 +274,19 @@ namespace test_magic_line
 {
     TEST(TestMagicPeg, test_magic_line) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_magic_line ..." << std::endl;
-        auto cases = std::list<std::pair<std::string, bool>>{
-                {">0x24\t\tstring\t\t>\\0\tmusician: \"%s\"", true},
-                {">>>>0x4D\tbeshort\t\t0x000\t(2GDM v", true},
-                {">>>(16.s)\tulelong\t\t>0\t\\b, at 0x%x", true},
-                {">>>>(16.s+4)\tulelong\t\t>0\t%u bytes", true},
-                {">>>>>(&-8.l)\tstring\t\tRIFF", true},
+        auto cases = std::list< std::pair< std::string, bool>>{
+                {">0x24\t\tstring\t\t>\\0\tmusician: \"%s\"",               true},
+                {">>>>0x4D\tbeshort\t\t0x000\t(2GDM v",                     true},
+                {">>>(16.s)\tulelong\t\t>0\t\\b, at 0x%x",                  true},
+                {">>>>(16.s+4)\tulelong\t\t>0\t%u bytes",                   true},
+                {">>>>>(&-8.l)\tstring\t\tRIFF",                            true},
                 {"0\tstring\t4OP\\x1a\t\tIBK instrument data, 4 operators", true},
         };
 
-        for (auto const& pair : cases) {
+        for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto out = match_with<magic_line>(pair.first);
+            auto out = match_with< magic_line >(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
