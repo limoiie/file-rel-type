@@ -70,7 +70,11 @@ namespace magic::ast
             }
 
             static var make(std::string_view val, var v = {}) {
+                if (val.size() > MAX_STRING_LEN - 1) {
+                    val.substr(0, MAX_STRING_LEN - 1);
+                }
                 std::copy(val.cbegin(), val.cend(), v.s);
+                v.s[val.size()] = '\0';
                 return v;
             }
 
