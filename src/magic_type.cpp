@@ -4,8 +4,8 @@
 
 #include "magic_type.h"
 
-auto map_type() -> std::list< std::tuple< std::string, ref_type_t, ref_type_format_t>> const & {
-    static auto m = std::list< std::tuple< std::string, ref_type_t, ref_type_format_t>>{
+auto map_type() -> std::list< std::tuple< std::string, val_typ_t, val_fmt_t>> const & {
+    static auto m = std::list< std::tuple< std::string, val_typ_t, val_fmt_t>>{
             {"invalid",    FILE_INVALID,    FILE_FMT_NONE},
             {"default",    FILE_DEFAULT,    FILE_FMT_NONE},
 
@@ -58,14 +58,13 @@ auto map_type() -> std::list< std::tuple< std::string, ref_type_t, ref_type_form
             {"use",        FILE_USE,        FILE_FMT_NONE},
             {"clear",      FILE_CLEAR,      FILE_FMT_NONE},
             {"der",        FILE_DER,        FILE_FMT_STR},
-            {"",           FILE_INVALID,    FILE_FMT_NONE},
     };
     return m;
 }
 
-auto map_name_type() -> const std::map< std::string, ref_type_t > & {
+auto map_name_type() -> const std::map< std::string, val_typ_t > & {
     auto const &meta_data = map_type();
-    static auto name_type_mapping = std::map< std::string, ref_type_t >();
+    static auto name_type_mapping = std::map< std::string, val_typ_t >();
     if (name_type_mapping.empty()) {
         for (auto const &name_typ_fmt : meta_data) {
             name_type_mapping[std::get< 0 >(name_typ_fmt)] = std::get< 1 >(name_typ_fmt);
@@ -74,9 +73,9 @@ auto map_name_type() -> const std::map< std::string, ref_type_t > & {
     return name_type_mapping;
 }
 
-auto map_type_fmt() -> const std::map< ref_type_t, ref_type_format_t > & {
+auto map_type_fmt() -> const std::map< val_typ_t, val_fmt_t > & {
     auto const &meta_data = map_type();
-    static auto type_fmt_mapping = std::map< ref_type_t, ref_type_format_t >();
+    static auto type_fmt_mapping = std::map< val_typ_t, val_fmt_t >();
     if (type_fmt_mapping.empty()) {
         for (auto const &name_typ_fmt : meta_data) {
             type_fmt_mapping[std::get< 1 >(name_typ_fmt)] = std::get< 2 >(name_typ_fmt);
@@ -85,15 +84,15 @@ auto map_type_fmt() -> const std::map< ref_type_t, ref_type_format_t > & {
     return type_fmt_mapping;
 }
 
-ref_type_t parse_type(const std::string &name) {
+val_typ_t parse_typ(const std::string &name) {
     auto const &mapping = map_name_type();
     if (mapping.count(name)) {
         return mapping.at(name);
     }
-    return ref_type_t::FILE_INVALID;
+    return val_typ_t::FILE_INVALID;
 }
 
-val_typ_t parse_sign_type(std::string const &name) {
+val_sign_typ_t parse_sign_typ(std::string const &name) {
     auto type_name = name;
     auto is_unsigned = false;
     if (tolower(name.front()) == 'u') {
@@ -101,19 +100,19 @@ val_typ_t parse_sign_type(std::string const &name) {
         is_unsigned = true;
     }
     return {
-        parse_type(type_name), is_unsigned
+            parse_typ(type_name), is_unsigned
     };
 }
 
-ref_type_format_t type_format(const ref_type_t typ) {
+val_fmt_t fmt_of_typ(val_typ_t typ) {
     auto const &mapping = map_type_fmt();
     if (mapping.count(typ)) {
         return mapping.at(typ);
     }
-    return ref_type_format_t::FILE_FMT_NONE;
+    return val_fmt_t::FILE_FMT_NONE;
 }
 
-size_t typ_size(const ref_type_t typ) {
+size_t size_of_typ(val_typ_t typ) {
     switch (typ) {
         case FILE_BYTE:
             return (size_t) 1;
@@ -163,50 +162,50 @@ size_t typ_size(const ref_type_t typ) {
     }
 }
 
-bool is_number_typ(ref_type_t const typ) {
-    auto const format = type_format(typ);
+bool is_number_typ(val_typ_t const typ) {
+    auto const format = fmt_of_typ(typ);
     return is_number_fmt(format);
 }
 
-bool is_number_fmt(ref_type_format_t const fmt) {
+bool is_number_fmt(val_fmt_t const fmt) {
     return fmt == FILE_FMT_INT ||
            fmt == FILE_FMT_QUAD ||
            fmt == FILE_FMT_FLOAT ||
            fmt == FILE_FMT_DOUBLE;
 }
 
-bool is_string_typ(ref_type_t const typ) {
-    auto const format = type_format(typ);
+bool is_string_typ(val_typ_t const typ) {
+    auto const format = fmt_of_typ(typ);
     return is_string_fmt(format);
 }
 
-bool is_string_fmt(ref_type_format_t const fmt) {
+bool is_string_fmt(val_fmt_t const fmt) {
     return fmt == FILE_FMT_STR;
 }
 
-val_typ_t::val_typ_t(ref_type_t typ, bool is_unsigned)
+val_sign_typ_t::val_sign_typ_t(val_typ_t typ, bool is_unsigned)
         : typ(typ), is_unsigned(is_unsigned) {
 }
 
-val_typ_t val_typ_t::default_() {
+val_sign_typ_t val_sign_typ_t::default_() {
     return {
             FILE_LONG, false
     };
 }
 
-bool val_typ_t::operator==(const val_typ_t &rhs) const {
+bool val_sign_typ_t::operator==(const val_sign_typ_t &rhs) const {
     return typ == rhs.typ &&
            is_unsigned == rhs.is_unsigned;
 }
 
-bool val_typ_t::operator!=(const val_typ_t &rhs) const {
+bool val_sign_typ_t::operator!=(const val_sign_typ_t &rhs) const {
     return !(rhs == *this);
 }
 
-bool val_typ_t::is_string() const {
+bool val_sign_typ_t::is_string() const {
     return is_string_typ(typ);
 }
 
-bool val_typ_t::is_number() const {
+bool val_sign_typ_t::is_number() const {
     return is_number_typ(typ);
 }

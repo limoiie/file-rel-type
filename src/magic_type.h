@@ -12,7 +12,7 @@
 
 #define BIT(O) (1u << (O##u))
 
-enum ref_type_t {
+enum val_typ_t {
     FILE_INVALID,
     FILE_BYTE,
     FILE_SHORT,
@@ -64,7 +64,7 @@ enum ref_type_t {
     FILE_DER
 };
 
-enum ref_type_format_t {
+enum val_fmt_t {
     FILE_FMT_NONE = BIT(0),
     FILE_FMT_STR = BIT(1),
     FILE_FMT_INT = BIT(2),
@@ -73,17 +73,17 @@ enum ref_type_format_t {
     FILE_FMT_DOUBLE = BIT(5),
 };
 
-struct val_typ_t {
-    ref_type_t typ;
+struct val_sign_typ_t {
+    val_typ_t typ;
     bool is_unsigned;
 
-    val_typ_t(ref_type_t typ, bool is_unsigned);
+    val_sign_typ_t(val_typ_t typ, bool is_unsigned);
 
-    static val_typ_t default_();
+    static val_sign_typ_t default_();
 
-    bool operator==(const val_typ_t &rhs) const;
+    bool operator==(const val_sign_typ_t &rhs) const;
 
-    bool operator!=(const val_typ_t &rhs) const;
+    bool operator!=(const val_sign_typ_t &rhs) const;
 
     [[nodiscard]] bool is_string() const;
 
@@ -92,28 +92,28 @@ struct val_typ_t {
 };
 
 inline
-auto map_type() -> std::list< std::tuple< std::string, ref_type_t, ref_type_format_t>> const &;
+auto map_type() -> std::list< std::tuple< std::string, val_typ_t, val_fmt_t>> const &;
 
 inline
-auto map_name_type() -> std::map< std::string, ref_type_t > const &;
+auto map_name_type() -> std::map< std::string, val_typ_t > const &;
 
 inline
-auto map_type_fmt() -> std::map< ref_type_t, ref_type_format_t > const &;
+auto map_type_fmt() -> std::map< val_typ_t, val_fmt_t > const &;
 
-bool is_number_typ(ref_type_t typ);
+bool is_number_typ(val_typ_t typ);
 
-bool is_number_fmt(ref_type_format_t fmt);
+bool is_number_fmt(val_fmt_t fmt);
 
-bool is_string_typ(ref_type_t typ);
+bool is_string_typ(val_typ_t typ);
 
-bool is_string_fmt(ref_type_format_t fmt);
+bool is_string_fmt(val_fmt_t fmt);
 
-ref_type_t parse_type(std::string const &name);
+val_typ_t parse_typ(std::string const &name);
 
-val_typ_t parse_sign_type(std::string const &name);
+val_sign_typ_t parse_sign_typ(std::string const &name);
 
-ref_type_format_t type_format(ref_type_t typ);
+val_fmt_t fmt_of_typ(val_typ_t typ);
 
-size_t typ_size(ref_type_t typ);
+size_t size_of_typ(val_typ_t typ);
 
 #endif //FILE_REL_TYPE_MAGIC_TYPE_H

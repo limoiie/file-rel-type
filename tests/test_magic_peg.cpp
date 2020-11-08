@@ -81,7 +81,7 @@ namespace test_type_mask
         };
 
         for (auto const &pair : cases) {
-            auto const out = match_with< exact< ::typ_relation::deref_str_mask>>(pair.first);
+            auto const out = match_with< exact< ::np_typ_relation::deref_str_mask>>(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -94,7 +94,7 @@ namespace test_type_mask
         };
 
         for (auto const &pair : cases) {
-            auto const out = match_with< exact< ::typ_relation::deref_num_mask>>(pair.first);
+            auto const out = match_with< exact< ::np_typ_relation::deref_num_mask>>(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -156,7 +156,7 @@ namespace test_typ_relation
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto out = match_with< exact< relation_str>>(pair.first);
+            auto out = match_with< exact< relation_str_val>>(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -180,7 +180,7 @@ namespace test_typ_relation
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto out = match_with< exact< ::typ_relation::typ_relation > >(pair.first);
+            auto out = match_with< exact< ::np_typ_relation::typ_relation > >(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }

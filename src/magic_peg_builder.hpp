@@ -14,6 +14,8 @@
 
 #include <pegtl-helper/integer.hpp>
 
+#include "pegtl-helper/ascii.hpp"
+
 #include "utils/stl_container_helper.h"
 
 #include "magic_peg.h"
@@ -30,7 +32,7 @@ namespace peg::magic::action
     struct state_magic_build {
         std::stack< std::shared_ptr< exp>> stk;
         std::stack< char > stk_op;
-        std::shared_ptr< val_typ_t > typ;
+        std::shared_ptr< val_sign_typ_t > typ;
 
         unsigned flag;
         bool has_range;
@@ -68,8 +70,6 @@ namespace peg::magic::action
 
     template<>
     struct action_magic< np_offset::np_indirect::offset_indirect_relative_num > {
-        using int_t = long long int;
-
         template< typename ActionInput >
         static void apply(const ActionInput & /*unused*/, state_magic_build &st) {
             auto inner = st.stk.top();
@@ -92,7 +92,7 @@ namespace peg::magic::action
         template< typename ParseInput >
         static void
         success(const ParseInput & /*unused*/, np_type::action::state_to_deref_typ &s, state_magic_build &st) {
-            st.typ = std::make_shared< val_typ_t >(s.typ);
+            st.typ = std::make_shared< val_sign_typ_t >(s.typ);
         }
 
     };
@@ -122,7 +122,7 @@ namespace peg::magic::action
 */
 
     template<>
-    struct action_magic< np_offset::np_indirect::np_indirect_mask::offset_indirect_mask_indirect_num > {
+    struct action_magic< np_offset::np_indirect::offset_indirect_mask_indirect_num > {
         template< typename ActionInput >
         static void apply(const ActionInput & /*unused*/, state_magic_build &st) {
             auto inner = st.stk.top();
@@ -153,7 +153,7 @@ namespace peg::magic::action
     };
 
     template<>
-    struct action_magic< np_offset::np_indirect::np_indirect_mask::offset_indirect_mask >
+    struct action_magic< np_offset::np_indirect::offset_indirect_mask >
             : action_mask {
     };
 
@@ -213,7 +213,7 @@ namespace peg::magic::action
         static void success(ParseInput &in, np_type::action::state_to_deref_typ &s, state_magic_build &st) {
             auto offset_exp = st.stk.top();
             st.stk.pop();
-            st.typ = std::make_shared< val_typ_t >(s.typ);
+            st.typ = std::make_shared< val_sign_typ_t >(s.typ);
             auto deref_exp = unop::builder::make_ptr('*', offset_exp, s.typ);
             st.stk.push(deref_exp);
         }
@@ -245,7 +245,7 @@ namespace peg::magic::action
         static void apply0(state_magic_build &st) {
             if (!st.has_range) {
                 auto range = var::builder::make((uint32_t) STRING_DEFAULT_RANGE);
-                auto range_exp = num::builder::make_ptr(val_typ_t::default_(), range);
+                auto range_exp = num::builder::make_ptr(val_sign_typ_t::default_(), range);
                 st.stk.push(range_exp);
             }
             action_mask::apply0(st);
@@ -268,40 +268,6 @@ namespace peg::magic::action
         }
     };
 
-    namespace internal
-    {
-        using tao::pegtl::helper::integer::action::internal::accumulate_digits;
-
-        template< class Rule >
-        struct action_relation_string
-                : maybe_nothing {
-        };
-
-        template<>
-        struct action_relation_string< escaped_one >
-                : ::action::unescape_one {
-        };
-
-        template<>
-        struct action_relation_string< escaped_oct_char >
-                : ::action::unescape_oct_char {
-        };
-
-        template<>
-        struct action_relation_string< escaped_hex_char >
-                : ::action::unescape_hex_char {
-        };
-
-        template<>
-        struct action_relation_string< np_relation::relation_plain >
-                : ::action::plain {
-        };
-
-        struct to_relation_string_switcher
-                : change_action_and_states< action_relation_string, std::string > {
-        };
-    }
-
     template<>
     struct action_magic< np_operator::compare_operator > {
         template< class ActionInput >
@@ -312,12 +278,12 @@ namespace peg::magic::action
     };
 
     template<>
-    struct action_magic< np_relation::relation_value >
-            : internal::to_relation_string_switcher {
+    struct action_magic< word_with_hex_oct >
+            : ::action::to_string_switcher {
         template< class ParseInput >
         static void success(ParseInput &in, std::string &s, state_magic_build &st) {
             auto str = var::builder::make((std::string_view) s);
-            auto typ = val_typ_t{ref_type_t::FILE_STRING, false};
+            auto typ = val_sign_typ_t{val_typ_t::FILE_STRING, false};
             auto inner = num::builder::make_ptr(typ, str);
             st.stk.push(inner);
         }
@@ -334,12 +300,12 @@ namespace peg::magic::action
     };
 
     template<>
-    struct action_magic< ::typ_relation::relation_str >
+    struct action_magic< ::np_typ_relation::relation_str_val >
             : action_push_binop_with_flag {
     };
 
     template<>
-    struct action_magic< ::typ_relation::relation_num >
+    struct action_magic< ::np_typ_relation::relation_num_val >
             : action_push_binop_with_flag {
     };
 

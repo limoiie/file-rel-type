@@ -46,39 +46,34 @@ namespace np_offset
 {
     namespace np_indirect
     {
-        namespace np_indirect_mask
-        {
-            struct offset_indirect_mask_operator
-                    : np_operator::mask_operator {
-            };
-
-            struct offset_indirect_mask_absolute_num
-                    : number {
-            };
-
-            struct offset_indirect_mask_indirect_num
-                    : seq<
-                            one< '(' >,
-                            number,
-                            one< ')' >
-                    > {
-            };
-
-            struct offset_indirect_mask
-                    : seq<
-                            offset_indirect_mask_operator,          // [&|^+/-*%]
-                            sor<
-                                    offset_indirect_mask_absolute_num,  //     [-+]?digit+
-                                    offset_indirect_mask_indirect_num   // "(" [-+]?digit+ ")"
-                            >
-                    > {
-            };
-        }
-
-        struct offset_indirect_absolute_num : number {
+        struct offset_indirect_mask_absolute_num
+                : number {
         };
 
-        struct offset_indirect_relative_num : number {
+        struct offset_indirect_mask_indirect_num
+                : seq<
+                        one< '(' >,
+                        number,
+                        one< ')' >
+                > {
+        };
+
+        struct offset_indirect_mask
+                : seq<
+                        np_operator::mask_operator,          // [&|^+/-*%]
+                        sor<
+                                offset_indirect_mask_absolute_num,  //     [-+]?digit+
+                                offset_indirect_mask_indirect_num   // "(" [-+]?digit+ ")"
+                        >
+                > {
+        };
+
+        struct offset_indirect_absolute_num
+                : number {
+        };
+
+        struct offset_indirect_relative_num
+                : number {
         };
 
         struct offset_indirect_num
@@ -98,14 +93,15 @@ namespace np_offset
                         one< '(' >,
                         offset_indirect_num,
                         opt< abbrev_sign_typ >,
-                        opt< np_indirect_mask::offset_indirect_mask >,
+                        opt< offset_indirect_mask >,
                         one< ')' >
                 > {
         };
 
     }
 
-    struct offset_absolute : number {
+    struct offset_absolute
+            : number {
     };
 
     struct offset_
@@ -134,10 +130,6 @@ namespace np_offset
 
 namespace np_deref_mask
 {   /// region de-reference mask (additional computation)
-    struct deref_mask_operator
-            : np_operator::mask_operator {
-    };
-
     struct deref_mask_num
             : number {
     };
@@ -151,41 +143,6 @@ namespace np_deref_mask
                     >
             > {
     };
-
-}
-
-namespace np_relation
-{
-    struct relation_escaped
-            : sor<
-                    escaped_one,
-                    seq< one< 'x' >, escaped_hex_char >,
-                    escaped_oct_char
-            > {
-    };
-
-    struct relation_plain
-            : internal::rematch< print, not_at< word_edge > > {
-    };
-
-    struct relation_character
-            : if_then_else< one< '\\' >, relation_escaped, relation_plain > {
-    };
-
-    struct relation_value
-            : internal::plus< relation_character > {
-    };
-
-    struct relation_num_value
-            : number {
-    };
-
-}
-
-namespace typ_relation
-{
-    using namespace np_type::np_deref_type;
-    using namespace np_deref_mask;
 
     struct deref_num_mask
             : seq<
@@ -201,6 +158,13 @@ namespace typ_relation
             > {
     };
 
+}
+
+namespace np_typ_relation
+{
+    using namespace np_type::np_deref_type;
+    using namespace np_deref_mask;
+
     template< class Rule >
     struct relation_exp
             : seq<
@@ -208,19 +172,19 @@ namespace typ_relation
             > {
     };
 
-    struct relation_str
-            : relation_exp< np_relation::relation_value > {
+    struct relation_str_val
+            : relation_exp< word_with_hex_oct > {
     };
 
-    struct relation_num
-            : relation_exp< np_relation::relation_num_value > {
+    struct relation_num_val
+            : relation_exp< number > {
     };
 
     struct typ_relation
             : tao::pegtl::switcher<
-                    formal_str_typ, seq< opt< deref_str_mask >, ___, relation_str >,
-                    formal_num_typ, seq< opt< deref_num_mask >, ___, relation_num >,
-                    formal_non_typ, seq< opt< /* success  */ >, ___, relation_str >
+                    formal_str_typ, seq< opt< deref_str_mask >, ___, relation_str_val >,
+                    formal_non_typ, seq< opt< /* success  */ >, ___, relation_str_val >,
+                    formal_num_typ, seq< opt< deref_num_mask >, ___, relation_num_val >
             > {
     };
 }
@@ -249,11 +213,9 @@ namespace np_description
 
 }
 
-
 using namespace np_type::np_deref_type;
 using namespace np_deref_mask;
-
-using namespace typ_relation;
+using namespace np_typ_relation;
 
 struct magic_line_new
         : contrib::exact<
@@ -261,11 +223,7 @@ struct magic_line_new
                 __,
                 np_offset::offset,
                 ___,
-                tao::pegtl::switcher<
-                        formal_str_typ, seq< opt< deref_str_mask >, ___, relation_str >,
-                        formal_num_typ, seq< opt< deref_num_mask >, ___, relation_num >,
-                        formal_non_typ, seq< opt< /* success  */ >, ___, relation_str >
-                >,
+                typ_relation,
                 __,
                 opt< np_description::description >,
                 if_then_else<

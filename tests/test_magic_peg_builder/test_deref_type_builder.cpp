@@ -22,7 +22,7 @@ using namespace tao::pegtl::contrib;
 static
 auto ph_exp() {
     auto const default_val = magic::ast::var::builder::make(0u);
-    return magic::ast::num::builder::make_ptr(val_typ_t::default_(), default_val);
+    return magic::ast::num::builder::make_ptr(val_sign_typ_t::default_(), default_val);
 }
 
 template< class Rule >
@@ -48,8 +48,8 @@ namespace testing_internal
 
     std::shared_ptr< exp > make_exp(std::string const &typ, std::string const &op, long long int num) {
         auto left_inner = ph_exp();  // make a placeholder for the offset
-        auto left = unop::builder::make_ptr('*', left_inner, parse_sign_type(typ));
-        auto right = num::builder::make_ptr(val_typ_t::default_(), var::builder::make((uint64_t) num));
+        auto left = unop::builder::make_ptr('*', left_inner, parse_sign_typ(typ));
+        auto right = num::builder::make_ptr(val_sign_typ_t::default_(), var::builder::make((uint64_t) num));
         auto inner = binop::builder::make_ptr(op.back(), left, right);
         if (op.length() == 2) {
             return unop::builder::make_ptr('~', inner);
@@ -116,7 +116,7 @@ TEST(TestMagicPegBuilder, test_build_relation_str) { // NOLINT(cert-err58-cpp)
     for (auto const &pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        auto out = parse_magic< np_relation::relation_value >(pair.first);
+        auto out = parse_magic< word_with_hex_oct >(pair.first);
         auto str = std::dynamic_pointer_cast<magic::ast::num>(out.stk.top());
 
         ASSERT_EQ(std::string_view(str->inner->data.s), pair.second);

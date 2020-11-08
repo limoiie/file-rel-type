@@ -91,21 +91,21 @@ namespace magic::ast
     };
 
     struct val {
-        val_typ_t typ;
+        val_sign_typ_t typ;
         var data;
 
-        explicit val(val_typ_t typ, var const &data)
+        explicit val(val_sign_typ_t typ, var const &data)
                 : typ(typ), data(data) {
         }
 
         bool operator==(const val &rhs) const {
             if (typ != rhs.typ) return false;
-            switch (type_format(typ.typ)) {
+            switch (fmt_of_typ(typ.typ)) {
                 case FILE_FMT_STR:
                     return std::string_view(data.s) == std::string_view(rhs.data.s);
                 case FILE_FMT_INT:
                 case FILE_FMT_QUAD:
-                    switch (typ_size(typ.typ)) {
+                    switch (size_of_typ(typ.typ)) {
                         case 1:
                             return data.b == rhs.data.b;
                         case 2:
@@ -157,7 +157,7 @@ namespace magic::ast
 
     struct num : public exp {
         struct builder {
-            static std::shared_ptr< num > make_ptr(val_typ_t typ, var const &data) {
+            static std::shared_ptr< num > make_ptr(val_sign_typ_t typ, var const &data) {
                 return std::shared_ptr< num >(new num{std::make_shared< val >(typ, data)});
             }
 
@@ -323,7 +323,7 @@ namespace magic::ast
     };
 
     struct unop_deference : public unop {
-        explicit unop_deference(std::shared_ptr< exp > const &inner, val_typ_t typ = {FILE_LONG, false})
+        explicit unop_deference(std::shared_ptr< exp > const &inner, val_sign_typ_t typ = {FILE_LONG, false})
                 : unop(inner), typ(typ) {
         }
 
@@ -344,7 +344,7 @@ namespace magic::ast
             return nullptr; // todo: impl
         }
 
-        val_typ_t typ;
+        val_sign_typ_t typ;
 
     };
 

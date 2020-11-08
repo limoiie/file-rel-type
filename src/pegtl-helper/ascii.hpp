@@ -41,6 +41,26 @@ struct escaped_hex_char
         : internal::rep_min_max< 1, 2, xdigit > {
 };
 
+struct escaped_with_hex_oct
+        : sor<
+                escaped_one,
+                seq< one< 'x' >, escaped_hex_char >,
+                escaped_oct_char
+        > {
+};
+
+struct plain_in_word
+        : internal::rematch< print, not_at< word_edge > > {
+};
+
+struct char_in_word_with_hex_oct
+        : if_then_else< one< '\\' >, escaped_with_hex_oct, plain_in_word > {
+};
+
+struct word_with_hex_oct
+        : internal::plus< char_in_word_with_hex_oct > {
+};
+
 namespace action
 {
     using tao::pegtl::helper::integer::action::internal::accumulate_digits;
@@ -77,6 +97,35 @@ namespace action
             }
             st.push_back(byte);
         }
+    };
+
+    template< class Rule >
+    struct action_to_string
+            : maybe_nothing {
+    };
+
+    template<>
+    struct action_to_string< escaped_one >
+            : unescape_one {
+    };
+
+    template<>
+    struct action_to_string< escaped_oct_char >
+            : unescape_oct_char {
+    };
+
+    template<>
+    struct action_to_string< escaped_hex_char >
+            : unescape_hex_char {
+    };
+
+    template<>
+    struct action_to_string< plain_in_word >
+            : plain {
+    };
+
+    struct to_string_switcher
+            : change_action_and_states< action_to_string, std::string > {
     };
 
 }

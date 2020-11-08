@@ -103,13 +103,13 @@ namespace testing_internal
     }
 
     std::shared_ptr< unop >
-    make_unop_def(std::shared_ptr< exp > const &inner, std::shared_ptr< val_typ_t > const &typ) {
+    make_unop_def(std::shared_ptr< exp > const &inner, std::shared_ptr< val_sign_typ_t > const &typ) {
         return typ ? unop_deference::builder::make_ptr('*', inner, *typ)
                    : unop_deference::builder::make_ptr('*', inner);
     }
 
     std::shared_ptr< exp >
-    make_unop_def_with_direct_mask(std::shared_ptr< exp > const &left, std::shared_ptr< val_typ_t > const &typ,
+    make_unop_def_with_direct_mask(std::shared_ptr< exp > const &left, std::shared_ptr< val_sign_typ_t > const &typ,
                                    char const mask_op, int const mask_num, bool const inverse = false) {
         auto right = make_num(mask_num);
         auto inner = binop::builder::make_ptr(mask_op, left, right);
@@ -118,7 +118,7 @@ namespace testing_internal
     }
 
     std::shared_ptr< exp >
-    make_unop_def_with_indirect_mask(std::shared_ptr< exp > const &left, std::shared_ptr< val_typ_t > const &typ,
+    make_unop_def_with_indirect_mask(std::shared_ptr< exp > const &left, std::shared_ptr< val_sign_typ_t > const &typ,
                                      char const mask_op, int const mask_num, bool const inverse = false) {
         auto right_inner = make_num(mask_num);
         auto right = make_unop_def(right_inner, typ);
