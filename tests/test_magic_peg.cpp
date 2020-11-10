@@ -236,7 +236,7 @@ namespace test_magic_line
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto out = match_with< magic_line_new >(pair.first);
+            auto out = match_with<magic_line >(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }

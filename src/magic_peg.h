@@ -217,7 +217,7 @@ using namespace np_type::np_deref_type;
 using namespace np_deref_mask;
 using namespace np_typ_relation;
 
-struct magic_line_new
+struct magic_line
         : contrib::exact<
                 continue_level,
                 __,
