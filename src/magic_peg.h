@@ -42,6 +42,10 @@ struct number
         : seq< number_ > {
 };
 
+struct string
+        : seq< word_with_hex_oct > {
+};
+
 namespace np_offset
 {
     namespace np_indirect
@@ -173,11 +177,11 @@ namespace np_typ_relation
     };
 
     struct relation_str_val
-            : relation_exp< word_with_hex_oct > {
+            : relation_exp< ::string > {
     };
 
     struct relation_num_val
-            : relation_exp< number > {
+            : relation_exp< ::number > {
     };
 
     struct typ_relation
