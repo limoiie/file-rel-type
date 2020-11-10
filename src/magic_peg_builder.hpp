@@ -61,30 +61,20 @@ namespace peg::magic::action
             : action_push_num< long long int > {
     };
 
-/*
-    template<>
-    struct action_magic< np_offset::np_indirect::offset_indirect_absolute_num >
-            : maybe_nothing {  // follow action<number_>
-    };
-*/
-
-    template<>
-    struct action_magic< np_offset::np_indirect::offset_indirect_relative_num > {
+    struct action_relative_if_necessary {
         template< typename ActionInput >
-        static void apply(const ActionInput & /*unused*/, state_magic_build &st) {
-            auto inner = st.stk.top();
-            st.stk.pop();
-            st.stk.push(unop::builder::make_ptr('&', inner));
+        static void apply(const ActionInput & in, state_magic_build &st) {
+            if (in.peek_char() == '&') {
+                auto inner = std_::pop(st.stk);
+                st.stk.push(unop::builder::make_ptr('&', inner));
+            }
         }
-
     };
 
-/*
     template<>
     struct action_magic< np_offset::np_indirect::offset_indirect_num >
-            : maybe_nothing {  // delegate to action<offset_indirect_[absolute/relative]_num>
+            : action_relative_if_necessary {
     };
-*/
 
     template<>
     struct action_magic< np_offset::np_indirect::abbrev_sign_typ >
@@ -183,29 +173,10 @@ namespace peg::magic::action
     };
 */
 
-/*
     template<>
-    struct action_magic< np_offset::offset_absolute_ >
-            : maybe_nothing { // follow action<offset_>
+    struct action_magic< np_offset::offset >
+            : action_relative_if_necessary {
     };
-*/
-
-    template<>
-    struct action_magic< np_offset::offset_relative_ > {
-        template< typename ActionInput >
-        static void apply(const ActionInput & /*unused*/, state_magic_build &st) {
-            auto inner = st.stk.top();
-            st.stk.pop();
-            st.stk.push(unop::builder::make_ptr('&', inner));
-        }
-    };
-
-/*
-    template<>
-    struct action_magic< offset >
-            :maybe_nothing { // follow action<offset_[relative/absolute]_>
-    };
-*/
 
     struct action_to_typ
             : np_type::np_deref_type::to_typ_switcher {

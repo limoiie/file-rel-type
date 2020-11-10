@@ -28,51 +28,6 @@ peg::magic::action::state_magic_build parse_magic(std::string const &stmt) {
     return st;
 }
 
-TEST(TestMagicPegBuilder, test_build_offset_indirect_absolute_num) { // NOLINT(cert-err58-cpp)
-    std::cout << "Testing test_build_number ..." << std::endl;
-    auto cases = std::list< std::pair< std::string, int>>{
-            PAIR(0),
-            PAIR(1),
-            PAIR(-1),
-            PAIR(-0),
-            PAIR(123),
-            PAIR(0x123),
-            PAIR(0x0),
-    };
-
-    for (auto const &pair : cases) {
-        std::cout << "  Case: " << pair.first << std::endl;
-
-        auto st = parse_magic< np_offset::np_indirect::offset_indirect_absolute_num >(pair.first);
-        auto num_exp = std::dynamic_pointer_cast< peg::magic::action::num >(st.stk.top());
-        ASSERT_EQ(num_exp->inner->data.l, pair.second);
-    }
-}
-
-TEST(TestMagicPegBuilder, test_build_offset_indirect_relative_num) { // NOLINT(cert-err58-cpp)
-    std::cout << "Testing test_build_offset_indirect_relative_num ..." << std::endl;
-    auto cases = std::list< std::pair< std::string, int > >{
-            PAIR(0),
-            PAIR(1),
-            PAIR(-1),
-            PAIR(-0),
-            PAIR(123),
-            PAIR(0x123),
-            PAIR(0x0),
-    };
-
-    for (auto const &pair : cases) {
-        std::cout << "  Case: " << pair.first << std::endl;
-
-        auto st = parse_magic< np_offset::np_indirect::offset_indirect_relative_num >(pair.first);
-
-        auto unop_exp = std::dynamic_pointer_cast< peg::magic::action::unop >(st.stk.top());
-        ASSERT_NE(unop_exp, nullptr);
-        auto num_exp = std::dynamic_pointer_cast< peg::magic::action::num >(unop_exp->inner);
-        ASSERT_EQ(num_exp->inner->data.l, pair.second);
-    }
-}
-
 namespace testing_internal
 {
     using peg::magic::action::var;

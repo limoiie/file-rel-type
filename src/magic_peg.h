@@ -48,6 +48,10 @@ struct string
 
 namespace np_offset
 {
+    struct relative_op
+            : one< '&' > {
+    };
+
     namespace np_indirect
     {
         struct offset_indirect_mask_absolute_num
@@ -72,19 +76,11 @@ namespace np_offset
                 > {
         };
 
-        struct offset_indirect_absolute_num
-                : number {
-        };
-
-        struct offset_indirect_relative_num
-                : number {
-        };
-
         struct offset_indirect_num
                 : if_then_else<
-                        one< '&' >,
-                        offset_indirect_relative_num,
-                        offset_indirect_absolute_num
+                        relative_op,
+                        number,
+                        number
                 > {
         };
 
@@ -102,32 +98,23 @@ namespace np_offset
                 > {
         };
 
+        struct offset_absolute
+                : number {
+        };
     }
-
-    struct offset_absolute
-            : number {
-    };
 
     struct offset_
             : sor<
-                    offset_absolute,
+                    np_indirect::offset_absolute,
                     np_indirect::offset_indirect
             > {
     };
 
-    struct offset_relative_
-            : offset_ {
-    };
-
-    struct offset_absolute_
-            : offset_ {
-    };
-
     struct offset
             : if_then_else<
-                    one< '&' >,
-                    offset_relative_,
-                    offset_absolute_
+                    relative_op,
+                    offset_,
+                    offset_
             > {
     };
 }
