@@ -66,7 +66,7 @@ namespace np_offset
                 > {
         };
 
-        struct offset_indirect_mask
+        struct offset_mask
                 : seq<
                         np_operator::mask_operator,          // [&|^+/-*%]
                         sor<
@@ -93,7 +93,7 @@ namespace np_offset
                         one< '(' >,
                         offset_indirect_num,
                         opt< abbrev_sign_typ >,
-                        opt< offset_indirect_mask >,
+                        opt< offset_mask >,
                         one< ')' >
                 > {
         };

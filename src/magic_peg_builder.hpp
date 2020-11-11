@@ -143,7 +143,7 @@ namespace peg::magic::action
     };
 
     template<>
-    struct action_magic< np_offset::np_indirect::offset_indirect_mask >
+    struct action_magic< np_offset::np_indirect::offset_mask >
             : action_mask {
     };
 
