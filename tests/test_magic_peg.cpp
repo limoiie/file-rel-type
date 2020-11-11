@@ -16,6 +16,7 @@
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
+using namespace np_typ_relation;
 
 namespace type_whole
 {
@@ -103,8 +104,9 @@ namespace test_type_mask
 
 namespace test_offset
 {
-    TEST(TestMagicPeg, test_magic_offset) { // NOLINT(cert-err58-cpp)
-        std::cout << "Testing test_magic_offset ..." << std::endl;
+
+    TEST(TestMagicPeg, test_magic_offset_new) { // NOLINT(cert-err58-cpp)
+        std::cout << "Testing test_magic_offset_new ..." << std::endl;
         auto cases = std::list< std::pair< std::string, bool>>{
                 {"&10",             true},
                 {"&0x10",           true},
@@ -117,7 +119,7 @@ namespace test_offset
                 {"&(&10.l-(10))",   true},
                 {"&(&0x10.l-(10))", true},
                 {"&(&10.l-(0x10))", true},
-                {"&&10",            false},
+                {"&&10",            true},
                 {"(9.b+19)",        true},
                 {"(9b+19)",         false},
                 {"(&-8.l)",         true}
@@ -126,7 +128,7 @@ namespace test_offset
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto const out = match_with< exact< np_offset::offset>>(pair.first);
+            auto const out = match_with< exact< np_offset::offset_general > >(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -236,7 +238,7 @@ namespace test_magic_line
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto out = match_with<magic_line >(pair.first);
+            auto out = match_with< magic_line >(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }

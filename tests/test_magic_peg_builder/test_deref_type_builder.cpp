@@ -14,6 +14,7 @@
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
+using namespace np_typ_relation;
 
 #define PAIR(NUM) { #NUM, NUM }
 

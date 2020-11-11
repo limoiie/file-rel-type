@@ -15,6 +15,7 @@
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
+using namespace np_typ_relation;
 
 TEST(TestMagicPegPredefine, test_format_str_typ) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing test_format_str_typ ..." << std::endl;

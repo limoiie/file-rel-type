@@ -24,7 +24,7 @@ peg::magic::action::state_magic_build parse_magic(std::string const &stmt) {
     tao::pegtl::memory_input in(stmt, __FUNCTION__);
 
     parse< exact< Rule >,
-            peg::magic::action::action_magic >(in, st);
+           peg::magic::action::action_magic >(in, st);
     return st;
 }
 
@@ -41,12 +41,25 @@ namespace testing_internal
     std::shared_ptr< exp > make_num(int const n) {
         return num::builder::make_ptr(
                 {FILE_LONG, false},
-                var::builder::make((uint32_t) n)
+                var::builder::make((uint32_t)n)
         );
     }
 
+    std::shared_ptr< exp > make_num_core(int const l, char const op, int const r,
+                                         int const inverse, int const indir_op = false) {
+        auto right = make_num(r);
+        auto left = make_num(l);
+        auto inner = indir_op ? binop::builder::make_ptr(op, left, unop::builder::make_ptr('*', right))
+                              : binop::builder::make_ptr(op, left, right);
+
+        std::shared_ptr< exp > ret = inner;
+        if (inverse)
+            ret = unop::builder::make_ptr('~', ret);
+        return ret;
+    }
+
     std::shared_ptr< unop > make_unop_rel(int const n) {
-        return unop::builder::make_ptr('&', make_num((uint32_t) n));
+        return unop::builder::make_ptr('&', make_num((uint32_t)n));
     }
 
     std::shared_ptr< unop > make_unop_rel(std::shared_ptr< exp > const &inner) {
@@ -54,7 +67,7 @@ namespace testing_internal
     }
 
     std::shared_ptr< unop > make_unop_def(int const n) {
-        return unop::builder::make_ptr('*', make_num((uint32_t) n));
+        return unop::builder::make_ptr('*', make_num((uint32_t)n));
     }
 
     std::shared_ptr< unop >
@@ -63,45 +76,6 @@ namespace testing_internal
                    : unop_deference::builder::make_ptr('*', inner);
     }
 
-    std::shared_ptr< exp >
-    make_unop_def_with_direct_mask(std::shared_ptr< exp > const &left, std::shared_ptr< val_sign_typ_t > const &typ,
-                                   char const mask_op, int const mask_num, bool const inverse = false) {
-        auto right = make_num(mask_num);
-        auto inner = binop::builder::make_ptr(mask_op, left, right);
-        return inverse ? make_unop_def(unop::builder::make_ptr('~', inner), typ)
-                       : make_unop_def(inner, typ);
-    }
-
-    std::shared_ptr< exp >
-    make_unop_def_with_indirect_mask(std::shared_ptr< exp > const &left, std::shared_ptr< val_sign_typ_t > const &typ,
-                                     char const mask_op, int const mask_num, bool const inverse = false) {
-        auto right_inner = make_num(mask_num);
-        auto right = make_unop_def(right_inner, typ);
-        auto inner = binop::builder::make_ptr(mask_op, left, right);
-        return inverse ? make_unop_def(unop::builder::make_ptr('~', inner), typ)
-                       : make_unop_def(inner, typ);
-    }
-}
-
-TEST(TestMagicPegBuilder, test_build_offset_indirect_num) { // NOLINT(cert-err58-cpp)
-    using peg::magic::action::var;
-
-    std::cout << "Testing test_build_offset_indirect_num ..." << std::endl;
-    auto cases = std::list< std::pair< std::string, std::shared_ptr< peg::magic::action::exp>> >{
-            {"123",   testing_internal::make_num(123)},
-            {"+1",    testing_internal::make_num(+1)},
-            {"&1",    testing_internal::make_unop_rel(1)},
-            {"&123",  testing_internal::make_unop_rel(123)},
-            {"&-123", testing_internal::make_unop_rel(-123)},
-    };
-
-    for (auto const &pair : cases) {
-        std::cout << "  Case: " << pair.first << std::endl;
-
-        auto st = parse_magic< np_offset::np_indirect::offset_indirect_num >(pair.first);
-
-        ASSERT_EQ(*st.stk.top(), *pair.second);
-    }
 }
 
 namespace testing_internal
@@ -114,26 +88,53 @@ namespace testing_internal
                 {"(123)",                testing_internal::make_unop_def(123)},
                 {"(-123)",               testing_internal::make_unop_def(-123)},
                 {"(0x123)",              testing_internal::make_unop_def(0x123)},
-                {"(&+23)",               testing_internal::make_unop_def(testing_internal::make_unop_rel(+23),
-                                                                         nullptr)},
-                {"(&-0x123)",            testing_internal::make_unop_def(testing_internal::make_unop_rel(-0x123),
-                                                                         nullptr)},
+                {"(&+23)",               testing_internal::make_unop_def(
+                        testing_internal::make_unop_rel(+23), nullptr
+                )},
+                {"(&-0x123)",            testing_internal::make_unop_def(
+                        testing_internal::make_unop_rel(-0x123), nullptr
+                )},
                 {"(&-0x123.l)",          testing_internal::make_unop_def(
-                        testing_internal::make_unop_rel(-0x123), sign_type('.', 'l'))},
-                {"(&-0x123.l+123)",      testing_internal::make_unop_def_with_direct_mask(
-                        testing_internal::make_unop_rel(-0x123), sign_type('.', 'l'), '+', 123)},
-                {"(&-0x123.l~+123)",     testing_internal::make_unop_def_with_direct_mask(
-                        testing_internal::make_unop_rel(-0x123), sign_type('.', 'l'), '+', 123, true)},
-                {"(-0x123.L/(123))",     testing_internal::make_unop_def_with_indirect_mask(
-                        testing_internal::make_num(-0x123), sign_type('.', 'L'), '/', 123)},
-                {"(-0x123.L~/(123))",    testing_internal::make_unop_def_with_indirect_mask(
-                        testing_internal::make_num(-0x123), sign_type('.', 'L'), '/', 123, true)},
-                {"(&-0x123.l+(123))",    testing_internal::make_unop_def_with_indirect_mask(
-                        testing_internal::make_unop_rel(-0x123), sign_type('.', 'l'), '+', 123)},
-                {"(&-0x123.l+(-0x123))", testing_internal::make_unop_def_with_indirect_mask(
-                        testing_internal::make_unop_rel(-0x123), sign_type('.', 'l'), '+', -0x123)},
-                {"(&-0x123+(-0x123))",   testing_internal::make_unop_def_with_indirect_mask(
-                        testing_internal::make_unop_rel(-0x123), nullptr, '+', -0x123)},
+                        testing_internal::make_unop_rel(-0x123), sign_type('.', 'l')
+                )},
+                {"(&-0x123.l+123)",      testing_internal::make_unop_def(
+                        testing_internal::make_unop_rel(
+                                testing_internal::make_num_core(-0x123, '+', 123, false)
+                        ),
+                        sign_type('.', 'l')
+                )},
+                {"(&-0x123.l~+123)",     testing_internal::make_unop_def(
+                        testing_internal::make_unop_rel(
+                                testing_internal::make_num_core(-0x123, '+', 123, true)
+                        ),
+                        sign_type('.', 'l')
+                )},
+                {"(-0x123.L/(123))",     testing_internal::make_unop_def(
+                        testing_internal::make_num_core(-0x123, '/', 123, false, true),
+                        sign_type('.', 'L')
+                )},
+                {"(-0x123.L~/(123))",    testing_internal::make_unop_def(
+                        testing_internal::make_num_core(-0x123, '/', 123, true, true),
+                        sign_type('.', 'L')
+                )},
+                {"(&-0x123.l+(123))",    testing_internal::make_unop_def(
+                        testing_internal::make_unop_rel(
+                                testing_internal::make_num_core(-0x123, '+', 123, false, true)
+                        ),
+                        sign_type('.', 'l')
+                )},
+                {"(&-0x123.l+(-0x123))", testing_internal::make_unop_def(
+                        testing_internal::make_unop_rel(
+                                testing_internal::make_num_core(-0x123, '+', -0x123, false, true)
+                        ),
+                        sign_type('.', 'l')
+                )},
+                {"(&-0x123+(-0x123))",   testing_internal::make_unop_def(
+                        testing_internal::make_unop_rel(
+                                testing_internal::make_num_core(-0x123, '+', -0x123, false, true)
+                        ),
+                        nullptr
+                )},
         };
     }
 
@@ -151,62 +152,21 @@ namespace testing_internal
     }
 }
 
-TEST(TestMagicPegBuilder, test_build_offset_indirect) { // NOLINT(cert-err58-cpp)
-    using peg::magic::action::unop;
-    using peg::magic::action::var;
-    using np_type::np_indirect_type::action::internal::sign_type;
-
-    std::cout << "Testing test_build_offset_indirect ..." << std::endl;
+TEST(TestMagicPegBuilder, test_build_offset_general) { // NOLINT(cert-err58-cpp)
+    std::cout << "Testing test_build_offset_general ..." << std::endl;
     auto cases = testing_internal::make_offset_indirect_exp();
 
     for (auto const &pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        auto st = parse_magic< np_offset::np_indirect::offset_indirect >(pair.first);
+        auto st = parse_magic< np_offset::offset_general >(pair.first);
+        auto const& left = *st.stk.top();
+        auto const& right = *pair.second;
         ASSERT_EQ(*st.stk.top(), *pair.second);
     }
 }
 
-TEST(TestMagicPegBuilder, test_build_offset_indirect_false) { // NOLINT(cert-err58-cpp)
-    using peg::magic::action::unop;
-    using peg::magic::action::var;
-    using np_type::np_indirect_type::action::internal::sign_type;
-
-    std::cout << "Testing test_build_offset_indirect_false ..." << std::endl;
-    auto cases = std::list< std::pair< std::string, std::shared_ptr< peg::magic::action::exp>> >{
-            {"(123)",             testing_internal::make_unop_rel(123)},
-            {"(-123)",            testing_internal::make_unop_def(123)},
-            {"(0x123)",           testing_internal::make_unop_def(testing_internal::make_unop_rel(0x123), nullptr)},
-            {"(&+23)",            testing_internal::make_unop_def(+23)},
-            {"(&-0x123)",         testing_internal::make_unop_def(testing_internal::make_unop_rel(0x123), nullptr)},
-            {"(&-0x123,L)",       testing_internal::make_unop_def(
-                    testing_internal::make_unop_rel(-0x123), sign_type('.', 'l'))},
-            {"(&-0x123.l+321)",   testing_internal::make_unop_def_with_direct_mask(
-                    testing_internal::make_unop_rel(-0x123), sign_type('.', 'l'), '+', 123)},
-            {"(-0x123.L*(123))",  testing_internal::make_unop_def_with_indirect_mask(
-                    testing_internal::make_num(-0x123), sign_type('.', 'L'), '/', 123)},
-            {"(-0x123.l+(123))",  testing_internal::make_unop_def_with_indirect_mask(
-                    testing_internal::make_unop_rel(-0x123), sign_type('.', 'l'), '+', 123)},
-            {"(&-0x123.l-0x123)", testing_internal::make_unop_def_with_indirect_mask(
-                    testing_internal::make_unop_rel(-0x123), sign_type('.', 'l'), '+', -0x123)},
-            {"(&-0x123-0x123)",   testing_internal::make_unop_def_with_indirect_mask(
-                    testing_internal::make_unop_rel(-0x123), nullptr, '+', -0x123)},
-    };
-
-    for (auto const &pair : cases) {
-        std::cout << "  Case: " << pair.first << std::endl;
-
-        auto st = parse_magic< np_offset::np_indirect::offset_indirect >(pair.first);
-        ASSERT_NE(*st.stk.top(), *pair.second);
-    }
-}
-
 TEST(TestMagicPegBuilder, test_build_offset) { // NOLINT(cert-err58-cpp)
-    using peg::magic::action::exp;
-    using peg::magic::action::unop;
-    using peg::magic::action::var;
-    using np_type::np_indirect_type::action::internal::sign_type;
-
     std::cout << "Testing test_build_offset ..." << std::endl;
     auto cases = testing_internal::make_offset_indirect_exp();
     cases.splice(cases.end(), testing_internal::make_offset_relative_indirect_exp());
@@ -214,7 +174,7 @@ TEST(TestMagicPegBuilder, test_build_offset) { // NOLINT(cert-err58-cpp)
     for (auto const &pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        auto st = parse_magic< np_offset::offset >(pair.first);
+        auto st = parse_magic< np_offset::offset_general >(pair.first);
         ASSERT_EQ(*st.stk.top(), *pair.second);
     }
 }

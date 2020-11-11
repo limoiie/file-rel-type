@@ -31,6 +31,7 @@ namespace peg::magic::action
 
     struct state_magic_build {
         std::stack< std::shared_ptr< exp>> stk;
+        std::stack< val_sign_typ_t > stk_typ;
         std::stack< char > stk_op;
         std::shared_ptr< val_sign_typ_t > typ;
 
@@ -51,7 +52,7 @@ namespace peg::magic::action
         static void success(const ParseInput &, state_to_integer< Int > &s, state_magic_build &st) {
             st.stk.push(num::builder::make_ptr(
                     {FILE_LONG, false},
-                    var::builder::make((uint64_t) s.val)
+                    var::builder::make((uint64_t)s.val)
             ));
         }
     };
@@ -61,23 +62,8 @@ namespace peg::magic::action
             : action_push_num< long long int > {
     };
 
-    struct action_relative_if_necessary {
-        template< typename ActionInput >
-        static void apply(const ActionInput & in, state_magic_build &st) {
-            if (in.peek_char() == '&') {
-                auto inner = std_::pop(st.stk);
-                st.stk.push(unop::builder::make_ptr('&', inner));
-            }
-        }
-    };
-
     template<>
-    struct action_magic< np_offset::np_indirect::offset_indirect_num >
-            : action_relative_if_necessary {
-    };
-
-    template<>
-    struct action_magic< np_offset::np_indirect::abbrev_sign_typ >
+    struct action_magic< np_offset::abbrev_sign_typ >
             : np_type::np_indirect_type::to_typ_switcher {
         template< typename ParseInput >
         static void
@@ -104,78 +90,63 @@ namespace peg::magic::action
             : action_push_operator {
     };
 
-/*
-    template<>
-    struct action_magic< np_offset::np_indirect::np_indirect_mask::offset_indirect_mask_absolute_num >
-            : maybe_nothing { // follow action<number_>
-    };
-*/
-
-    template<>
-    struct action_magic< np_offset::np_indirect::offset_indirect_mask_indirect_num > {
-        template< typename ActionInput >
-        static void apply(const ActionInput & /*unused*/, state_magic_build &st) {
-            auto inner = st.stk.top();
-            st.stk.pop();
-            inner = st.typ ? unop::builder::make_ptr('*', inner, *st.typ)
-                           : unop::builder::make_ptr('*', inner);
-            st.stk.push(inner);
-        }
-    };
-
     struct action_mask {
         static void apply0(state_magic_build &st) {
-            auto right = st.stk.top();
-            st.stk.pop();
-            auto left = st.stk.top();
-            st.stk.pop();
-            auto opt = st.stk_op.top();
-            st.stk_op.pop();
+            auto right = std_::pop(st.stk);
+            auto left = std_::pop(st.stk);
+            auto opt = std_::pop(st.stk_op);
+
+            // fixme: remove the empty check
+            if (!st.stk_typ.empty()) st.stk_typ.pop();
+            // st.stk_typ.pop();
+            // st.stk_typ.push();
 
             st.stk.push(binop::builder::make_ptr(opt, left, right));
             if (!st.stk_op.empty() && st.stk_op.top() == '~') {
                 st.stk_op.pop();
-                auto inner = st.stk.top();
-                st.stk.pop();
+                auto inner = std_::pop(st.stk);
                 st.stk.push(unop::builder::make_ptr('~', inner));
             }
         }
     };
 
     template<>
-    struct action_magic< np_offset::np_indirect::offset_mask >
-            : action_mask {
-    };
-
-/*
-    template<>
-    struct action_magic<np_offset::offset_absolute>
-            : maybe_nothing { // follow action<number_>
-    };
-*/
-
-    template<>
-    struct action_magic< np_offset::np_indirect::offset_indirect > {
-        template< typename ActionInput >
-        static void apply(const ActionInput & /*unused*/, state_magic_build &st) {
-            auto inner = st.stk.top();
-            st.stk.pop();
-            inner = st.typ ? unop::builder::make_ptr('*', inner, *st.typ)
-                           : unop::builder::make_ptr('*', inner);
-            st.stk.push(inner);
+    struct action_magic< np_offset::offset_num > {
+        template< class ActionInput >
+        static void apply(ActionInput &in, state_magic_build &st) {
+            if (isdigit(in.string_view().back())) {
+                st.stk_typ.push(val_sign_typ_t::default_());
+            } else {
+                st.stk_typ.push(*st.typ);
+            }
         }
     };
 
-/*
     template<>
-    struct action_magic< np_offset::offset_ >
-            : maybe_nothing { // follow action<offset_[absolute/indirect]>
+    struct action_magic< np_offset::offset_binop_mask >
+            : action_mask {
     };
-*/
 
     template<>
-    struct action_magic< np_offset::offset >
-            : action_relative_if_necessary {
+    struct action_magic< np_offset::offset_ind > {
+        static void apply0(state_magic_build &st) {
+            auto inner = std_::pop(st.stk);
+            auto typ = std_::pop(st.stk_typ);
+            inner = unop::builder::make_ptr('*', inner, typ);
+            st.stk.push(inner);
+            st.stk_typ.push(typ);
+        }
+    };
+
+    template<>
+    struct action_magic< np_offset::offset_rel > {
+        static void apply0(state_magic_build &st) {
+            auto inner = std_::pop(st.stk);
+            auto typ = std_::pop(st.stk_typ);
+            inner = unop::builder::make_ptr('&', inner, typ);
+            st.stk.push(inner);
+            st.stk_typ.push(typ);
+        }
     };
 
     struct action_to_typ
@@ -190,32 +161,31 @@ namespace peg::magic::action
         }
     };
 
-
     template<>
-    struct action_magic< formal_str_typ >
+    struct action_magic< np_typ_relation::formal_str_typ >
             : action_to_typ {
     };
 
     template<>
-    struct action_magic< formal_num_typ >
+    struct action_magic< np_typ_relation::formal_num_typ >
             : action_to_typ {
     };
 
     template<>
-    struct action_magic< formal_non_typ >
+    struct action_magic< np_typ_relation::formal_non_typ >
             : action_to_typ {
     };
 
     template<>
-    struct action_magic< deref_num_mask >
+    struct action_magic< np_deref_mask::deref_num_mask >
             : action_mask {
     };
 
     template<>
-    struct action_magic< deref_str_mask > {
+    struct action_magic< np_deref_mask::deref_str_mask > {
         static void apply0(state_magic_build &st) {
             if (!st.has_range) {
-                auto range = var::builder::make((uint32_t) STRING_DEFAULT_RANGE);
+                auto range = var::builder::make((uint32_t)STRING_DEFAULT_RANGE);
                 auto range_exp = num::builder::make_ptr(val_sign_typ_t::default_(), range);
                 st.stk.push(range_exp);
             }
@@ -235,7 +205,7 @@ namespace peg::magic::action
         template< class ActionInput >
         static void apply(ActionInput &in, state_magic_build &st) {
             assert(st.typ->is_string());
-            st.flag |= (unsigned) np_flag::convert_flag(in.peek_char());
+            st.flag |= (unsigned)np_flag::convert_flag(in.peek_char());
         }
     };
 
@@ -253,7 +223,7 @@ namespace peg::magic::action
             : ::action::to_string_switcher {
         template< class ParseInput >
         static void success(ParseInput &in, std::string &s, state_magic_build &st) {
-            auto str = var::builder::make((std::string_view) s);
+            auto str = var::builder::make((std::string_view)s);
             auto typ = val_sign_typ_t{val_typ_t::FILE_STRING, false};
             auto inner = num::builder::make_ptr(typ, str);
             st.stk.push(inner);

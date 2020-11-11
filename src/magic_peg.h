@@ -48,75 +48,49 @@ struct string
 
 namespace np_offset
 {
-    struct relative_op
-            : one< '&' > {
+    struct abbrev_sign_typ
+            : np_type::np_indirect_type::abbrev_sign_typ {
     };
 
-    namespace np_indirect
-    {
-        struct offset_indirect_mask_absolute_num
-                : number {
-        };
+    struct offset_general;
 
-        struct offset_indirect_mask_indirect_num
-                : seq<
-                        one< '(' >,
-                        number,
-                        one< ')' >
-                > {
-        };
+    struct offset_num
+            : seq<
+                    number,
+                    opt< abbrev_sign_typ >
+            > {
+    };
 
-        struct offset_mask
-                : seq<
-                        np_operator::mask_operator,          // [&|^+/-*%]
-                        sor<
-                                offset_indirect_mask_absolute_num,  //     [-+]?digit+
-                                offset_indirect_mask_indirect_num   // "(" [-+]?digit+ ")"
-                        >
-                > {
-        };
+    struct offset_binop_mask
+            : seq<
+                    np_operator::mask_operator,
+                    offset_general
+            > {
+    };
 
-        struct offset_indirect_num
-                : if_then_else<
-                        relative_op,
-                        number,
-                        number
-                > {
-        };
+    struct offset_binop
+            : seq<
+                    offset_num,
+                    opt< offset_binop_mask >
+            > {
+    };
 
-        struct abbrev_sign_typ
-                : np_type::np_indirect_type::abbrev_sign_typ {
-        };
+    struct offset_ind
+            : seq< one< '(' >, offset_general, one< ')' > > {
+    };
 
-        struct offset_indirect
-                : seq<
-                        one< '(' >,
-                        offset_indirect_num,
-                        opt< abbrev_sign_typ >,
-                        opt< offset_mask >,
-                        one< ')' >
-                > {
-        };
+    struct offset_rel
+            : seq< one< '&' >, offset_general > {
+    };
 
-        struct offset_absolute
-                : number {
-        };
-    }
-
-    struct offset_
+    struct offset_general
             : sor<
-                    np_indirect::offset_absolute,
-                    np_indirect::offset_indirect
+                    offset_ind,
+                    offset_rel,
+                    offset_binop
             > {
     };
 
-    struct offset
-            : if_then_else<
-                    relative_op,
-                    offset_,
-                    offset_
-            > {
-    };
 }
 
 namespace np_deref_mask
@@ -204,17 +178,13 @@ namespace np_description
 
 }
 
-using namespace np_type::np_deref_type;
-using namespace np_deref_mask;
-using namespace np_typ_relation;
-
 struct magic_line
         : contrib::exact<
                 continue_level,
                 __,
-                np_offset::offset,
+                np_offset::offset_general,
                 ___,
-                typ_relation,
+                np_typ_relation::typ_relation,
                 __,
                 opt< np_description::description >,
                 if_then_else<
