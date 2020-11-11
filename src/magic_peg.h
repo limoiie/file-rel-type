@@ -21,15 +21,9 @@
 
 using namespace tao::pegtl;
 
-///////////////////////////////////////////
-/// region continue level
-///////////////////////////////////////////
-
 struct continue_level
         : star< one< '>' > > {
 };
-
-/// region-end continue level
 
 struct number_
         : helper::integer::signed_integer {
@@ -61,17 +55,17 @@ namespace np_offset
             > {
     };
 
-    struct offset_binop_mask
+    struct offset_binop
             : seq<
                     np_operator::mask_operator,
                     offset_general
             > {
     };
 
-    struct offset_binop
+    struct offset_num_or_binop
             : seq<
                     offset_num,
-                    opt< offset_binop_mask >
+                    opt< offset_binop >
             > {
     };
 
@@ -87,7 +81,7 @@ namespace np_offset
             : sor<
                     offset_ind,
                     offset_rel,
-                    offset_binop
+                    offset_num_or_binop
             > {
     };
 

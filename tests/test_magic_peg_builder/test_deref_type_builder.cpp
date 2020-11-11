@@ -117,7 +117,7 @@ TEST(TestMagicPegBuilder, test_build_relation_str) { // NOLINT(cert-err58-cpp)
     for (auto const &pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        auto out = parse_magic< word_with_hex_oct >(pair.first);
+        auto out = parse_magic< ::string >(pair.first);
         auto str = std::dynamic_pointer_cast<magic::ast::num>(out.stk.top());
 
         ASSERT_EQ(std::string_view(str->inner->data.s), pair.second);
