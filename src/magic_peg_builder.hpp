@@ -87,15 +87,18 @@ namespace peg::magic::action
         }
     };
 
-    struct [[maybe_unused]] action_push_deref
+    struct [[maybe_unused]] action_push_typ
             : np_type::np_deref_type::to_typ_switcher {
         template< class ParseInput >
         static void success(ParseInput &in, np_type::action::state_to_deref_typ &s, state_magic_build &st) {
-            auto offset_exp = std_::pop(st.stk);
             st.typ = std::make_shared< val_sign_typ_t >(s.typ);
-            auto deref_exp = unop::builder::make_ptr('*', offset_exp, s.typ);
-            st.stk.push(deref_exp);
+            st.stk_typ.push(s.typ);
         }
+    };
+
+    struct [[maybe_unused]] action_push_deref
+            : action_push_typ
+            , action_push_unop<'*'> {
     };
 
     template< class Rule >

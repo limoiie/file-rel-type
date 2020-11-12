@@ -16,6 +16,7 @@
 #include "pegtl-helper/ascii.hpp"
 #include "pegtl-helper/integer.hpp"
 #include "pegtl-helper/exact.hpp"
+#include "pegtl-helper/change_action_and_states_in_place.hpp"
 
 namespace np_operator
 {
@@ -254,7 +255,7 @@ namespace np_type
 
         }
 
-        using to_typ_switcher = change_action_and_states<
+        using to_typ_switcher = change_action_and_states_in_place<
                 action::template action_to_deref_typ,
                 action::state_to_deref_typ
         >;

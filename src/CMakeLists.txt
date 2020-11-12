@@ -18,7 +18,7 @@ add_executable(file_rel_type
     main.cpp
     utils/stl_container_helper.h
     pegtl-helper/switcher.hpp
-    )
+    pegtl-helper/change_action_and_states_in_place.hpp)
 
 target_link_libraries(file_rel_type
     magic
