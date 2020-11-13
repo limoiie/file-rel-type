@@ -43,6 +43,15 @@ namespace peg::magic::action
         }
     };
 
+    struct [[maybe_unused]] action_push_typ
+            : np_type::np_deref_type::to_typ_switcher {
+        template< class ParseInput >
+        static void success(ParseInput &in, np_type::action::state_to_deref_typ &s, state_magic_build &st) {
+            st.typ = std::make_shared< val_sign_typ_t >(s.typ);
+            st.stk_typ.push(s.typ);
+        }
+    };
+
     template< char Op >
     struct [[maybe_unused]] action_push_unop {
         [[maybe_unused]] static void apply0(state_magic_build &st) {
@@ -86,15 +95,6 @@ namespace peg::magic::action
         }
     };
 
-    struct [[maybe_unused]] action_push_typ
-            : np_type::np_deref_type::to_typ_switcher {
-        template< class ParseInput >
-        static void success(ParseInput &in, np_type::action::state_to_deref_typ &s, state_magic_build &st) {
-            st.typ = std::make_shared< val_sign_typ_t >(s.typ);
-            st.stk_typ.push(s.typ);
-        }
-    };
-
     struct [[maybe_unused]] action_push_deref
             : action_push_typ,
               action_push_unop< '*' > {
@@ -112,7 +112,7 @@ namespace peg::magic::action
         static void success(const ParseInput &, state_to_integer< long long int > &s, state_magic_build &st) {
             st.stk.push(num::builder::make_ptr(
                     {FILE_LONG, false},
-                    var::builder::make((uint64_t)s.val)
+                    var::builder::make((uint64_t) s.val)
             ));
         }
     };
@@ -124,7 +124,7 @@ namespace peg::magic::action
         static void success(ParseInput &in, std::string &s, state_magic_build &st) {
             st.stk.push(num::builder::make_ptr(
                     {FILE_STRING, false},
-                    var::builder::make((std::string_view)s)
+                    var::builder::make((std::string_view) s)
             ));
         }
     };
@@ -148,7 +148,7 @@ namespace peg::magic::action
     struct [[maybe_unused]] action_magic< np_offset::offset_num > {
         template< class ActionInput >
         static void apply(ActionInput &in, state_magic_build &st) {
-            if (isdigit(in.string_view().back())) {
+            if ([[maybe_unused]] auto const missing_typ = isdigit(in.string_view().back())) {
                 st.stk_typ.push(val_sign_typ_t::default_());
             }
         }
@@ -169,16 +169,16 @@ namespace peg::magic::action
             : action_push_unop< '&' > {
     };
 
-    template<unsigned Fmt>
-    struct [[maybe_unused]] action_magic< np_type::np_deref_type::formal_typ<Fmt> >
+    template< unsigned Fmt >
+    struct [[maybe_unused]] action_magic< np_type::np_deref_type::formal_typ< Fmt > >
             : action_push_deref {
     };
 
     template<>
-    struct [[maybe_unused]] action_magic<np_deref_mask::deref_mask_str> {
+    struct [[maybe_unused]] action_magic< np_deref_mask::deref_mask_str > {
         [[maybe_unused]] static void apply0(state_magic_build &st) {
-            if (!st.has_range) {
-                auto range = var::builder::make((uint32_t)STRING_DEFAULT_RANGE);
+            if (!st.has_range) {  // push the default range exp if no range specified
+                auto range = var::builder::make((uint32_t) STRING_DEFAULT_RANGE);
                 auto range_typ = val_sign_typ_t::default_();
                 auto range_exp = num::builder::make_ptr(range_typ, range);
                 st.stk.push(range_exp);
@@ -209,7 +209,7 @@ namespace peg::magic::action
         template< class ActionInput >
         static void apply(ActionInput &in, state_magic_build &st) {
             assert(st.typ->is_string());
-            st.flag |= (unsigned)np_flag::convert_flag(in.peek_char());
+            st.flag |= (unsigned) np_flag::convert_flag(in.peek_char());
         }
     };
 

@@ -182,7 +182,7 @@ namespace test_description_and_type_code
             : must<
                     np_description::description,
                     if_then_else<
-                            np_type_code::type_code_start,
+                            np_description::splitter,
                             np_type_code::type_code,
                             success
                     >,

@@ -119,26 +119,24 @@ namespace np_typ_relation
     };
 }
 
-namespace np_type_code
+namespace np_description
 {
-    struct type_code_start
-            : one< '|' > {
+    struct splitter : one< '|' > {};
+
+    struct description_end
+            : sor< splitter, tao::pegtl::eof > {
     };
 
-    struct type_code
-            : helper::integer::unsigned_decimal {
+    struct description
+            : internal::until< at< description_end > > {
     };
 
 }
 
-namespace np_description
+namespace np_type_code
 {
-    struct description_edge
-            : sor< np_type_code::type_code_start, tao::pegtl::eof > {
-    };
-
-    struct description
-            : internal::until< at< description_edge > > {
+    struct type_code
+            : helper::integer::unsigned_decimal {
     };
 
 }
@@ -153,7 +151,7 @@ struct magic_line
                 __,
                 opt< np_description::description >,
                 if_then_else<
-                        np_type_code::type_code_start,
+                        np_description::splitter,
                         np_type_code::type_code,
                         success
                 >
