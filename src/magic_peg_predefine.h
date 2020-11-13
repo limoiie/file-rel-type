@@ -80,39 +80,27 @@ namespace np_type
                 inline
                 val_typ_t abbrev_sign_typ(char const c) {
                     switch (c) {
-                        case 'l':
-                            return FILE_LELONG;
-                        case 'L':
-                            return FILE_BELONG;
-                        case 'm':
-                            return FILE_MELONG;
+                        case 'l':return FILE_LELONG;
+                        case 'L':return FILE_BELONG;
+                        case 'm':return FILE_MELONG;
                         case 'h':
-                        case 's':
-                            return FILE_LESHORT;
+                        case 's':return FILE_LESHORT;
                         case 'H':
-                        case 'S':
-                            return FILE_BESHORT;
+                        case 'S':return FILE_BESHORT;
                         case 'c':
                         case 'b':
                         case 'C':
-                        case 'B':
-                            return FILE_BYTE;
+                        case 'B':return FILE_BYTE;
                         case 'e':
                         case 'f':
-                        case 'g':
-                            return FILE_LEDOUBLE;
+                        case 'g':return FILE_LEDOUBLE;
                         case 'E':
                         case 'F':
-                        case 'G':
-                            return FILE_BEDOUBLE;
-                        case 'i':
-                            return FILE_LEID3;
-                        case 'I':
-                            return FILE_BEID3;
-                        case 'q':
-                            return FILE_LEQUAD;
-                        case 'Q':
-                            return FILE_BEQUAD;
+                        case 'G':return FILE_BEDOUBLE;
+                        case 'i':return FILE_LEID3;
+                        case 'I':return FILE_BEID3;
+                        case 'q':return FILE_LEQUAD;
+                        case 'Q':return FILE_BEQUAD;
                         default:
                             throw std::runtime_error(
                                     std::string("Invalid offset deref type: ").append(std::string() + c));
@@ -163,10 +151,6 @@ namespace np_type
 
     namespace np_deref_type
     {
-        struct formal_sign
-                : one< 'u', 'U' > {
-        };
-
         template< unsigned Fmt >
         struct formal_typ_ {
             template< class ParseInput >
@@ -175,10 +159,16 @@ namespace np_type
                     for (auto const &str_typ_fmt : map_type()) {
                         auto const &str = std::get< 0 >(str_typ_fmt);
                         auto const &fmt = std::get< 2 >(str_typ_fmt);
-                        auto const invalid_fmt = ((unsigned) fmt & Fmt) == 0;
-                        if (in.size() < str.size() || invalid_fmt) continue;
+                        if (is_invalid_fmt(fmt) || in.size() < str.size()) continue;
                         if ((std::string_view) str == std::string_view(in.current(), str.size())) {
                             in.bump_in_this_line(str.size());
+                            return true;
+                        }
+
+                        if (in.peek_char() != 'u' && in.peek_char() != 'U') continue;
+                        if (!is_number_fmt(fmt) || in.size() < str.size() + 1) continue;
+                        if ((std::string_view) str == std::string_view(in.current() + 1, str.size())) {
+                            in.bump_in_this_line(str.size() + 1);
                             return true;
                         }
                     }
@@ -186,73 +176,74 @@ namespace np_type
                 return false;
             }
 
+            static bool is_invalid_fmt(val_fmt_t const fmt) {
+                return 0 == ((unsigned) fmt & Fmt);
+            }
+
+        };
+
+        template< unsigned Fmt >
+        struct formal_typ
+                : seq< formal_typ_< Fmt > > {
         };
 
         struct formal_str_typ
-                : formal_typ_< (unsigned) val_fmt_t::FILE_FMT_STR > {
+                : seq< formal_typ< (unsigned) val_fmt_t::FILE_FMT_STR > > {
         };
 
-        struct formal_num_typ_
-                : formal_typ_<
+        struct formal_num_typ
+                : seq< formal_typ<
                         (unsigned) val_fmt_t::FILE_FMT_INT |
                         (unsigned) val_fmt_t::FILE_FMT_QUAD |
                         (unsigned) val_fmt_t::FILE_FMT_FLOAT |
                         (unsigned) val_fmt_t::FILE_FMT_DOUBLE
-                > {
-
-        };
-
-        struct formal_num_typ
-                : seq<
-                        opt< formal_sign >,
-                        formal_num_typ_
-                > {
+                > > {
         };
 
         struct formal_non_typ
-                : formal_typ_<
-                        (unsigned) val_fmt_t::FILE_FMT_NONE
-                > {
+                : seq< formal_typ< (unsigned) val_fmt_t::FILE_FMT_NONE > > {
         };
 
         namespace action
         {
             using np_type::action::state_to_deref_typ;
 
+            struct action_to_typ {
+                template< class ActionInput >
+                static void apply(ActionInput &in, state_to_deref_typ &st) {
+                    st.typ = parse_sign_typ(in.string());
+                }
+            };
+
             template< class Rule >
             struct action_to_deref_typ
                     : maybe_nothing {
             };
 
+            template< unsigned Fmt >
+            struct action_to_deref_typ< formal_typ_< Fmt > >
+                    : action_to_typ {
+            };
+
             template<>
-            struct action_to_deref_typ< formal_sign > {
-                static void apply0(state_to_deref_typ &st) {
-                    st.typ.is_unsigned = true;
+            struct action_to_deref_typ< np_indirect_type::abbrev_sign > {
+                template< typename ActionInput >
+                static void apply(const ActionInput &in, state_to_deref_typ &st) {
+                    st.typ.is_unsigned =
+                            np_indirect_type::action::internal::offset_indirect_unsigned(in.peek_char());
                 }
+
             };
 
-            struct action_to_typ {
-                template< class ActionInput >
-                static void apply(ActionInput &in, state_to_deref_typ &st) {
-                    st.typ.typ = parse_typ(in.string());
+            template<>
+            struct action_to_deref_typ< np_indirect_type::abbrev_typ > {
+                template< typename ActionInput >
+                static void apply(const ActionInput &in, state_to_deref_typ &st) {
+                    st.typ.typ =
+                            np_indirect_type::action::internal::abbrev_sign_typ(in.peek_char());
                 }
-            };
 
-            template<>
-            struct action_to_deref_typ< formal_str_typ >
-                    : action_to_typ {
             };
-
-            template<>
-            struct action_to_deref_typ< formal_num_typ_ >
-                    : action_to_typ {
-            };
-
-            template<>
-            struct action_to_deref_typ< formal_non_typ >
-                    : action_to_typ {
-            };
-
         }
 
         using to_typ_switcher = change_action_and_states_in_place<

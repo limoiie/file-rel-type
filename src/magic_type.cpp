@@ -93,15 +93,16 @@ val_typ_t parse_typ(const std::string &name) {
 }
 
 val_sign_typ_t parse_sign_typ(std::string const &name) {
-    auto type_name = name;
+    auto typ = parse_typ(name);
     auto is_unsigned = false;
-    if (tolower(name.front()) == 'u') {
-        type_name = name.substr(1);
-        is_unsigned = true;
+    if (typ == val_typ_t::FILE_INVALID) {
+        if (tolower(name.front()) == 'u') {
+            typ = parse_typ(name.substr(1));
+            is_unsigned = typ != val_typ_t::FILE_INVALID;
+        }
     }
-    return {
-            parse_typ(type_name), is_unsigned
-    };
+
+    return {typ, is_unsigned};
 }
 
 val_fmt_t fmt_of_typ(val_typ_t typ) {
@@ -114,13 +115,11 @@ val_fmt_t fmt_of_typ(val_typ_t typ) {
 
 size_t size_of_typ(val_typ_t typ) {
     switch (typ) {
-        case FILE_BYTE:
-            return (size_t) 1;
+        case FILE_BYTE:return (size_t) 1;
 
         case FILE_SHORT:
         case FILE_LESHORT:
-        case FILE_BESHORT:
-            return (size_t) 2;
+        case FILE_BESHORT:return (size_t) 2;
 
         case FILE_LONG:
         case FILE_LELONG:
@@ -137,8 +136,7 @@ size_t size_of_typ(val_typ_t typ) {
         case FILE_MELDATE:
         case FILE_FLOAT:
         case FILE_BEFLOAT:
-        case FILE_LEFLOAT:
-            return (size_t) 4;
+        case FILE_LEFLOAT:return (size_t) 4;
 
         case FILE_QUAD:
         case FILE_BEQUAD:
@@ -154,11 +152,9 @@ size_t size_of_typ(val_typ_t typ) {
         case FILE_BEQWDATE:
         case FILE_DOUBLE:
         case FILE_BEDOUBLE:
-        case FILE_LEDOUBLE:
-            return (size_t) 8;
+        case FILE_LEDOUBLE:return (size_t) 8;
 
-        default:
-            return (size_t) ~0u;
+        default:return (size_t) ~0u;
     }
 }
 

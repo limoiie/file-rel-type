@@ -21,23 +21,14 @@
 
 using namespace tao::pegtl;
 
+struct number_ : helper::integer::signed_integer {};
+struct string_ : word_with_hex_oct {};
+
+struct number : seq< number_ > {};
+struct string : seq< string_ > {};
+
 struct continue_level
         : star< one< '>' > > {
-};
-
-struct number_
-        : helper::integer::signed_integer {
-};
-
-/**
- * Wrap `number_` in `seq` to let the compiler see the specialization of `action` on `number_`
- */
-struct number
-        : seq< number_ > {
-};
-
-struct string
-        : seq< word_with_hex_oct > {
 };
 
 namespace np_offset
@@ -62,19 +53,14 @@ namespace np_offset
             > {
     };
 
+    struct offset_ind : seq< one< '(' >, offset_general, one< ')' > > {};
+    struct offset_rel : seq< one< '&' >, offset_general > {};
+
     struct offset_num_or_binop
             : seq<
                     offset_num,
                     opt< offset_binop >
             > {
-    };
-
-    struct offset_ind
-            : seq< one< '(' >, offset_general, one< ')' > > {
-    };
-
-    struct offset_rel
-            : seq< one< '&' >, offset_general > {
     };
 
     struct offset_general
@@ -103,47 +89,32 @@ namespace np_deref_mask
             > {
     };
 
-    struct deref_num_mask
-            : seq<
-                    np_operator::mask_operator,
-                    deref_mask_num
-            > {
+    struct deref_mask_str
+            : plus< deref_mask_item > {
     };
 
-    struct deref_str_mask
-            : seq<
-                    np_operator::mask_operator,
-                    plus< deref_mask_item >
-            > {
-    };
+    struct deref_num_mask : seq< np_operator::mask_operator, deref_mask_num > {};
+    struct deref_str_mask : seq< np_operator::mask_operator, deref_mask_str > {};
 
 }
 
 namespace np_typ_relation
 {
-    using namespace np_type::np_deref_type;
     using namespace np_deref_mask;
 
     template< class Rule >
     struct relation_exp
-            : seq<
-                    opt< np_operator::compare_operator >, Rule
-            > {
+            : seq< opt< np_operator::compare_operator >, Rule > {
     };
 
-    struct relation_str_val
-            : relation_exp< ::string > {
-    };
-
-    struct relation_num_val
-            : relation_exp< ::number > {
-    };
+    struct relation_str_val : relation_exp< ::string > {};
+    struct relation_num_val : relation_exp< ::number > {};
 
     struct typ_relation
             : tao::pegtl::switcher<
-                    formal_str_typ, seq< opt< deref_str_mask >, ___, relation_str_val >,
-                    formal_non_typ, seq< opt< /* success  */ >, ___, relation_str_val >,
-                    formal_num_typ, seq< opt< deref_num_mask >, ___, relation_num_val >
+                    np_type::np_deref_type::formal_str_typ, seq< opt< deref_str_mask >, ___, relation_str_val >,
+                    np_type::np_deref_type::formal_non_typ, seq< opt< /* success  */ >, ___, relation_str_val >,
+                    np_type::np_deref_type::formal_num_typ, seq< opt< deref_num_mask >, ___, relation_num_val >
             > {
     };
 }

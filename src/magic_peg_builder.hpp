@@ -13,13 +13,10 @@
 #include <tao/pegtl/contrib/unescape.hpp>
 
 #include <pegtl-helper/integer.hpp>
-
-#include "pegtl-helper/ascii.hpp"
-
-#include "utils/stl_container_helper.h"
-
-#include "magic_peg.h"
-#include "magic_ast/magic_ast.h"
+#include <pegtl-helper/ascii.hpp>
+#include <utils/stl_container_helper.h>
+#include <magic_peg.h>
+#include <magic_ast/magic_ast.h>
 
 namespace peg::magic::action
 {
@@ -70,9 +67,9 @@ namespace peg::magic::action
 
             st.stk.push(binop::builder::make_ptr(opt, left, right));
             if (!st.stk_op.empty() && st.stk_op.top() == '~') {
-                st.stk_op.pop();
                 auto inner = std_::pop(st.stk);
-                st.stk.push(unop::builder::make_ptr('~', inner));
+                auto op = std_::pop(st.stk_op);
+                st.stk.push(unop::builder::make_ptr(op, inner));
             }
         }
     };
@@ -82,8 +79,10 @@ namespace peg::magic::action
             auto right = std_::pop(st.stk);
             auto left = std_::pop(st.stk);
             auto op = std_::pop(st.stk_op);
-            auto inner = binop::builder::make_ptr(op, left, right, st.flag);
-            st.stk.push(inner);
+
+            if (!st.stk_typ.empty()) st.stk_typ.pop();
+
+            st.stk.push(binop::builder::make_ptr(op, left, right, st.flag));
         }
     };
 
@@ -97,8 +96,8 @@ namespace peg::magic::action
     };
 
     struct [[maybe_unused]] action_push_deref
-            : action_push_typ
-            , action_push_unop<'*'> {
+            : action_push_typ,
+              action_push_unop< '*' > {
     };
 
     template< class Rule >
@@ -119,7 +118,7 @@ namespace peg::magic::action
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< ::string >
+    struct [[maybe_unused]] action_magic< string_ >
             : ::action::to_string_switcher {
         template< class ParseInput >
         static void success(ParseInput &in, std::string &s, state_magic_build &st) {
@@ -132,13 +131,7 @@ namespace peg::magic::action
 
     template<>
     struct [[maybe_unused]] action_magic< np_offset::abbrev_sign_typ >
-            : np_type::np_indirect_type::to_typ_switcher {
-        template< typename ParseInput >
-        static void
-        success(const ParseInput & /*unused*/, np_type::action::state_to_deref_typ &s, state_magic_build &st) {
-            st.typ = std::make_shared< val_sign_typ_t >(s.typ);
-        }
-
+            : action_push_typ {
     };
 
     template<>
@@ -157,8 +150,6 @@ namespace peg::magic::action
         static void apply(ActionInput &in, state_magic_build &st) {
             if (isdigit(in.string_view().back())) {
                 st.stk_typ.push(val_sign_typ_t::default_());
-            } else {
-                st.stk_typ.push(*st.typ);
             }
         }
     };
@@ -178,19 +169,22 @@ namespace peg::magic::action
             : action_push_unop< '&' > {
     };
 
-    template<>
-    struct [[maybe_unused]] action_magic< np_typ_relation::formal_str_typ >
+    template<unsigned Fmt>
+    struct [[maybe_unused]] action_magic< np_type::np_deref_type::formal_typ<Fmt> >
             : action_push_deref {
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< np_typ_relation::formal_num_typ >
-            : action_push_deref {
-    };
-
-    template<>
-    struct [[maybe_unused]] action_magic< np_typ_relation::formal_non_typ >
-            : action_push_deref {
+    struct [[maybe_unused]] action_magic<np_deref_mask::deref_mask_str> {
+        [[maybe_unused]] static void apply0(state_magic_build &st) {
+            if (!st.has_range) {
+                auto range = var::builder::make((uint32_t)STRING_DEFAULT_RANGE);
+                auto range_typ = val_sign_typ_t::default_();
+                auto range_exp = num::builder::make_ptr(range_typ, range);
+                st.stk.push(range_exp);
+                st.stk_typ.push(range_typ);
+            }
+        }
     };
 
     template<>
@@ -199,15 +193,8 @@ namespace peg::magic::action
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< np_deref_mask::deref_str_mask > {
-        [[maybe_unused]] static void apply0(state_magic_build &st) {
-            if (!st.has_range) {
-                auto range = var::builder::make((uint32_t)STRING_DEFAULT_RANGE);
-                auto range_exp = num::builder::make_ptr(val_sign_typ_t::default_(), range);
-                st.stk.push(range_exp);
-            }
-            action_push_binop::apply0(st);
-        }
+    struct [[maybe_unused]] action_magic< np_deref_mask::deref_str_mask >
+            : action_push_binop {
     };
 
     template<>
