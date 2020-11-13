@@ -74,7 +74,7 @@ TEST(TestMagicPegBuilder, test_build_typ_str_mask) { // NOLINT(cert-err58-cpp)
         std::cout << "  Case: " << pair.first << std::endl;
 
         auto out = parse_magic< seq<
-                formal_str_typ, opt< deref_str_mask >
+                np_type::np_deref_type::formal_str_typ, opt< deref_str_mask >
         >>(pair.first);
         ASSERT_EQ(*out.stk.top(), *pair.second.first);
         ASSERT_EQ(out.flag, pair.second.second);
@@ -94,7 +94,7 @@ TEST(TestMagicPegBuilder, test_build_typ_num_mask) { // NOLINT(cert-err58-cpp)
         std::cout << "  Case: " << pair.first << std::endl;
 
         auto out = parse_magic< seq<
-                formal_num_typ, opt< deref_num_mask >
+                np_type::np_deref_type::formal_num_typ, opt< deref_num_mask >
         >>(pair.first);
         ASSERT_EQ(*out.stk.top(), *pair.second.first);
         ASSERT_EQ(out.flag, pair.second.second);

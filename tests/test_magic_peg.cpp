@@ -20,28 +20,16 @@ using namespace np_typ_relation;
 
 namespace type_whole
 {
-    template< typename Rule >
-    struct [[maybe_unused]] my_action
-            : nothing< Rule > {
-    };
-
-    template<>
-    struct [[maybe_unused]] my_action< np_type::np_deref_type::formal_sign > {
-        template< typename ActionInput >
-        static void apply(const ActionInput &in, bool &out) {
-            out = true;
-        }
-    };
-
     bool is_unsigned(std::string const &str) {
-        auto ret = false;
-        tao::pegtl::memory_input in(str, __FUNCTION__);
-        tao::pegtl::parse< exact< sor<
+        using namespace np_type::np_deref_type;
+        np_type::np_deref_type::action::state_to_deref_typ st;
+        memory_input in(str, __FUNCTION__);
+        parse< exact<sor<
                 formal_str_typ,
-                formal_non_typ,
-                formal_num_typ
-        > >, my_action >(in, ret);
-        return ret;
+                formal_num_typ,
+                formal_non_typ
+        >>>(in, st);
+        return st.typ.is_unsigned;
     }
 
     TEST(TestMagicPeg, test_rough_type) { // NOLINT(cert-err58-cpp)

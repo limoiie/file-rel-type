@@ -28,7 +28,7 @@ TEST(TestMagicPegPredefine, test_format_str_typ) { // NOLINT(cert-err58-cpp)
     for (auto const &pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        auto out = match_with< formal_str_typ >(pair.first);
+        auto out = match_with< np_type::np_deref_type::formal_str_typ >(pair.first);
         ASSERT_EQ(out, pair.second);
     }
 }
@@ -45,7 +45,7 @@ TEST(TestMagicPegPredefine, test_format_num_typ) { // NOLINT(cert-err58-cpp)
     for (auto const &pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        auto out = match_with< formal_num_typ >(pair.first);
+        auto out = match_with< np_type::np_deref_type::formal_num_typ >(pair.first);
         ASSERT_EQ(out, pair.second);
     }
 }
