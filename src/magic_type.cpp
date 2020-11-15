@@ -63,14 +63,23 @@ auto map_type() -> std::list< std::tuple< std::string, val_typ_t, val_fmt_t>> co
 }
 
 auto map_name_type() -> const std::map< std::string, val_typ_t > & {
-    auto const &meta_data = map_type();
-    static auto name_type_mapping = std::map< std::string, val_typ_t >();
-    if (name_type_mapping.empty()) {
-        for (auto const &name_typ_fmt : meta_data) {
-            name_type_mapping[std::get< 0 >(name_typ_fmt)] = std::get< 1 >(name_typ_fmt);
+    static auto mapping = std::map< std::string, val_typ_t >();
+    if (mapping.empty()) {
+        for (auto const &name_type_format : map_type()) {
+            mapping[std::get< 0 >(name_type_format)] = std::get< 1 >(name_type_format);
         }
     }
-    return name_type_mapping;
+    return mapping;
+}
+
+auto map_type_name() -> const std::map< val_typ_t, std::string > & {
+    static auto mapping = std::map< val_typ_t, std::string >();
+    if (mapping.empty()) {
+        for (auto const &name_type_format : map_type()) {
+            mapping[std::get< 1 >(name_type_format)] = std::get< 0 >(name_type_format);
+        }
+    }
+    return mapping;
 }
 
 auto map_type_fmt() -> const std::map< val_typ_t, val_fmt_t > & {
@@ -154,8 +163,12 @@ size_t size_of_typ(val_typ_t typ) {
         case FILE_BEDOUBLE:
         case FILE_LEDOUBLE:return (size_t) 8;
 
-        default:return (size_t) ~0u;
+        default:return (size_t) ~(size_t) 0;
     }
+}
+
+std::string name_of_typ(val_typ_t const typ) {
+    return map_type_name().at(typ);
 }
 
 bool is_number_typ(val_typ_t const typ) {
@@ -187,6 +200,12 @@ val_sign_typ_t val_sign_typ_t::default_() {
     return {
             FILE_LONG, false
     };
+}
+
+std::shared_ptr< val_sign_typ_t > val_sign_typ_t::default_ptr() {
+    return std::make_shared< val_sign_typ_t >(
+            FILE_LONG, false
+    );
 }
 
 bool val_sign_typ_t::operator==(const val_sign_typ_t &rhs) const {

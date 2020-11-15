@@ -35,8 +35,6 @@ namespace testing_internal
     using peg::magic::action::num;
     using peg::magic::action::unop;
     using peg::magic::action::binop;
-    using peg::magic::action::unop_relative;
-    using peg::magic::action::unop_deference;
 
     std::shared_ptr< exp > make_num(int const n) {
         return num::builder::make_ptr(
@@ -47,33 +45,35 @@ namespace testing_internal
 
     std::shared_ptr< exp > make_num_core(int const l, char const op, int const r,
                                          int const inverse, int const indir_op = false) {
-        auto right = make_num(r);
-        auto left = make_num(l);
-        auto inner = indir_op ? binop::builder::make_ptr(op, left, unop::builder::make_ptr('*', right))
-                              : binop::builder::make_ptr(op, left, right);
-
-        std::shared_ptr< exp > ret = inner;
+        std::shared_ptr<exp> right = make_num(r);
+        std::shared_ptr<exp> left = make_num(l);
+        if (indir_op) {
+            right = unop::builder::make_ptr('*', right, right->typ);
+        }
+        auto inner_typ = lift_type(left->typ, right->typ);
+        std::shared_ptr<exp> inner = binop::builder::make_ptr(op, left, right, inner_typ);
         if (inverse)
-            ret = unop::builder::make_ptr('~', ret);
-        return ret;
+            inner = unop::builder::make_ptr('~', inner, inner->typ);
+        return inner;
     }
 
     std::shared_ptr< unop > make_unop_rel(int const n) {
-        return unop::builder::make_ptr('&', make_num((uint32_t)n));
+        auto inner = make_num((uint32_t)n);
+        return unop::builder::make_ptr('&', inner, inner->typ);
     }
 
     std::shared_ptr< unop > make_unop_rel(std::shared_ptr< exp > const &inner) {
-        return unop::builder::make_ptr('&', inner);
+        return unop::builder::make_ptr('&', inner, inner->typ);
     }
 
     std::shared_ptr< unop > make_unop_def(int const n) {
-        return unop::builder::make_ptr('*', make_num((uint32_t)n));
+        auto inner = make_num((uint32_t)n);
+        return unop::builder::make_ptr('*', inner, inner->typ);
     }
 
     std::shared_ptr< unop >
     make_unop_def(std::shared_ptr< exp > const &inner, std::shared_ptr< val_sign_typ_t > const &typ) {
-        return typ ? unop_deference::builder::make_ptr('*', inner, *typ)
-                   : unop_deference::builder::make_ptr('*', inner);
+        return unop::builder::make_ptr('*', inner, typ ? *typ : val_sign_typ_t::default_());
     }
 
 }
@@ -160,7 +160,7 @@ TEST(TestMagicPegBuilder, test_build_offset_general) { // NOLINT(cert-err58-cpp)
         std::cout << "  Case: " << pair.first << std::endl;
 
         auto st = parse_magic< np_offset::offset_general >(pair.first);
-        auto const& left = *st.stk.top();
+        auto const& left = *st.stk_exp.top();
         auto const& right = *pair.second;
         ASSERT_EQ(*st.stk.top(), *pair.second);
     }
@@ -175,6 +175,6 @@ TEST(TestMagicPegBuilder, test_build_offset) { // NOLINT(cert-err58-cpp)
         std::cout << "  Case: " << pair.first << std::endl;
 
         auto st = parse_magic< np_offset::offset_general >(pair.first);
-        ASSERT_EQ(*st.stk.top(), *pair.second);
+        ASSERT_EQ(*st.stk_exp.top(), *pair.second);
     }
 }

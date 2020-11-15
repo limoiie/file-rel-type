@@ -35,6 +35,9 @@ namespace np_operator
     struct compare_operator
             : one< '&', '^', '=', '<', '>', '!' > {
     };
+    struct unop_rel : one< '&' > {};
+    struct unop_ind : one< '(' > {};
+    struct unop_ind_end : one< ')' > {};
 }
 
 namespace np_type

@@ -31,7 +31,7 @@ peg::magic::action::state_magic_build parse_magic(std::string const &stmt) {
     auto st = peg::magic::action::state_magic_build{};
     tao::pegtl::memory_input in(stmt, __FUNCTION__);
 
-    st.stk.push(ph_exp());
+    st.stk_exp.push(ph_exp());
 
     parse< exact< Rule >,
             peg::magic::action::action_magic >(in, st);
@@ -49,11 +49,14 @@ namespace testing_internal
 
     std::shared_ptr< exp > make_exp(std::string const &typ, std::string const &op, long long int num) {
         auto left_inner = ph_exp();  // make a placeholder for the offset
-        auto left = unop::builder::make_ptr('*', left_inner, parse_sign_typ(typ));
-        auto right = num::builder::make_ptr(val_sign_typ_t::default_(), var::builder::make((uint64_t) num));
-        auto inner = binop::builder::make_ptr(op.back(), left, right);
+        auto left_typ = parse_sign_typ(typ);
+        auto left = unop::builder::make_ptr('*', left_inner, left_typ);
+        auto right_typ = val_sign_typ_t::default_();
+        auto right = num::builder::make_ptr(right_typ, var::builder::make((uint64_t) num));
+        auto inner_typ = lift_type(left_typ, right_typ);
+        auto inner = binop::builder::make_ptr(op.back(), left, right, inner_typ);
         if (op.length() == 2) {
-            return unop::builder::make_ptr('~', inner);
+            return unop::builder::make_ptr('~', inner, inner_typ);
         }
         return inner;
     }
@@ -76,7 +79,7 @@ TEST(TestMagicPegBuilder, test_build_typ_str_mask) { // NOLINT(cert-err58-cpp)
         auto out = parse_magic< seq<
                 np_type::np_deref_type::formal_str_typ, opt< deref_str_mask >
         >>(pair.first);
-        ASSERT_EQ(*out.stk.top(), *pair.second.first);
+        ASSERT_EQ(*out.stk_exp.top(), *pair.second.first);
         ASSERT_EQ(out.flag, pair.second.second);
     }
 }
@@ -96,7 +99,7 @@ TEST(TestMagicPegBuilder, test_build_typ_num_mask) { // NOLINT(cert-err58-cpp)
         auto out = parse_magic< seq<
                 np_type::np_deref_type::formal_num_typ, opt< deref_num_mask >
         >>(pair.first);
-        ASSERT_EQ(*out.stk.top(), *pair.second.first);
+        ASSERT_EQ(*out.stk_exp.top(), *pair.second.first);
         ASSERT_EQ(out.flag, pair.second.second);
     }
 }
@@ -118,7 +121,7 @@ TEST(TestMagicPegBuilder, test_build_relation_str) { // NOLINT(cert-err58-cpp)
         std::cout << "  Case: " << pair.first << std::endl;
 
         auto out = parse_magic< ::string >(pair.first);
-        auto str = std::dynamic_pointer_cast<magic::ast::num>(out.stk.top());
+        auto str = std::dynamic_pointer_cast<magic::ast::num>(out.stk_exp.top());
 
         ASSERT_EQ(std::string_view(str->inner->data.s), pair.second);
     }

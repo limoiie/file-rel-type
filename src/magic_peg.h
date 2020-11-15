@@ -53,8 +53,8 @@ namespace np_offset
             > {
     };
 
-    struct offset_ind : seq< one< '(' >, offset_general, one< ')' > > {};
-    struct offset_rel : seq< one< '&' >, offset_general > {};
+    struct offset_ind : seq< np_operator::unop_ind, offset_general, np_operator::unop_ind_end > {};
+    struct offset_rel : seq< np_operator::unop_rel, offset_general > {};
 
     struct offset_num_or_binop
             : seq<

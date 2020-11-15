@@ -101,28 +101,19 @@ namespace magic::ast
         bool operator==(const val &rhs) const {
             if (typ != rhs.typ) return false;
             switch (fmt_of_typ(typ.typ)) {
-                case FILE_FMT_STR:
-                    return std::string_view(data.s) == std::string_view(rhs.data.s);
+                case FILE_FMT_STR:return std::string_view(data.s) == std::string_view(rhs.data.s);
                 case FILE_FMT_INT:
                 case FILE_FMT_QUAD:
                     switch (size_of_typ(typ.typ)) {
-                        case 1:
-                            return data.b == rhs.data.b;
-                        case 2:
-                            return data.s == rhs.data.s;
-                        case 4:
-                            return data.l == rhs.data.l;
-                        case 8:
-                            return data.q == rhs.data.q;
-                        default:
-                            return false;
+                        case 1:return data.b == rhs.data.b;
+                        case 2:return data.s == rhs.data.s;
+                        case 4:return data.l == rhs.data.l;
+                        case 8:return data.q == rhs.data.q;
+                        default:return false;
                     }
-                case FILE_FMT_FLOAT:
-                    return data.f == rhs.data.f;
-                case FILE_FMT_DOUBLE:
-                    return data.d == rhs.data.d;
-                default:
-                    return false;
+                case FILE_FMT_FLOAT:return data.f == rhs.data.f;
+                case FILE_FMT_DOUBLE:return data.d == rhs.data.d;
+                default:return false;
             }
         }
 
@@ -136,7 +127,12 @@ namespace magic::ast
     };
 
     struct exp {
-        virtual std::shared_ptr< val > compute(std::shared_ptr< ctx_exp_t > const &ctx) = 0;
+        exp() : exp(val_sign_typ_t::default_()) {
+        }
+
+        explicit exp(val_sign_typ_t const &typ)
+                : typ(typ) {
+        }
 
         friend
         bool operator==(exp const &lhs, exp const &rhs) {
@@ -150,7 +146,7 @@ namespace magic::ast
 
     protected:
         [[nodiscard]] virtual bool equal_to(exp const &other) const {
-            return true;
+            return typ == other.typ;
         }
 
     };
@@ -165,7 +161,7 @@ namespace magic::ast
 
     private:
         explicit num(std::shared_ptr< val > inner)
-                : inner(std::move(inner)) {
+                : exp(inner->typ), inner(std::move(inner)) {
         }
 
     public:
@@ -195,14 +191,20 @@ namespace magic::ast
     struct binop : public exp {
         struct builder {
             static std::shared_ptr< binop >
-            make_ptr(char op, std::shared_ptr< exp > const &left, std::shared_ptr< exp > const &right) {
+            make_ptr(char op,
+                     std::shared_ptr< exp > const &left,
+                     std::shared_ptr< exp > const &right,
+                     val_sign_typ_t const &typ) {
                 return std::shared_ptr< binop >(new binop{op, left, right});
             }
 
             static std::shared_ptr< binop_str >
-            make_ptr(char op, std::shared_ptr< exp > const &left, std::shared_ptr< exp > const &right,
+            make_ptr(char op,
+                     std::shared_ptr< exp > const &left,
+                     std::shared_ptr< exp > const &right,
+                     val_sign_typ_t const &typ,
                      unsigned const flag) {
-                return std::make_shared< binop_str >(op, left, right, flag);
+                return std::make_shared< binop_str >(op, left, right, typ, flag);
             }
         };
 
@@ -213,6 +215,10 @@ namespace magic::ast
     protected:
         binop(char op, std::shared_ptr< exp > left, std::shared_ptr< exp > right)
                 : op(op), left(std::move(left)), right(std::move(right)) {
+        }
+
+        binop(char op, std::shared_ptr< exp > left, std::shared_ptr< exp > right, val_sign_typ_t const &typ)
+                : exp(typ), op(op), left(std::move(left)), right(std::move(right)) {
         }
 
     public:
@@ -236,8 +242,12 @@ namespace magic::ast
     };
 
     struct binop_str : public binop {
-        binop_str(char op, std::shared_ptr< exp > left, std::shared_ptr< exp > right, unsigned const flag)
-                : binop(op, std::move(left), std::move(right)), flag(flag) {
+        binop_str(char op,
+                  std::shared_ptr< exp > left,
+                  std::shared_ptr< exp > right,
+                  val_sign_typ_t const &typ,
+                  unsigned const flag)
+                : binop(op, std::move(left), std::move(right), typ), flag(flag) {
         }
 
     public:
@@ -258,119 +268,44 @@ namespace magic::ast
 
     };
 
-    struct unop_relative;
-    struct unop_deference;
-    struct unop_inverse;
-
     struct unop : public exp {
         struct builder {
-            template< class ...Ps >
-            static std::shared_ptr< unop > make_ptr(char op, std::shared_ptr< exp > const &inner, Ps const &... ps) {
-                switch (op) {
-                    case '&':
-                        return std::make_shared< unop_relative >(inner);
-                    case '*':
-                        return std::make_shared< unop_deference >(inner, ps...);
-                    case '~':
-                        return std::make_shared< unop_inverse >(inner);
-                    default:
-                        throw std::runtime_error(std::string("Unknown unop: ").append(std::string() + op));
-                }
+            static std::shared_ptr< unop >
+            make_ptr(char op, std::shared_ptr< exp > const &inner, val_sign_typ_t const &typ) {
+                return std::make_shared< unop >(op, inner, typ);
             }
         };
 
-    protected:
-        explicit unop(std::shared_ptr< exp > inner)
-                : inner(std::move(inner)) {
+        explicit unop(char const op, std::shared_ptr< exp > inner)
+                : op(op), inner(std::move(inner)) {
         }
 
-    public:
+        explicit unop(char const op, std::shared_ptr< exp > inner, val_sign_typ_t const &typ)
+                : exp(typ), op(op), inner(std::move(inner)) {
+        }
+
         bool operator==(unop const &other) const {
             return equal_to(other);
+        }
+
+        std::shared_ptr< val > compute(std::shared_ptr< ctx_exp_t > const &ctx) override {
+            return nullptr; // todo: impl
         }
 
     protected:
         [[nodiscard]] bool equal_to(const exp &other) const override {
             if (auto const *n = dynamic_cast<unop const *>(&other)) {
-                return exp::equal_to(other) && *inner == *n->inner;
+                return exp::equal_to(other) && *inner == *n->inner && op == n->op;
             }
             return false;
         }
 
     public:
         std::shared_ptr< exp > inner;
+        char const op;
 
     };
 
-    struct unop_relative : public unop {
-        explicit unop_relative(std::shared_ptr< exp > const &inner)
-                : unop(inner) {
-        }
-
-    protected:
-        [[nodiscard]] bool equal_to(const exp &other) const override {
-            if ([[maybe_unused]] auto const *n = dynamic_cast<unop_relative const *>(&other)) {
-                return unop::equal_to(other);
-            }
-            return false;
-        }
-
-    public:
-        std::shared_ptr< val > compute(std::shared_ptr< ctx_exp_t > const &ctx) override {
-            return nullptr; // todo: impl
-        }
-
-    };
-
-    struct unop_deference : public unop {
-        explicit unop_deference(std::shared_ptr< exp > const &inner, val_sign_typ_t typ = {FILE_LONG, false})
-                : unop(inner), typ(typ) {
-        }
-
-        bool operator==(unop_deference const &other) const {
-            return unop::equal_to(other) && typ == other.typ;
-        }
-
-    protected:
-        [[nodiscard]] bool equal_to(const exp &other) const override {
-            if (auto const *n = dynamic_cast<unop_deference const *>(&other)) {
-                return *this == *n;
-            }
-            return false;
-        }
-
-    public:
-        std::shared_ptr< val > compute(std::shared_ptr< ctx_exp_t > const &ctx) override {
-            return nullptr; // todo: impl
-        }
-
-        val_sign_typ_t typ;
-
-    };
-
-    struct unop_inverse : public unop {
-        explicit unop_inverse(std::shared_ptr< exp > const &inner)
-                : unop(inner) {
-        }
-
-        bool operator==(unop_inverse const &other) const {
-            return unop::equal_to(other);
-        }
-
-    protected:
-        [[nodiscard]] bool equal_to(const exp &other) const override {
-            if (auto const *n = dynamic_cast<unop_inverse const *>(&other)) {
-                return *this == *n;
-            }
-            return false;
-        }
-
-    public:
-        std::shared_ptr< val > compute(std::shared_ptr< ctx_exp_t > const &ctx) override {
-            return nullptr; // todo: impl
-        }
-
-    };
 }
 
 #endif //FILE_REL_TYPE_MAGIC_AST_H

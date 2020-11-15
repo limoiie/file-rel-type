@@ -9,6 +9,7 @@
 #include <list>
 #include <tuple>
 #include <map>
+#include <memory>
 
 #define BIT(O) (1u << (O##u))
 
@@ -81,6 +82,8 @@ struct val_sign_typ_t {
 
     static val_sign_typ_t default_();
 
+    static std::shared_ptr< val_sign_typ_t > default_ptr();
+
     bool operator==(const val_sign_typ_t &rhs) const;
 
     bool operator!=(const val_sign_typ_t &rhs) const;
@@ -90,6 +93,11 @@ struct val_sign_typ_t {
     [[nodiscard]] bool is_number() const;
 
 };
+
+inline
+val_sign_typ_t lift_type(val_sign_typ_t const &lhs, val_sign_typ_t const &rhs) {
+    return lhs;  // todo: need implementation
+}
 
 inline
 auto map_type() -> std::list< std::tuple< std::string, val_typ_t, val_fmt_t>> const &;
@@ -115,5 +123,7 @@ val_sign_typ_t parse_sign_typ(std::string const &name);
 val_fmt_t fmt_of_typ(val_typ_t typ);
 
 size_t size_of_typ(val_typ_t typ);
+
+std::string name_of_typ(val_typ_t typ);
 
 #endif //FILE_REL_TYPE_MAGIC_TYPE_H
