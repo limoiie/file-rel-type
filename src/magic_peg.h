@@ -12,7 +12,7 @@
 #include <tao/pegtl/contrib/if_then.hpp>
 
 #include "magic_type.h"
-#include "magic_peg_predefine.h"
+#include "magic_peg_op_typ.h"
 
 #include "pegtl-helper/ascii.hpp"
 #include "pegtl-helper/integer.hpp"

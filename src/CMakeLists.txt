@@ -6,7 +6,7 @@ add_library(magic
     MagicEntry.cpp
     MagicEntry.h
     magic_peg.h
-    magic_peg_predefine.h
+    magic_peg_op_typ.h
     pegtl-helper/integer.hpp
     pegtl-helper/exact.hpp
     magic_peg_builder.hpp

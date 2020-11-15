@@ -9,7 +9,7 @@
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/unescape.hpp>
 
-#include <magic_peg_predefine.h>
+#include <magic_peg_op_typ.h>
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;

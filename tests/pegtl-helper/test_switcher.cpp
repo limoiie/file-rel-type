@@ -10,7 +10,7 @@
 #include <tao/pegtl/contrib/unescape.hpp>
 
 #include <magic_peg.h>
-#include <magic_peg_predefine.h>
+#include <magic_peg_op_typ.h>
 #include <magic_peg_builder.hpp>
 
 #include <pegtl-helper/switcher.hpp>
