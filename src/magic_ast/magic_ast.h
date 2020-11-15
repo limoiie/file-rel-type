@@ -121,6 +121,24 @@ namespace magic::ast
             return !(rhs == *this);
         }
 
+        std::string to_string() const {
+            switch (fmt_of_typ(typ.typ)) {
+                case FILE_FMT_STR:return std::string(data.s);
+                case FILE_FMT_INT:
+                case FILE_FMT_QUAD:
+                    switch (size_of_typ(typ.typ)) {
+                        case 1: return typ.is_unsigned ? std::to_string(data.b) : std::to_string((int8_t) data.b);
+                        case 2: return typ.is_unsigned ? std::to_string(data.h) : std::to_string((int16_t) data.h);
+                        case 4: return typ.is_unsigned ? std::to_string(data.l) : std::to_string((int32_t) data.l);
+                        case 8: return typ.is_unsigned ? std::to_string(data.q) : std::to_string((int64_t) data.q);
+                        default: return std::to_string(0);
+                    }
+                case FILE_FMT_FLOAT:return std::to_string(data.f);
+                case FILE_FMT_DOUBLE:return std::to_string(data.d);
+                default:return std::to_string(0);
+            }
+        }
+
     };
 
     struct ctx_exp_t {
@@ -144,10 +162,21 @@ namespace magic::ast
             return !(lhs == rhs);
         }
 
+        virtual std::string to_string() const {
+            return "< " + to_string_() + ":" + typ.to_string() + " >";
+        }
+
+        virtual std::shared_ptr< val > compute(std::shared_ptr< ctx_exp_t > const &ctx) = 0;
+
     protected:
         [[nodiscard]] virtual bool equal_to(exp const &other) const {
             return typ == other.typ;
         }
+
+        virtual std::string to_string_() const = 0;
+
+    public:
+        val_sign_typ_t typ;
 
     };
 
@@ -179,6 +208,10 @@ namespace magic::ast
                 return *this == *n;
             }
             return false;
+        }
+
+        std::string to_string_() const override {
+            return inner->to_string();
         }
 
     public:
@@ -232,6 +265,10 @@ namespace magic::ast
                 return *this == *n;
             }
             return false;
+        }
+
+        std::string to_string_() const override {
+            return left->to_string() + op + right->to_string();
         }
 
     public:
@@ -298,6 +335,10 @@ namespace magic::ast
                 return exp::equal_to(other) && *inner == *n->inner && op == n->op;
             }
             return false;
+        }
+
+        std::string to_string_() const override {
+            return op + inner->to_string();
         }
 
     public:

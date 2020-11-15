@@ -92,6 +92,8 @@ struct val_sign_typ_t {
 
     [[nodiscard]] bool is_number() const;
 
+    std::string to_string() const;
+
 };
 
 inline

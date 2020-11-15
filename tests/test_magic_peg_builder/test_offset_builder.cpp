@@ -162,7 +162,9 @@ TEST(TestMagicPegBuilder, test_build_offset_general) { // NOLINT(cert-err58-cpp)
         auto st = parse_magic< np_offset::offset_general >(pair.first);
         auto const& left = *st.stk_exp.top();
         auto const& right = *pair.second;
-        ASSERT_EQ(*st.stk.top(), *pair.second);
+        std::cout << "    l: " << left.to_string() << std::endl;
+        std::cout << "    r: " << right.to_string() << std::endl;
+        ASSERT_EQ(*st.stk_exp.top(), *pair.second);
     }
 }
 

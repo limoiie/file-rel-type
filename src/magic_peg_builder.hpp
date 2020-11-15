@@ -120,9 +120,9 @@ namespace peg::magic::action
 
     template<>
     struct [[maybe_unused]] action_magic< number_ >
-            : to_integer_switcher< long long int > {
+            : to_integer_switcher< int64_t > {
         template< class ParseInput >
-        static void success(const ParseInput &, state_to_integer< long long int > &s, state_magic_build &st) {
+        static void success(const ParseInput &, state_to_integer< int64_t > &s, state_magic_build &st) {
             st.stk_exp.push(num::builder::make_ptr(
                     {FILE_LONG, false},
                     var::builder::make((uint64_t) s.val)
@@ -184,8 +184,7 @@ namespace peg::magic::action
 
     template< unsigned Fmt >
     struct [[maybe_unused]] action_magic< np_type::np_deref_type::formal_typ< Fmt > >
-            : action_fresh_typ,
-              action_push_unop {
+            : action_fresh_typ, action_push_unop {
     };
 
     template<>

@@ -224,3 +224,7 @@ bool val_sign_typ_t::is_string() const {
 bool val_sign_typ_t::is_number() const {
     return is_number_typ(typ);
 }
+
+std::string val_sign_typ_t::to_string() const {
+    return std::string(is_unsigned ? "u" : "i").append(name_of_typ(typ));
+}
