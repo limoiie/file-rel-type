@@ -30,11 +30,11 @@ peg::magic::action::state_magic_build parse_magic(std::string const &stmt) {
 
 namespace testing_internal
 {
-    using peg::magic::action::var;
-    using peg::magic::action::exp;
-    using peg::magic::action::num;
-    using peg::magic::action::unop;
-    using peg::magic::action::binop;
+    using magic::ast::var;
+    using magic::ast::exp;
+    using magic::ast::num;
+    using magic::ast::unop;
+    using magic::ast::binop;
 
     std::shared_ptr< exp > make_num(int const n) {
         return num::builder::make_ptr(

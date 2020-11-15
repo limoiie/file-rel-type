@@ -15,6 +15,7 @@
 #include <pegtl-helper/integer.hpp>
 #include <pegtl-helper/ascii.hpp>
 #include <utils/stl_container_helper.h>
+
 #include <magic_peg.h>
 #include <magic_ast/magic_ast.h>
 
