@@ -72,7 +72,7 @@ namespace peg::magic::action
         }
     };
 
-    struct [[maybe_unused]] action_push_unop {
+    struct [[maybe_unused]] action_push_un_exp {
         [[maybe_unused]] static void apply0(state_magic_build &st) {
             auto inner = std_::pop(st.stk_exp);
             auto typ = std_::pop(st.stk_typ);
@@ -83,7 +83,7 @@ namespace peg::magic::action
         }
     };
 
-    struct [[maybe_unused]] action_push_binop {
+    struct [[maybe_unused]] action_push_bin_exp {
         [[maybe_unused]] static void apply0(state_magic_build &st) {
             auto right = std_::pop(st.stk_exp);
             auto left = std_::pop(st.stk_exp);
@@ -95,12 +95,12 @@ namespace peg::magic::action
             st.stk_exp.push(inner);
 
             if (!st.stk_opt.empty() && st.stk_opt.top() == '~') {
-                action_push_unop::apply0(st);
+                action_push_un_exp::apply0(st);
             }
         }
     };
 
-    struct [[maybe_unused]] action_push_binop_with_flag {
+    struct [[maybe_unused]] action_push_bin_exp_with_flag {
         [[maybe_unused]] static void apply0(state_magic_build &st) {
             auto right = std_::pop(st.stk_exp);
             auto left = std_::pop(st.stk_exp);
@@ -168,23 +168,23 @@ namespace peg::magic::action
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< np_offset::offset_binop >
-            : action_push_binop {
+    struct [[maybe_unused]] action_magic< np_offset::offset_bin >
+            : action_push_bin_exp {
     };
 
     template<>
     struct [[maybe_unused]] action_magic< np_offset::offset_ind >
-            : action_push_unop {
+            : action_push_un_exp {
     };
 
     template<>
     struct [[maybe_unused]] action_magic< np_offset::offset_rel >
-            : action_push_unop {
+            : action_push_un_exp {
     };
 
     template< unsigned Fmt >
     struct [[maybe_unused]] action_magic< np_type::np_deref_type::formal_typ< Fmt > >
-            : action_fresh_typ, action_push_unop {
+            : action_fresh_typ, action_push_un_exp {
     };
 
     template<>
@@ -221,12 +221,12 @@ namespace peg::magic::action
 
     template<>
     struct [[maybe_unused]] action_magic< np_deref_mask::deref_num_mask >
-            : action_push_binop {
+            : action_push_bin_exp {
     };
 
     template<>
     struct [[maybe_unused]] action_magic< np_deref_mask::deref_str_mask >
-            : action_push_binop {
+            : action_push_bin_exp {
     };
 
     template<>
@@ -236,12 +236,12 @@ namespace peg::magic::action
 
     template<>
     struct [[maybe_unused]] action_magic< ::np_typ_relation::relation_str_val >
-            : action_push_binop_with_flag {
+            : action_push_bin_exp_with_flag {
     };
 
     template<>
     struct [[maybe_unused]] action_magic< ::np_typ_relation::relation_num_val >
-            : action_push_binop {
+            : action_push_bin_exp {
     };
 
 }

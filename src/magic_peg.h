@@ -46,7 +46,7 @@ namespace np_offset
             > {
     };
 
-    struct offset_binop
+    struct offset_bin
             : seq<
                     np_operator::mask_operator,
                     offset_general
@@ -56,10 +56,10 @@ namespace np_offset
     struct offset_ind : seq< np_operator::unop_ind, offset_general, np_operator::unop_ind_end > {};
     struct offset_rel : seq< np_operator::unop_rel, offset_general > {};
 
-    struct offset_num_or_binop
+    struct offset_num_or_bin
             : seq<
                     offset_num,
-                    opt< offset_binop >
+                    opt< offset_bin >
             > {
     };
 
@@ -67,7 +67,7 @@ namespace np_offset
             : sor<
                     offset_ind,
                     offset_rel,
-                    offset_num_or_binop
+                    offset_num_or_bin
             > {
     };
 
