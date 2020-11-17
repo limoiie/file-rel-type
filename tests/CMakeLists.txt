@@ -12,7 +12,7 @@ add_executable(test_all
     test_magic_peg_builder/test_deref_type_builder.cpp
     test_magic_peg_predefine.cpp
     pegtl-helper/test_switcher.cpp
-    pegtl-helper/test_change_action_and_states_in_place.cpp)
+    pegtl-helper/test_change_action_and_states_in_place.cpp input/test_random_input.cpp)
 
 target_link_libraries(
     test_all PRIVATE magic GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main

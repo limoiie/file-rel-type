@@ -25,7 +25,7 @@ add_library(magic
     magic_ast/exp_bin.cpp
     magic_ast/exp_bin.h
     utils/stl_container_helper.h
-    magic_ast/magic_ast_eval.cpp magic_ast/magic_ast.h)
+    magic_ast/magic_ast_eval.cpp magic_ast/magic_ast.h input/random_istream_reader.h)
 
 target_link_libraries(
     magic
@@ -35,7 +35,7 @@ target_link_libraries(
 
 add_executable(file_rel_type
     main.cpp
-    )
+    input/random_buffer_input.hpp input/random_istream_input.hpp)
 
 target_link_libraries(file_rel_type
     magic
