@@ -117,6 +117,10 @@ struct random_buffer_input {
         return seek_(target_pos);
     }
 
+    [[nodiscard]] char const *current() {
+        return iter_;
+    }
+
 private:
     bool seek_(pos_type pos) {
         if (pos >= reader_.size()) return false;
@@ -158,11 +162,6 @@ private:
         // align reader
         if (reader_.tell() != pos)
             reader_.seek(pos);
-    }
-
-public:
-    [[nodiscard]] char const *current() {
-        return iter_;
     }
 
     /**
