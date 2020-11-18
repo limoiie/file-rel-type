@@ -15,6 +15,8 @@ add_executable(test_all
     pegtl-helper/test_change_action_and_states_in_place.cpp
     input/test_random_input.cpp
     magic_ast/test_read_number.cpp
+    magic_ast/eval/test_type_cast.cpp
+    magic_ast/eval/test_eval_binop.cpp
     )
 
 target_link_libraries(
