@@ -6,19 +6,26 @@
 
 namespace magic::ast
 {
-    std::shared_ptr< val > compute_num(std::shared_ptr< ctx_exp_t > const &ctx, num *e) {
+    using p_ctx = std::shared_ptr< ctx_exp_t >;
+    using p_val = std::shared_ptr< val >;
+
+    std::shared_ptr< val > compute_unop_deref(p_ctx const &ctx, unop *e, p_val const &v) {
+        return nullptr;
+    }
+
+    std::shared_ptr< val > compute_num(p_ctx const &ctx, num *e) {
         return e->inner;
     }
 
-    std::shared_ptr< val > compute_unop(std::shared_ptr< ctx_exp_t > const &ctx, unop *e) {
+    std::shared_ptr< val > compute_unop(p_ctx const &ctx, unop *e) {
         return nullptr;
     }
 
-    std::shared_ptr< val > compute_binop(std::shared_ptr< ctx_exp_t > const &ctx, binop *e) {
+    std::shared_ptr< val > compute_binop(p_ctx const &ctx, binop *e) {
         return nullptr;
     }
 
-    std::shared_ptr< val > compute_binop_str(std::shared_ptr< ctx_exp_t > const &ctx, binop_str *e) {
+    std::shared_ptr< val > compute_binop_str(p_ctx const &ctx, binop_str *e) {
         return nullptr;
     }
 

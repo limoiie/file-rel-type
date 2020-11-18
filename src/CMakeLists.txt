@@ -24,8 +24,14 @@ add_library(magic
     magic_ast/exp_un.h
     magic_ast/exp_bin.cpp
     magic_ast/exp_bin.h
+    magic_ast/magic_ast_eval.cpp
+    magic_ast/magic_ast.h
+    magic_ast/eval/read_number.hpp
+    magic_ast/eval/read_string.hpp
     utils/stl_container_helper.h
-    magic_ast/magic_ast_eval.cpp magic_ast/magic_ast.h input/random_istream_reader.h)
+    input/random_istream_reader.h
+    make_int_type.hpp
+    )
 
 target_link_libraries(
     magic
