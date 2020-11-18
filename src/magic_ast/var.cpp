@@ -42,3 +42,11 @@ magic::ast::var magic::ast::var::builder::make(std::string_view val, magic::ast:
     v.s[val.size()] = '\0';
     return v;
 }
+
+magic::ast::var magic::ast::var::builder::make() {
+    return make((uint64_t) 0);
+}
+
+std::shared_ptr< magic::ast::var > magic::ast::var::builder::make_ptr() {
+    return make_ptr((uint64_t) 0);
+}

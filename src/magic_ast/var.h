@@ -50,7 +50,22 @@ namespace magic::ast
                 return std::make_shared< var >(make(v));
             }
 
+            static var make();
+
+            static std::shared_ptr< var > make_ptr();
+
         };
+
+        void set(uint8_t  v) { b = v; }
+        void set(uint16_t v) { h = v; }
+        void set(uint32_t v) { l = v; }
+        void set(uint64_t v) { q = v; }
+        void set(float_t  v) { f = v; }
+        void set(double_t v) { d = v; }
+
+        void set(std::string_view v) {
+            std::copy(v.begin(), v.end(), s);
+        }
 
     private:
         var() = default;
