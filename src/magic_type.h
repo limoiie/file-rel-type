@@ -74,6 +74,13 @@ enum val_fmt_t {
     FILE_FMT_DOUBLE = BIT(5),
 };
 
+enum num_endian_t {
+    NORMAL_ENDIAN,
+    BIGGER_ENDIAN,
+    MIDDLE_ENDIAN,
+    LITTLE_ENDIAN
+};
+
 struct val_sign_typ_t {
     val_typ_t typ;
     bool is_unsigned;
@@ -127,5 +134,9 @@ val_fmt_t fmt_of_typ(val_typ_t typ);
 size_t size_of_typ(val_typ_t typ);
 
 std::string name_of_typ(val_typ_t typ);
+
+num_endian_t endian_of_typ(val_typ_t typ);
+
+val_typ_t erase_endian(val_typ_t typ);
 
 #endif //FILE_REL_TYPE_MAGIC_TYPE_H
