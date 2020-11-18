@@ -41,7 +41,11 @@ target_link_libraries(
 
 add_executable(file_rel_type
     main.cpp
-    input/random_buffer_input.hpp input/random_istream_input.hpp)
+    input/random_buffer_input.hpp
+    input/random_istream_input.hpp
+    magic_ast/eval/eval_binop.h
+    magic_ast/eval/cast_var.h
+    )
 
 target_link_libraries(file_rel_type
     magic
