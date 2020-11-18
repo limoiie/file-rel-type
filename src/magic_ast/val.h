@@ -26,19 +26,19 @@ namespace magic::ast
         bool operator==(const val &rhs) const {
             if (typ != rhs.typ) return false;
             switch (fmt_of_typ(typ.typ)) {
-                case FILE_FMT_STR:return std::string_view(data.s) == std::string_view(rhs.data.s);
+                case FILE_FMT_STR: return std::string_view(data.s) == std::string_view(rhs.data.s);
                 case FILE_FMT_INT:
                 case FILE_FMT_QUAD:
                     switch (size_of_typ(typ.typ)) {
-                        case 1:return data.b == rhs.data.b;
-                        case 2:return data.s == rhs.data.s;
-                        case 4:return data.l == rhs.data.l;
-                        case 8:return data.q == rhs.data.q;
+                        case 1: return data.b == rhs.data.b;
+                        case 2: return data.s == rhs.data.s;
+                        case 4: return data.l == rhs.data.l;
+                        case 8: return data.q == rhs.data.q;
                         default:return false;
                     }
-                case FILE_FMT_FLOAT:return data.f == rhs.data.f;
-                case FILE_FMT_DOUBLE:return data.d == rhs.data.d;
-                default:return false;
+                case FILE_FMT_FLOAT: return data.f == rhs.data.f;
+                case FILE_FMT_DOUBLE: return data.d == rhs.data.d;
+                default: return false;
             }
         }
 
@@ -48,7 +48,7 @@ namespace magic::ast
 
         std::string to_string() const {
             switch (fmt_of_typ(typ.typ)) {
-                case FILE_FMT_STR:return std::string(data.s);
+                case FILE_FMT_STR: return std::string(data.s);
                 case FILE_FMT_INT:
                 case FILE_FMT_QUAD:
                     switch (size_of_typ(typ.typ)) {
@@ -58,9 +58,9 @@ namespace magic::ast
                         case 8: return typ.is_unsigned ? std::to_string(data.q) : std::to_string((int64_t) data.q);
                         default: return std::to_string(0);
                     }
-                case FILE_FMT_FLOAT:return std::to_string(data.f);
-                case FILE_FMT_DOUBLE:return std::to_string(data.d);
-                default:return std::to_string(0);
+                case FILE_FMT_FLOAT: return std::to_string(data.f);
+                case FILE_FMT_DOUBLE: return std::to_string(data.d);
+                default: return std::to_string(0);
             }
         }
     };

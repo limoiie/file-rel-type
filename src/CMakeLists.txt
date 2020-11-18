@@ -45,6 +45,8 @@ add_executable(file_rel_type
     input/random_istream_input.hpp
     magic_ast/eval/eval_binop.h
     magic_ast/eval/type_cast.h
+    magic_ast/eval/eval_unop.h
+    magic_ast/eval/type_lift.h
     )
 
 target_link_libraries(file_rel_type
