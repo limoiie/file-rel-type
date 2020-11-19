@@ -60,8 +60,8 @@ TEST(TestEvalBinOp, test_eval_binop) { // NOLINT(cert-err58-cpp)
             create< uint32_t >('=', FILE_QUAD, 10, 20),
             create< uint32_t >('=', FILE_LONG, 20, 20),
             create< int32_t >('+', FILE_LONG, 10, 20),
-            create< int32_t >('-', FILE_LONG, -10, 20),
-            create< int32_t >('-', FILE_LONG, 10, 20),
+            create< int32_t >('-', FILE_LONG, INT32_MIN, INT32_MIN),
+            create< int16_t >('-', FILE_SHORT, INT16_MAX, 20),
     };
 
     for (auto &pair : cases) {

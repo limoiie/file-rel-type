@@ -10,6 +10,7 @@
 
 #include "../val.h"
 #include "type_cast.h"
+#include "type_dispatcher.h"
 
 using namespace magic::ast;
 
@@ -20,55 +21,43 @@ namespace internal
         assert(lhs.typ == rhs.typ);
         auto v = var::builder::make();
         auto &res_v = caster_int< S >::template get_< IsUnsigned >(v);
-        auto lhs_v = caster_int< S >::template get_< IsUnsigned >(lhs.data);
-        auto rhs_v = caster_int< S >::template get_< IsUnsigned >(rhs.data);
+        auto const &lhs_v = caster_int< S >::template get_< IsUnsigned >(lhs.data);
+        auto const &rhs_v = caster_int< S >::template get_< IsUnsigned >(rhs.data);
+
+        auto maker = [&](int_t<S, IsUnsigned> const&) {
+            return std::make_shared< val >(lhs.typ, v);
+        };
+
         switch (op) {
-            case '&': res_v = lhs_v & rhs_v;
-                break;
-            case '|': res_v = lhs_v | rhs_v;
-                break;
-            case '^': res_v = lhs_v ^ rhs_v;
-                break;
-            case '+': res_v = lhs_v + rhs_v;
-                break;
-            case '-': res_v = lhs_v - rhs_v;
-                break;
-            case '*': res_v = lhs_v * rhs_v;
-                break;
-            case '/': res_v = lhs_v / rhs_v;
-                break;
-            case '%': res_v = lhs_v % rhs_v;
-                break;
-            case '<': res_v = lhs_v < rhs_v;
-                break;
-            case '>': res_v = lhs_v > rhs_v;
-                break;
-            case '=': res_v = lhs_v == rhs_v;
-                break;
-            case '!': res_v = lhs_v != rhs_v;
-                break;
+            case '&': return maker(res_v = lhs_v & rhs_v);
+            case '|': return maker(res_v = lhs_v | rhs_v);
+            case '^': return maker(res_v = lhs_v ^ rhs_v);
+            case '+': return maker(res_v = lhs_v + rhs_v);
+            case '-': return maker(res_v = lhs_v - rhs_v);
+            case '*': return maker(res_v = lhs_v * rhs_v);
+            case '/': return maker(res_v = lhs_v / rhs_v);
+            case '%': return maker(res_v = lhs_v % rhs_v);
+            case '<': return maker(res_v = lhs_v < rhs_v);
+            case '>': return maker(res_v = lhs_v > rhs_v);
+            case '=': return maker(res_v = lhs_v == rhs_v);
+            case '!': return maker(res_v = lhs_v != rhs_v);
         }
-        return std::make_shared< val >(lhs.typ, v);
+
+        throw std::logic_error("Failed to compute bin expression: unsupported operator!");
     }
 
 }
 
-template< std::size_t S >
-std::shared_ptr< val > compute_binop(char const op, val const &lhs, val const &rhs) {
-    assert(lhs.typ == rhs.typ);
-    return lhs.typ.is_unsigned ? internal::compute_binop_< S, true >(op, lhs, rhs)
-                               : internal::compute_binop_< S, false >(op, lhs, rhs);
-}
+template< std::size_t S, bool Sign >
+struct [[maybe_unused]] binop_computer {
+    static std::shared_ptr< val > on_dispatch(char const op, val const &lhs, val const &rhs) {
+        return internal::compute_binop_< S, Sign >(op, lhs, rhs);
+    }
+};
 
 std::shared_ptr< val > compute_binop(char const op, val const &lhs, val const &rhs) {
     assert(lhs.typ == rhs.typ);
-    switch (size_of_typ(lhs.typ.typ)) {
-        case 1: return compute_binop< 1 >(op, lhs, rhs);
-        case 2: return compute_binop< 2 >(op, lhs, rhs);
-        case 4: return compute_binop< 4 >(op, lhs, rhs);
-        case 8: return compute_binop< 8 >(op, lhs, rhs);
-    }
-    throw std::logic_error("Failed to compute bin expression: not supported type size!");
+    return dispatch_by< binop_computer >(size_of_typ(lhs.typ.typ), lhs.typ.is_unsigned, op, lhs, rhs);
 }
 
 #endif //FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_EVAL_BINOP_H_

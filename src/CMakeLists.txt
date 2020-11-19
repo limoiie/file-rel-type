@@ -33,11 +33,10 @@ add_library(magic
     make_int_type.hpp
     )
 
-target_link_libraries(
-    magic
+target_link_libraries(magic
     cpp-common-static
     taocpp::pegtl
-)
+    )
 
 add_executable(file_rel_type
     main.cpp
@@ -47,6 +46,7 @@ add_executable(file_rel_type
     magic_ast/eval/type_cast.h
     magic_ast/eval/eval_unop.h
     magic_ast/eval/type_lift.h
+    magic_ast/eval/type_dispatcher.h
     )
 
 target_link_libraries(file_rel_type

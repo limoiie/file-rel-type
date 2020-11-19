@@ -17,10 +17,30 @@
 #include "../../make_int_type.hpp"
 
 #include "read_number.hpp"
+#include "type_dispatcher.h"
 
-template< std::size_t Chunk >
+template< size_t S, std::size_t Chunk >
+struct [[maybe_unused]] num_fetcher {
+    using in_t = random_istream_input< Chunk >;
+
+    void operator()(in_t &in, magic::ast::var &v, num_endian_t const endian) {
+        if (in.require(S)) {
+            auto *p_var = (magic::ast::var *) in.current();
+            switch (endian) {
+                case NORMAL_ENDIAN: v.set(read_normal_endian< make_uint_t< S >>(p_var)); return;
+                case BIGGER_ENDIAN: v.set(read_bigger_endian< make_uint_t< S >>(p_var)); return;
+                case MIDDLE_ENDIAN: v.set(read_middle_endian< make_uint_t< S >>(p_var)); return;
+                case LITTLE_ENDIAN: v.set(read_little_endian< make_uint_t< S >>(p_var)); return;
+            }
+        }
+        throw std::domain_error("Failed to fetch value: illegal value endian!");
+    }
+
+};
+
+template< std::size_t Chunk = 64 >
 struct fetcher {
-    explicit fetcher(random_istream_input< 64 > &in)
+    explicit fetcher(random_istream_input< Chunk > &in)
             : in(in) {
     }
 
@@ -40,17 +60,7 @@ struct fetcher {
     }
 
     std::shared_ptr< magic::ast::var > fetch_num(magic::ast::var &v, val_typ_t const typ) const {
-        auto const endian = endian_of_typ(typ);
-        switch (size_of_typ(typ)) {
-            case 1:
-                return fetch_num < 1 > (endian);
-            case 2:
-                return fetch_num < 2 > (endian);
-            case 4:
-                return fetch_num < 4 > (endian);
-            case 8:
-                return fetch_num < 8 > (endian);
-        }
+        dispatcher_by_size::dispatch< num_fetcher >(size_of_typ(typ), in, v, endian_of_typ(typ));
 
         // type id3 need one more step
         if (typ == FILE_LEID3 || typ == FILE_BEID3) {
@@ -59,29 +69,7 @@ struct fetcher {
         throw std::domain_error("Failed to fetch value: illegal type size!");
     }
 
-    template< size_t S >
-    std::shared_ptr< magic::ast::var > fetch_num(num_endian_t const endian) {
-        if (in.require(S)) {
-            auto *p_var = (magic::ast::var *) in.current();
-            switch (endian) {
-                case NORMAL_ENDIAN:
-                    return magic::ast::var::builder::make_ptr(
-                            read_normal_endian< make_uint_t< S >>(p_var));
-                case BIGGER_ENDIAN:
-                    return magic::ast::var::builder::make_ptr(
-                            read_bigger_endian< make_uint_t< S >>(p_var));
-                case MIDDLE_ENDIAN:
-                    return magic::ast::var::builder::make_ptr(
-                            read_middle_endian< make_uint_t< S >>(p_var));
-                case LITTLE_ENDIAN:
-                    return magic::ast::var::builder::make_ptr(
-                            read_little_endian< make_uint_t< S >>(p_var));
-            }
-        }
-        throw std::domain_error("Failed to fetch value: illegal value endian!");
-    }
-
-    random_istream_input< 64 > &in;
+    random_istream_input< Chunk > &in;
 
 };
 
