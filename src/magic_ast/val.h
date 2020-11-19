@@ -31,7 +31,7 @@ namespace magic::ast
                 case FILE_FMT_QUAD:
                     switch (size_of_typ(typ.typ)) {
                         case 1: return data.b == rhs.data.b;
-                        case 2: return data.s == rhs.data.s;
+                        case 2: return data.h == rhs.data.h;
                         case 4: return data.l == rhs.data.l;
                         case 8: return data.q == rhs.data.q;
                         default:return false;
