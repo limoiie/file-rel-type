@@ -57,11 +57,12 @@ namespace internal
     template< template< std::size_t... > class Fn, std::size_t C, class... Ps, std::size_t... To >
     auto dispatch_by_sizes(std::vector< std::size_t > const &ss, ids< To... > const &, Ps &&... ps) {
         if constexpr (C > 0) {
-            switch (ss[C - 1]) {
-                case 1: return dispatch_by_sizes< Fn, C - 1 >(ss, ids< 1, To... >(), std::forward< Ps >(ps)...);
-                case 2: return dispatch_by_sizes< Fn, C - 1 >(ss, ids< 2, To... >(), std::forward< Ps >(ps)...);
-                case 4: return dispatch_by_sizes< Fn, C - 1 >(ss, ids< 4, To... >(), std::forward< Ps >(ps)...);
-                case 8: return dispatch_by_sizes< Fn, C - 1 >(ss, ids< 8, To... >(), std::forward< Ps >(ps)...);
+            constexpr auto D = C - 1;
+            switch (ss[D]) {
+                case 1: return dispatch_by_sizes< Fn, D >(ss, ids< 1, To... >(), std::forward< Ps >(ps)...);
+                case 2: return dispatch_by_sizes< Fn, D >(ss, ids< 2, To... >(), std::forward< Ps >(ps)...);
+                case 4: return dispatch_by_sizes< Fn, D >(ss, ids< 4, To... >(), std::forward< Ps >(ps)...);
+                case 8: return dispatch_by_sizes< Fn, D >(ss, ids< 8, To... >(), std::forward< Ps >(ps)...);
             }
             throw std::logic_error("Failed to dispatch: not supported type size!");
         } else {

@@ -14,8 +14,8 @@
 
 using namespace magic::ast;
 
-template< std::size_t S, bool IsUnsigned >
-using int_t = std::conditional_t< IsUnsigned, make_uint_t< S >, make_int_t< S>>;
+template< std::size_t S, bool Sign >
+using int_t = std::conditional_t< Sign, make_uint_t< S >, make_int_t< S>>;
 
 template< std::size_t S >
 struct caster_int;
@@ -26,14 +26,9 @@ struct caster_int< 1 > {
         return v.b;
     }
 
-    template< bool IsUnsigned >
-    static int_t< 1, IsUnsigned > &get_(var &v) {
-        return (int_t< 1, IsUnsigned > &) v.b;
-    }
-
-    template< bool IsUnsigned >
-    static int_t< 1, IsUnsigned > get_(var const &v) {
-        return (int_t< 1, IsUnsigned >) v.b;
+    template< bool Sign, class Var >
+    static auto &get_(Var &&v) {
+        return (int_t< 1, Sign > &) std::forward< Var >(v).b;
     }
 
 };
@@ -44,14 +39,9 @@ struct caster_int< 2 > {
         return v.h;
     }
 
-    template< bool IsUnsigned >
-    static int_t< 2, IsUnsigned > &get_(var &v) {
-        return (int_t< 2, IsUnsigned > &) v.h;
-    }
-
-    template< bool IsUnsigned >
-    static int_t< 2, IsUnsigned > get_(var const &v) {
-        return (int_t< 2, IsUnsigned >) v.h;
+    template< bool Sign, class Var >
+    static auto &get_(Var &&v) {
+        return (int_t< 2, Sign > &) std::forward< Var >(v).h;
     }
 
 };
@@ -62,14 +52,9 @@ struct caster_int< 4 > {
         return v.l;
     }
 
-    template< bool IsUnsigned >
-    static int_t< 4, IsUnsigned > &get_(var &v) {
-        return (int_t< 4, IsUnsigned > &) v.l;
-    }
-
-    template< bool IsUnsigned >
-    static int_t< 4, IsUnsigned > get_(var const &v) {
-        return (int_t< 4, IsUnsigned >) v.l;
+    template< bool Sign, class Var >
+    static auto &get_(Var &&v) {
+        return (int_t< 4, Sign > &) std::forward< Var >(v).l;
     }
 
 };
@@ -80,14 +65,17 @@ struct caster_int< 8 > {
         return v.q;
     }
 
-    template< bool IsUnsigned >
-    static int_t< 8, IsUnsigned > &get_(var &v) {
-        return (int_t< 8, IsUnsigned > &) v.q;
+    template< bool Sign, class Var >
+    static auto &get_(Var &&v) {
+        return (int_t< 8, Sign > &) std::forward< Var >(v).q;
     }
 
-    template< bool IsUnsigned >
-    static int_t< 8, IsUnsigned > get_(var const &v) {
-        return (int_t< 8, IsUnsigned >) v.q;
+};
+
+template< std::size_t S, bool Sign >
+struct [[maybe_unused]] int_getter {
+    static auto on_dispatch(var &&v) {
+        return caster_int< S >::get_< Sign >(std::forward< var >(v));
     }
 
 };
@@ -103,16 +91,17 @@ struct [[maybe_unused]] int_caster {
         auto &from = caster_int< From >::get(v);
 
         switch ((is_from_unsigned ? 0b00 : 0b10) | (is_to_unsigned ? 0b00 : 0b01)) {
-            case 0b00:to = (uint_to_t) from;
+            case 0b00: to = (uint_to_t) from;
                 break;
-            case 0b01:to = (uint_to_t) (int_to_t) from;
+            case 0b01: to = (uint_to_t) (int_to_t) from;
                 break;
-            case 0b10:to = (uint_to_t) (int_from_t) from;
+            case 0b10: to = (uint_to_t) (int_from_t) from;
                 break;
-            case 0b11:to = (uint_to_t) (int_to_t) (int_from_t) from;
+            case 0b11: to = (uint_to_t) (int_to_t) (int_from_t) from;
                 break;
         }
     }
+
 };
 
 inline
