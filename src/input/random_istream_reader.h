@@ -54,6 +54,10 @@ struct random_istream_reader {
         return size;
     }
 
+    void clear() {
+        stream.clear();
+    }
+
     std::istream &stream;
 
 };

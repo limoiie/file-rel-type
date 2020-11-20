@@ -123,7 +123,7 @@ struct random_buffer_input {
 
 private:
     bool seek_(pos_type pos) {
-        if (pos >= reader_.size()) return false;
+        if (pos < 0 || pos >= reader_.size()) return false;
 
         if (is_in_buffer(pos)) {
             iter_ = map_pos_into_buffer(pos);
