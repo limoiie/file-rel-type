@@ -58,7 +58,7 @@ target_link_libraries(magic
 
 add_executable(file_rel_type
     main.cpp
-    )
+    pegtl-helper/line.hpp)
 
 target_link_libraries(file_rel_type
     magic
