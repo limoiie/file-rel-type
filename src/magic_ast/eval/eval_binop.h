@@ -55,6 +55,7 @@ struct [[maybe_unused]] binop_computer {
     }
 };
 
+inline
 std::shared_ptr< val > compute_binop(char const op, val const &lhs, val const &rhs) {
     assert(lhs.typ == rhs.typ);
     return dispatch_by< binop_computer >(size_of_typ(lhs.typ.typ), lhs.typ.is_unsigned, op, lhs, rhs);
