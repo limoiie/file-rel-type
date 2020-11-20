@@ -48,21 +48,24 @@ namespace magic::ast
         }
 
         std::string to_string() const {
-            switch (fmt_of_typ(typ.typ)) {
-                case FILE_FMT_STR: return std::string(data.s);
-                case FILE_FMT_INT:
-                case FILE_FMT_QUAD:
-                    switch (size_of_typ(typ.typ)) {
-                        case 1: return typ.is_unsigned ? std::to_string(data.b) : std::to_string((int8_t) data.b);
-                        case 2: return typ.is_unsigned ? std::to_string(data.h) : std::to_string((int16_t) data.h);
-                        case 4: return typ.is_unsigned ? std::to_string(data.l) : std::to_string((int32_t) data.l);
-                        case 8: return typ.is_unsigned ? std::to_string(data.q) : std::to_string((int64_t) data.q);
-                        default: return std::to_string(0);
-                    }
-                case FILE_FMT_FLOAT: return std::to_string(data.f);
-                case FILE_FMT_DOUBLE: return std::to_string(data.d);
-                default: return std::to_string(0);
-            }
+            auto fn_val = [this]() {
+                switch (fmt_of_typ(typ.typ)) {
+                    case FILE_FMT_STR: return std::string(data.s);
+                    case FILE_FMT_INT:
+                    case FILE_FMT_QUAD:
+                        switch (size_of_typ(typ.typ)) {
+                            case 1: return typ.is_unsigned ? std::to_string(data.b) : std::to_string((int8_t) data.b);
+                            case 2: return typ.is_unsigned ? std::to_string(data.h) : std::to_string((int16_t) data.h);
+                            case 4: return typ.is_unsigned ? std::to_string(data.l) : std::to_string((int32_t) data.l);
+                            case 8: return typ.is_unsigned ? std::to_string(data.q) : std::to_string((int64_t) data.q);
+                            default: return std::to_string(0);
+                        }
+                    case FILE_FMT_FLOAT: return std::to_string(data.f);
+                    case FILE_FMT_DOUBLE: return std::to_string(data.d);
+                    default: return std::to_string(0);
+                }
+            };
+            return fn_val() + "-" + typ.to_string() + "";
         }
     };
 }

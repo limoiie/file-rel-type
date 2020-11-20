@@ -18,7 +18,7 @@ add_executable(test_all
     magic_ast/eval/test_type_cast.cpp
     magic_ast/eval/test_eval_binop.cpp
     magic_ast/eval/test_type_lift.cpp
-    )
+    magic_ast/eval/test_val_fetcher.cpp)
 
 target_link_libraries(
     test_all PRIVATE magic GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main

@@ -19,19 +19,22 @@
 #include "read_number.hpp"
 #include "type_dispatcher.h"
 
-template< size_t S, std::size_t Chunk >
+template< size_t S >
 struct [[maybe_unused]] num_fetcher {
-    using in_t = random_istream_input< Chunk >;
-
-    void operator()(in_t &in, magic::ast::var &v, num_endian_t const endian) {
-        if (in.require(S)) {
-            auto *p_var = (magic::ast::var *) in.current();
-            switch (endian) {
-                case NORMAL_ENDIAN: v.set(read_normal_endian< make_uint_t< S >>(p_var)); return;
-                case BIGGER_ENDIAN: v.set(read_bigger_endian< make_uint_t< S >>(p_var)); return;
-                case MIDDLE_ENDIAN: v.set(read_middle_endian< make_uint_t< S >>(p_var)); return;
-                case LITTLE_ENDIAN: v.set(read_little_endian< make_uint_t< S >>(p_var)); return;
+    template< class Input >
+    static void on_dispatch(Input &in, magic::ast::var &v, val_endian_t const endian) {
+        if (!in.require(S)) {
+            in.discard();
+            if (!in.require(S)) {
+                throw std::domain_error("Failed to fetch value: type size is bigger than the buffer!");
             }
+        }
+        auto *p_var = (magic::ast::var *) in.current();
+        switch (endian) {
+            case NORMAL_ENDIAN: return v.set(read_normal_endian< make_uint_t< S >>(p_var));
+            case BIGGER_ENDIAN: return v.set(read_bigger_endian< make_uint_t< S >>(p_var));
+            case MIDDLE_ENDIAN: return v.set(read_middle_endian< make_uint_t< S >>(p_var));
+            case LITTLE_ENDIAN: return v.set(read_little_endian< make_uint_t< S >>(p_var));
         }
         throw std::domain_error("Failed to fetch value: illegal value endian!");
     }
@@ -39,12 +42,13 @@ struct [[maybe_unused]] num_fetcher {
 };
 
 template< std::size_t Chunk = 64 >
-struct fetcher {
-    explicit fetcher(random_istream_input< Chunk > &in)
+struct val_fetcher {
+    explicit val_fetcher(random_istream_input< Chunk > &in)
             : in(in) {
     }
 
     std::shared_ptr< magic::ast::val > fetch(val_sign_typ_t const typ) {
+        // after parsing, the endian info will be ignored
         auto const flipped_typ = erase_endian(typ.typ);
         auto v = magic::ast::var::builder::make();
         if (is_number_typ(typ.typ)) {
@@ -59,14 +63,13 @@ struct fetcher {
         return std::make_shared< magic::ast::val >(val_sign_typ_t{flipped_typ, typ.is_unsigned}, v);
     }
 
-    std::shared_ptr< magic::ast::var > fetch_num(magic::ast::var &v, val_typ_t const typ) const {
+    void fetch_num(magic::ast::var &v, val_typ_t const typ) const {
         dispatcher_by_size::dispatch< num_fetcher >(size_of_typ(typ), in, v, endian_of_typ(typ));
 
         // type id3 need one more step
         if (typ == FILE_LEID3 || typ == FILE_BEID3) {
             to_id3_(v.l);
         }
-        throw std::domain_error("Failed to fetch value: illegal type size!");
     }
 
     random_istream_input< Chunk > &in;
