@@ -15,7 +15,6 @@ add_library(magic
     pegtl-helper/change_action_and_states_in_place.hpp
     magic_peg_builder.hpp
     magic_ast/exp.h
-    magic_ast/magic_ast_eval.h
     magic_ast/var.cpp
     magic_ast/val.cpp
     magic_ast/exp_num.cpp
@@ -25,19 +24,21 @@ add_library(magic
     magic_ast/exp_bin.cpp
     magic_ast/exp_bin.h
     magic_ast/magic_ast_eval.cpp
+    magic_ast/magic_ast_eval.h
     magic_ast/magic_ast.h
     magic_ast/eval/read_number.hpp
     magic_ast/eval/read_string.hpp
     magic_ast/eval/eval_binop.h
-    magic_ast/eval/type_cast.h
     magic_ast/eval/eval_unop.h
+    magic_ast/eval/val_fetcher.h
+    magic_ast/eval/type_cast.h
+    magic_ast/eval/type_lift.cpp
     magic_ast/eval/type_lift.h
     magic_ast/eval/type_dispatcher.h
-    magic_ast/eval/type_lift.cpp
-    magic_ast/eval/type_lift_val.h
     magic_ast/eval/type_lift_val.cpp
-    magic_ast/eval/type_priority.h
+    magic_ast/eval/type_lift_val.h
     magic_ast/eval/type_priority.cpp
+    magic_ast/eval/type_priority.h
     utils/stl_container_helper.h
     input/random_istream_reader.h
     input/random_buffer_input.hpp

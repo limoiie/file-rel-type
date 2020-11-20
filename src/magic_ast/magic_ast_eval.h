@@ -16,16 +16,20 @@
 
 #include "../input/random_istream_input.hpp"
 #include "../make_int_type.hpp"
-#include "eval/read_number.hpp"
+#include "eval/val_fetcher.h"
 
 namespace magic::ast
 {
     struct ctx_exp_t {
         explicit ctx_exp_t(std::istream &stream, std::size_t maximum_buffer = 1024)
-                : in(stream, maximum_buffer) {
+                : in(stream, maximum_buffer)
+                , fetcher(in) {
         }
 
+        std::shared_ptr< val > current_offset;
+        std::stack< std::shared_ptr< val>> offset_history;
         random_istream_input< 64 > in;
+        val_fetcher< 64 > fetcher;
 
     };
 
