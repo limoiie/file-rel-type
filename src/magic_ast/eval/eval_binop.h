@@ -16,15 +16,15 @@ using namespace magic::ast;
 
 namespace internal
 {
-    template< std::size_t S, bool Sign >
+    template< std::size_t S, bool IsUnsigned >
     std::shared_ptr< val > compute_binop_(char const op, val const &lhs, val const &rhs) {
         assert(lhs.typ == rhs.typ);
         auto v = var::builder::make();
-        auto &res_v = caster_int< S >::template get_< Sign >(v);
-        auto const &lhs_v = caster_int< S >::template get_< Sign >(lhs.data);
-        auto const &rhs_v = caster_int< S >::template get_< Sign >(rhs.data);
+        auto &res_v = caster_int< S >::template get_< IsUnsigned >(v);
+        auto const &lhs_v = caster_int< S >::template get_< IsUnsigned >(lhs.data);
+        auto const &rhs_v = caster_int< S >::template get_< IsUnsigned >(rhs.data);
 
-        auto maker = [&](int_t<S, Sign> const&) {
+        auto maker = [&](int_t< S, IsUnsigned > const &) {
             return std::make_shared< val >(lhs.typ, v);
         };
 
@@ -48,10 +48,10 @@ namespace internal
 
 }
 
-template< std::size_t S, bool Sign >
+template< std::size_t S, bool IsUnsigned >
 struct [[maybe_unused]] binop_computer {
     static std::shared_ptr< val > on_dispatch(char const op, val const &lhs, val const &rhs) {
-        return internal::compute_binop_< S, Sign >(op, lhs, rhs);
+        return internal::compute_binop_< S, IsUnsigned >(op, lhs, rhs);
     }
 };
 

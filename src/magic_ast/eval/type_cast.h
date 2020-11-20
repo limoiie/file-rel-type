@@ -14,8 +14,8 @@
 
 using namespace magic::ast;
 
-template< std::size_t S, bool Sign >
-using int_t = std::conditional_t< Sign, make_uint_t< S >, make_int_t< S>>;
+template< std::size_t S, bool IsUnsigned >
+using int_t = std::conditional_t< IsUnsigned, make_uint_t< S >, make_int_t< S>>;
 
 template< std::size_t S >
 struct caster_int;
@@ -26,9 +26,9 @@ struct caster_int< 1 > {
         return v.b;
     }
 
-    template< bool Sign, class Var >
+    template< bool IsUnsigned, class Var >
     static auto &get_(Var &&v) {
-        return (int_t< 1, Sign > &) std::forward< Var >(v).b;
+        return (int_t< 1, IsUnsigned > &) std::forward< Var >(v).b;
     }
 
 };
@@ -39,9 +39,9 @@ struct caster_int< 2 > {
         return v.h;
     }
 
-    template< bool Sign, class Var >
+    template< bool IsUnsigned, class Var >
     static auto &get_(Var &&v) {
-        return (int_t< 2, Sign > &) std::forward< Var >(v).h;
+        return (int_t< 2, IsUnsigned > &) std::forward< Var >(v).h;
     }
 
 };
@@ -52,9 +52,9 @@ struct caster_int< 4 > {
         return v.l;
     }
 
-    template< bool Sign, class Var >
+    template< bool IsUnsigned, class Var >
     static auto &get_(Var &&v) {
-        return (int_t< 4, Sign > &) std::forward< Var >(v).l;
+        return (int_t< 4, IsUnsigned > &) std::forward< Var >(v).l;
     }
 
 };
@@ -65,17 +65,17 @@ struct caster_int< 8 > {
         return v.q;
     }
 
-    template< bool Sign, class Var >
+    template< bool IsUnsigned, class Var >
     static auto &get_(Var &&v) {
-        return (int_t< 8, Sign > &) std::forward< Var >(v).q;
+        return (int_t< 8, IsUnsigned > &) std::forward< Var >(v).q;
     }
 
 };
 
-template< std::size_t S, bool Sign >
+template< std::size_t S, bool IsUnsigned >
 struct [[maybe_unused]] int_getter {
     static auto on_dispatch(var &&v) {
-        return caster_int< S >::get_< Sign >(std::forward< var >(v));
+        return caster_int< S >::get_< IsUnsigned >(std::forward< var >(v));
     }
 
 };

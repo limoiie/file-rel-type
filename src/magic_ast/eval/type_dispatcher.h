@@ -18,20 +18,20 @@ template< size_t... _Vals >
 using ids = std::index_sequence< _Vals... >;
 
 template< template< std::size_t, bool, class... > class Fn, class ...As, class ...Ps >
-auto dispatch_by(std::size_t const s, bool const sign, Ps &&... ps) {
+auto dispatch_by(std::size_t const s, bool const is_unsigned, Ps &&... ps) {
     switch (s) {
         case 1:
-            return sign ? Fn< 1, T, As... >::on_dispatch(std::forward< Ps >(ps)...)
-                        : Fn< 1, F, As... >::on_dispatch(std::forward< Ps >(ps)...);
+            return is_unsigned ? Fn< 1, T, As... >::on_dispatch(std::forward< Ps >(ps)...)
+                               : Fn< 1, F, As... >::on_dispatch(std::forward< Ps >(ps)...);
         case 2:
-            return sign ? Fn< 2, T, As... >::on_dispatch(std::forward< Ps >(ps)...)
-                        : Fn< 2, F, As... >::on_dispatch(std::forward< Ps >(ps)...);
+            return is_unsigned ? Fn< 2, T, As... >::on_dispatch(std::forward< Ps >(ps)...)
+                               : Fn< 2, F, As... >::on_dispatch(std::forward< Ps >(ps)...);
         case 4:
-            return sign ? Fn< 4, T, As... >::on_dispatch(std::forward< Ps >(ps)...)
-                        : Fn< 4, F, As... >::on_dispatch(std::forward< Ps >(ps)...);
+            return is_unsigned ? Fn< 4, T, As... >::on_dispatch(std::forward< Ps >(ps)...)
+                               : Fn< 4, F, As... >::on_dispatch(std::forward< Ps >(ps)...);
         case 8:
-            return sign ? Fn< 8, T, As... >::on_dispatch(std::forward< Ps >(ps)...)
-                        : Fn< 8, F, As... >::on_dispatch(std::forward< Ps >(ps)...);
+            return is_unsigned ? Fn< 8, T, As... >::on_dispatch(std::forward< Ps >(ps)...)
+                               : Fn< 8, F, As... >::on_dispatch(std::forward< Ps >(ps)...);
     }
     throw std::logic_error("Failed to dispatch: not supported type size!");
 }
