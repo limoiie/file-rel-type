@@ -11,12 +11,13 @@
 #include <tao/pegtl/contrib/integer.hpp>
 #include <tao/pegtl/contrib/if_then.hpp>
 
-#include "magic_type.h"
-
 #include "pegtl-helper/ascii.hpp"
 #include "pegtl-helper/integer.hpp"
 #include "pegtl-helper/exact.hpp"
 #include "pegtl-helper/change_action_and_states_in_place.hpp"
+
+#include "magic_type.h"
+#include "val_sign_typ.h"
 
 namespace np_operator
 {

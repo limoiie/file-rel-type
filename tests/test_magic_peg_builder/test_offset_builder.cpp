@@ -13,6 +13,8 @@
 #include <magic_peg_op_typ.h>
 #include <magic_peg_builder.hpp>
 
+#include "val_sign_typ.h"
+
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
 

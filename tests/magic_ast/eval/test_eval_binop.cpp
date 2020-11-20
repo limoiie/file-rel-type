@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "magic_ast/eval/eval_binop.h"
+#include "val_sign_typ.h"
 
 using exp_t = std::tuple< char, val, val >;
 

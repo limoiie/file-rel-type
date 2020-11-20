@@ -12,6 +12,7 @@
 #include "var.h"
 
 #include "../magic_type.h"
+#include "../val_sign_typ.h"
 
 namespace magic::ast
 {

@@ -14,7 +14,7 @@ namespace magic::ast
     }
 
     std::shared_ptr< val > compute_num(p_ctx const &ctx, num *e) {
-        return e->inner;
+        return std::make_shared< val >(e->inner->typ, e->inner->data);
     }
 
     std::shared_ptr< val > compute_unop(p_ctx const &ctx, unop *e) {

@@ -7,6 +7,8 @@
 
 #include "exp.h"
 
+#include "../val_sign_typ.h"
+
 namespace magic::ast
 {
     struct unop : exp {

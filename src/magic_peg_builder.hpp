@@ -19,6 +19,9 @@
 #include <magic_peg.h>
 #include <magic_ast/magic_ast.h>
 
+#include "val_sign_typ.h"
+#include "magic_ast/eval/type_lift_val.h"
+
 namespace peg::magic::action
 {
     using namespace tao::pegtl::helper::integer;

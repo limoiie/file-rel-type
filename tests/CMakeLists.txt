@@ -17,6 +17,7 @@ add_executable(test_all
     magic_ast/test_read_number.cpp
     magic_ast/eval/test_type_cast.cpp
     magic_ast/eval/test_eval_binop.cpp
+    magic_ast/eval/test_type_lift.cpp
     )
 
 target_link_libraries(
