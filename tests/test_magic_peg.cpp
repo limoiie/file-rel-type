@@ -24,11 +24,11 @@ namespace type_whole
         using namespace np_type::np_deref_type;
         np_type::np_deref_type::action::state_to_deref_typ st;
         memory_input in(str, __FUNCTION__);
-        parse< exact<sor<
+        parse< exact< sor<
                 formal_str_typ,
                 formal_num_typ,
                 formal_non_typ
-        >>>(in, st);
+        > > >(in, st);
         return st.typ.is_unsigned;
     }
 
@@ -208,6 +208,28 @@ namespace test_description_and_type_code
         }
     }
 
+}
+
+namespace test_lines
+{
+    TEST(TestMagicPeg, test_lines) { // NOLINT(cert-err58-cpp)
+        std::cout << "Testing" << __FUNCTION__ << " ..." << std::endl;
+        auto cases = std::list< std::pair< std::string, bool>>{
+                {"# this is a test",     true},
+                {"! this is a strength", true},
+                {"",                     true},
+                {">>",                   false},
+                {"?",                    false},
+        };
+
+        for (auto const &pair : cases) {
+            std::cout << "  Case: " << pair.first << std::endl;
+
+            memory_input in(pair.first, __FUNCTION__);
+            auto out = parse< sor< empty_line, comment_line, strength_line > >(in);
+            ASSERT_EQ(out, pair.second);
+        }
+    }
 }
 
 namespace test_magic_line

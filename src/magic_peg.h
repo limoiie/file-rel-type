@@ -141,6 +141,21 @@ namespace np_type_code
 
 }
 
+/**
+ * Empty line for helping organizing rule blocks
+ */
+struct empty_line : contrib::line< star< blank > > {};
+
+/**
+ * Comment line for description
+ */
+struct comment_line : contrib::line< one< '#' >, star< any > > {};
+
+/**
+ * Annotation line for annotating the strength of the following magic line
+ */
+struct strength_line : contrib::line< one< '!' >, star< any > > {};
+
 struct magic_line
         : contrib::line<
                 continue_level,
