@@ -11,7 +11,7 @@ namespace TAO_PEGTL_NAMESPACE::contrib
 {
     template< class ...Rules >
     struct line
-            : must< Rules..., tao::pegtl::eolf > {
+            : seq< Rules..., tao::pegtl::eolf > {
         using rule_t = line;
         using subs_t = empty_list;
 
