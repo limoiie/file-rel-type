@@ -124,7 +124,7 @@ namespace np_description
     struct splitter : one< '|' > {};
 
     struct description_end
-            : sor< splitter, tao::pegtl::eof > {
+            : sor< splitter, tao::pegtl::eolf > {
     };
 
     struct description
@@ -141,23 +141,18 @@ namespace np_type_code
 
 }
 
-/**
- * Empty line for helping organizing rule blocks
- */
-struct empty_line : contrib::line< star< blank > > {};
+/// Empty line for helping organizing rule blocks
+struct empty_line : until< at< tao::pegtl::eolf >, blank > {};
 
-/**
- * Comment line for description
- */
-struct comment_line : contrib::line< one< '#' >, star< any > > {};
+/// Comment line for description
+struct comment_line : seq< one< '#' >, until< at< tao::pegtl::eolf > > > {};
 
-/**
- * Annotation line for annotating the strength of the following magic line
- */
-struct strength_line : contrib::line< one< '!' >, star< any > > {};
+/// Annotation line for annotating the strength of the following magic line
+struct strength_line : seq< one< '!' >, until< at< tao::pegtl::eolf > > > {};
 
+/// The rule line that defines the step matching mechanism
 struct magic_line
-        : contrib::line<
+        : seq<
                 continue_level,
                 __,
                 np_offset::offset_general,
@@ -171,6 +166,19 @@ struct magic_line
                         success
                 >
         > {
+};
+
+struct line
+        : sor<
+                comment_line,
+                strength_line,
+                magic_line,
+                empty_line
+        > {
+};
+
+struct magic_file
+        : list< ::line, tao::pegtl::eol > {
 };
 
 #endif //FILE_REL_TYPE_MAGIC_PEG_H

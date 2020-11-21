@@ -14,11 +14,11 @@
 using namespace tao::pegtl;
 
 struct __
-        : star< space > {
+        : star< blank > {
 };
 
 struct ___
-        : plus< space > {
+        : plus< blank > {
 };
 
 struct odigit

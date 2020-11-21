@@ -11,12 +11,12 @@
 
 #include <tao/pegtl.hpp>
 
-template<class Pattern>
+template< class Pattern >
 bool match_with(std::string const &content) {
     bool out;
     try {
         tao::pegtl::memory_input in(content, __FUNCTION__);
-        out = tao::pegtl::parse<Pattern>(in);
+        out = tao::pegtl::parse< Pattern >(in);
     } catch (std::exception &e) {
         std::cout << "  -- Captured Exception: " << e.what() << std::endl;
         out = false;
