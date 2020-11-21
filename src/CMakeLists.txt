@@ -9,10 +9,11 @@ add_library(magic
     magic_peg_op_typ.h
     magic_type.h
     magic_type.cpp
-    pegtl-helper/integer.hpp
-    pegtl-helper/exact.hpp
-    pegtl-helper/switcher.hpp
     pegtl-helper/change_action_and_states_in_place.hpp
+    pegtl-helper/exact.hpp
+    pegtl-helper/integer.hpp
+    pegtl-helper/line.hpp
+    pegtl-helper/switcher.hpp
     magic_peg_builder.hpp
     magic_ast/exp.h
     magic_ast/var.cpp
@@ -30,6 +31,7 @@ add_library(magic
     magic_ast/eval/read_string.hpp
     magic_ast/eval/eval_binop.h
     magic_ast/eval/eval_unop.h
+    magic_ast/eval/eval_unop.cpp
     magic_ast/eval/val_fetcher.h
     magic_ast/eval/type_cast.h
     magic_ast/eval/type_lift.cpp
@@ -40,6 +42,7 @@ add_library(magic
     magic_ast/eval/type_priority.cpp
     magic_ast/eval/type_priority.h
     utils/stl_container_helper.h
+    utils/tree.hpp
     input/random_istream_reader.h
     input/random_buffer_input.hpp
     input/random_istream_input.hpp
@@ -49,7 +52,7 @@ add_library(magic
     val_sign_typ.h
     type_endian.cpp
     type_endian.h
-    )
+    magic_ast/eval/eval_binop.cpp)
 
 target_link_libraries(magic
     cpp-common-static
@@ -58,7 +61,7 @@ target_link_libraries(magic
 
 add_executable(file_rel_type
     main.cpp
-    pegtl-helper/line.hpp utils/tree.hpp)
+    )
 
 target_link_libraries(file_rel_type
     magic

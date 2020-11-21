@@ -4,28 +4,29 @@
 
 #include "magic_ast_eval.h"
 
+#include "eval/eval_binop.h"
+#include "eval/eval_unop.h"
+
 namespace magic::ast
 {
     using p_ctx = std::shared_ptr< ctx_exp_t >;
-    using p_val = std::shared_ptr< val >;
 
-    std::shared_ptr< val > compute_unop_deref(p_ctx const &ctx, unop *e, p_val const &v) {
-        return nullptr;
+    p_val_t compute_num(p_ctx const &ctx, num *e) {
+        return std::make_shared< val >(*e->inner);
     }
 
-    std::shared_ptr< val > compute_num(p_ctx const &ctx, num *e) {
-        return std::make_shared< val >(e->inner->typ, e->inner->data);
+    p_val_t compute_unop(p_ctx const &ctx, unop *e) {
+        auto inner_v = e->inner->compute(ctx);
+        return ::compute_unop(e->op, inner_v, e->typ, ctx);
     }
 
-    std::shared_ptr< val > compute_unop(p_ctx const &ctx, unop *e) {
-        return nullptr;
+    p_val_t compute_binop(p_ctx const &ctx, binop *e) {
+        auto left_v = e->left->compute(ctx);
+        auto right_v = e->left->compute(ctx);
+        return ::compute_binop(e->op, left_v, right_v);
     }
 
-    std::shared_ptr< val > compute_binop(p_ctx const &ctx, binop *e) {
-        return nullptr;
-    }
-
-    std::shared_ptr< val > compute_binop_str(p_ctx const &ctx, binop_str *e) {
+    p_val_t compute_binop_str(p_ctx const &ctx, binop_str *e) {
         return nullptr;
     }
 

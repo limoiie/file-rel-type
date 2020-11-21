@@ -42,7 +42,7 @@ namespace magic::ast
             return "< " + to_string_() + ":" + typ.to_string() + " >";
         }
 
-        virtual std::shared_ptr< val > compute(std::shared_ptr< ctx_exp_t > const &ctx) = 0;
+        virtual p_val_t compute(std::shared_ptr< ctx_exp_t > const &ctx) = 0;
 
     protected:
         [[nodiscard]] virtual bool equal_to(exp const &other) const {

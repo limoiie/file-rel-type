@@ -26,6 +26,10 @@ void lift_type(val &l_val, val &r_val) {
     }
 }
 
+void lift_type(p_val_t const &l_val, p_val_t const &r_val) {
+    lift_type(*l_val, *r_val);
+}
+
 val_sign_typ_t lift_type(val_sign_typ_t const &l_typ, val_sign_typ_t const &r_typ) {
     auto const is_unsigned = l_typ.is_unsigned && r_typ.is_unsigned;
     auto const typ = priority_of_typ(l_typ.typ) > priority_of_typ(r_typ.typ) ? l_typ.typ : r_typ.typ;

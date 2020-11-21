@@ -20,26 +20,30 @@
 
 namespace magic::ast
 {
+    struct ctx_exp_t;
+
+    using p_ctx_t = std::shared_ptr< ctx_exp_t >;
+
     struct ctx_exp_t {
         explicit ctx_exp_t(std::istream &stream, std::size_t maximum_buffer = 1024)
                 : in(stream, maximum_buffer)
                 , fetcher(in) {
         }
 
-        std::shared_ptr< val > current_offset;
+        p_val_t current_offset;
         std::stack< std::shared_ptr< val>> offset_history;
         random_istream_input< 64 > in;
         val_fetcher< 64 > fetcher;
 
     };
 
-    std::shared_ptr< val > compute_num(std::shared_ptr< ctx_exp_t > const &ctx, num *e);
+    p_val_t compute_num(std::shared_ptr< ctx_exp_t > const &ctx, num *e);
 
-    std::shared_ptr< val > compute_unop(std::shared_ptr< ctx_exp_t > const &ctx, unop *e);
+    p_val_t compute_unop(std::shared_ptr< ctx_exp_t > const &ctx, unop *e);
 
-    std::shared_ptr< val > compute_binop(std::shared_ptr< ctx_exp_t > const &ctx, binop *e);
+    p_val_t compute_binop(std::shared_ptr< ctx_exp_t > const &ctx, binop *e);
 
-    std::shared_ptr< val > compute_binop_str(std::shared_ptr< ctx_exp_t > const &ctx, binop_str *e);
+    p_val_t compute_binop_str(std::shared_ptr< ctx_exp_t > const &ctx, binop_str *e);
 
 }
 

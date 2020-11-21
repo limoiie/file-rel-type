@@ -7,17 +7,19 @@
 #include "magic_ast/eval/eval_binop.h"
 #include "val_sign_typ.h"
 
-using exp_t = std::tuple< char, val, val >;
+using namespace magic::ast;
+
+using exp_t = std::tuple< char, p_val_t, p_val_t >;
 
 template< class Int >
-val create(val_typ_t typ, bool is_unsigned, Int v) {
-    return val{
+auto create(val_typ_t typ, bool is_unsigned, Int v) {
+    return std::make_shared< val >(
             val_sign_typ_t{typ, is_unsigned}, var::builder::make((std::make_unsigned_t< Int >) v)
-    };
+    );
 }
 
 template< class Int >
-std::pair< exp_t, val > create(char op, val_typ_t typ, Int lhs, Int rhs) {
+std::pair< exp_t, p_val_t > create(char op, val_typ_t typ, Int lhs, Int rhs) {
     Int res = 0;
     switch (op) {
         case '&': res = lhs & rhs;
@@ -55,7 +57,7 @@ std::pair< exp_t, val > create(char op, val_typ_t typ, Int lhs, Int rhs) {
 
 TEST(TestEvalBinOp, test_eval_binop) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing" << __FUNCTION__ << " ..." << std::endl;
-    auto cases = std::list< std::pair< exp_t, val>>{
+    auto cases = std::list< std::pair< exp_t, p_val_t>>{
             create< uint32_t >('+', FILE_LONG, 10, 20),
             create< uint32_t >('&', FILE_LONG, 10, 20),
             create< uint32_t >('=', FILE_QUAD, 10, 20),
@@ -67,14 +69,14 @@ TEST(TestEvalBinOp, test_eval_binop) { // NOLINT(cert-err58-cpp)
 
     for (auto &pair : cases) {
         std::cout << "  Case: "
-                  << std::get< 1 >(pair.first).to_string() << std::get< 0 >(pair.first)
-                  << std::get< 2 >(pair.first).to_string() << std::endl;
+                  << std::get< 1 >(pair.first)->to_string() << std::get< 0 >(pair.first)
+                  << std::get< 2 >(pair.first)->to_string() << std::endl;
 
         auto out = compute_binop(
                 std::get< 0 >(pair.first),
                 std::get< 1 >(pair.first),
                 std::get< 2 >(pair.first)
         );
-        ASSERT_EQ(*out, pair.second);
+        ASSERT_EQ(*out, *pair.second);
     }
 }

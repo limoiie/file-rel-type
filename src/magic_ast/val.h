@@ -16,6 +16,10 @@
 
 namespace magic::ast
 {
+    struct val;
+
+    using p_val_t = std::shared_ptr< val >;
+
     struct val {
         val_sign_typ_t typ;
         var data;
