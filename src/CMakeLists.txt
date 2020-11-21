@@ -3,8 +3,8 @@ find_package(pegtl CONFIG REQUIRED)
 add_library(magic
     ParseMagicFile.cpp
     ParseMagicFile.h
-    MagicEntry.cpp
-    MagicEntry.h
+    magic_entry.cpp
+    magic_entry.h
     magic_peg.h
     magic_peg_op_typ.h
     magic_type.h
@@ -58,7 +58,7 @@ target_link_libraries(magic
 
 add_executable(file_rel_type
     main.cpp
-    pegtl-helper/line.hpp)
+    pegtl-helper/line.hpp utils/tree.hpp)
 
 target_link_libraries(file_rel_type
     magic

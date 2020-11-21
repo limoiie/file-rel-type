@@ -238,18 +238,70 @@ namespace test_magic_line
     TEST(TestMagicPeg, test_magic_line) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_magic_line ..." << std::endl;
         auto cases = std::list< std::pair< std::string, bool>>{
-                {">0x24\t\tstring\t\t>\\0\tmusician: \"%s\"",               true},
-                {">>>>0x4D\tbeshort\t\t0x000\t(2GDM v",                     true},
-                {">>>(16.s)\tulelong\t\t>0\t\\b, at 0x%x",                  true},
-                {">>>>(16.s+4)\tulelong\t\t>0\t%u bytes",                   true},
-                {">>>>>(&-8.l)\tstring\t\tRIFF",                            true},
-                {"0\tstring\t4OP\\x1a\t\tIBK instrument data, 4 operators", true},
+                {">0x24\t\tstring\t\t>\\0\tmusician: \"%s\"",                      true},
+                {">>>>0x4D\tbeshort\t\t0x000\t(2GDM v",                            true},
+                {">>>(16.s)\tulelong\t\t>0\t\\b, at 0x%x",                         true},
+                {">>>>(16.s+4)\tulelong\t\t>0\t%u bytes",                          true},
+                {">>>>>(&-8.l)\tstring\t\tRIFF",                                   true},
+                {"0\tstring\t4OP\\x1a\t\tIBK instrument data, 4 operators",        true},
+                {">18\tlelong\t\t^02\n>>18\tlelong\t\t&01\t\tstatic object,|30\n", false}
         };
 
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto out = match_with< magic_line >(pair.first);
+            auto out = match_with< exact< magic_line > >(pair.first);
+            ASSERT_EQ(out, pair.second);
+        }
+    }
+}
+
+namespace test_magic_file
+{
+    TEST(TestMagicPeg, test_magic_file) { // NOLINT(cert-err58-cpp)
+        std::cout << "Testing" << __FUNCTION__ << " ..." << std::endl;
+        auto cases = std::list< std::pair< std::string, bool>>{
+                {
+                        "#----\n"
+                        "\n"
+                        "\n"
+                        " ",
+                        true
+                },
+                {
+                        "#----\n"
+                        "0\tleshort\t\t0x521c\t\tCOFF DSP21k|28\n"
+                        "!2345678901234567890123456789012",
+                        true
+                },
+                {
+                        "#--------------------------------------------\n"
+                        "# $File$\n"
+                        "# adi: file(1) magic for ADi's objects\n"
+                        "# From Gregory McGarry <g.mcgarry@ieee.org>\n"
+                        "#\n"
+                        "0\tleshort\t\t0x521c\t\tCOFF DSP21k|28\n"
+                        ">18\tlelong\t\t&02\t\texecutable,|29\n"
+                        ">18\tlelong\t\t^02\n"
+                        ">>18\tlelong\t\t&01\t\tstatic object,|30\n"
+                        ">>18\tlelong\t\t^01\t\trelocatable object,|31\n"
+                        ">18\tlelong\t\t&010\t\tstripped\n"
+                        ">18\tlelong\t\t^010\t\tnot stripped\n"
+                        "#----",
+                        true
+                },
+                {
+                        "#--------\n"
+                        "0\tleshort\t\t0x521c\t\tCOFF DSP21k|28\n"
+                        "fuck you\n",
+                        false
+                }
+        };
+
+        for (auto const &pair : cases) {
+            std::cout << "  Case: " << std::endl << pair.first << std::endl;
+
+            auto out = match_with< contrib::exact< magic_file > >(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }

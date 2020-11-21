@@ -12,15 +12,17 @@
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/unescape.hpp>
 
-#include <pegtl-helper/integer.hpp>
-#include <pegtl-helper/ascii.hpp>
+#include <utils/tree.hpp>
 #include <utils/stl_container_helper.h>
 
-#include <magic_peg.h>
-#include <magic_ast/magic_ast.h>
+#include <pegtl-helper/integer.hpp>
+#include <pegtl-helper/ascii.hpp>
 
-#include "val_sign_typ.h"
-#include "magic_ast/eval/type_lift_val.h"
+#include <val_sign_typ.h>
+#include <magic_peg.h>
+#include <magic_entry.h>
+#include <magic_ast/magic_ast.h>
+#include <magic_ast/eval/type_lift_val.h>
 
 namespace peg::magic::action
 {
@@ -32,10 +34,35 @@ namespace peg::magic::action
 
     struct state_magic_build {
         state_magic_build()
-                : flag(0), has_range(false) {
+                : flag(0), has_range(false), level(0), type_code(0) {
+            reset_line_status();
+        }
+
+        void reset_line_status() {
+            flag = 0u;
+            has_range = false;
+            level = 0;
+
             stk_opt.push('*');
             stk_typ.push(nullptr);
+            typ = nullptr;
+
+            description.clear();
+            type_code = 0;
         }
+
+        /// file status -----------------------------------------------------
+
+        // a series of lines that starts with a level-0 line represents one magic tree
+        // one file may contain several magic trees
+        std::list< std::shared_ptr< tree_node< magic_entry > > > magic_trees;
+
+        /// tree status -----------------------------------------------------
+
+        // one line corresponds to one entry
+        std::shared_ptr< tree_node< magic_entry > > current_entry;
+
+        /// line statues -----------------------------------------------------
 
         std::stack< std::shared_ptr< exp > > stk_exp;
         std::stack< std::shared_ptr< val_sign_typ_t > > stk_typ;
@@ -44,6 +71,11 @@ namespace peg::magic::action
 
         unsigned flag;
         bool has_range;
+        size_t level;
+
+        std::string description;
+        unsigned type_code;
+
     };
 
     struct action_push_operator {
@@ -77,7 +109,7 @@ namespace peg::magic::action
     };
 
     struct [[maybe_unused]] action_push_un_exp {
-        [[maybe_unused]] static void apply0(state_magic_build &st) {
+        static void apply0(state_magic_build &st) {
             auto inner = std_::pop(st.stk_exp);
             auto typ = std_::pop(st.stk_typ);
             auto op = std_::pop(st.stk_opt);
@@ -88,7 +120,7 @@ namespace peg::magic::action
     };
 
     struct [[maybe_unused]] action_push_bin_exp {
-        [[maybe_unused]] static void apply0(state_magic_build &st) {
+        static void apply0(state_magic_build &st) {
             auto right = std_::pop(st.stk_exp);
             auto left = std_::pop(st.stk_exp);
             auto typ = std_::pop(st.stk_typ);
@@ -105,7 +137,7 @@ namespace peg::magic::action
     };
 
     struct [[maybe_unused]] action_push_bin_exp_with_flag {
-        [[maybe_unused]] static void apply0(state_magic_build &st) {
+        static void apply0(state_magic_build &st) {
             auto right = std_::pop(st.stk_exp);
             auto left = std_::pop(st.stk_exp);
             auto typ = std_::pop(st.stk_typ);
@@ -143,6 +175,14 @@ namespace peg::magic::action
                     {FILE_STRING, false},
                     var::builder::make((std::string_view) s)
             ));
+        }
+    };
+
+    template<>
+    struct [[maybe_unused]] action_magic< continue_level > {
+        template< class ActionInput >
+        static void apply(ActionInput &in, state_magic_build &st) {
+            st.level = in.string_view().size();
         }
     };
 
@@ -193,7 +233,7 @@ namespace peg::magic::action
 
     template<>
     struct [[maybe_unused]] action_magic< np_deref_mask::deref_mask_num > {
-        [[maybe_unused]] static void apply0(state_magic_build &st) {
+        static void apply0(state_magic_build &st) {
             st.has_range = true;
         }
     };
@@ -209,7 +249,7 @@ namespace peg::magic::action
 
     template<>
     struct [[maybe_unused]] action_magic< np_deref_mask::deref_mask_str > {
-        [[maybe_unused]] static void apply0(state_magic_build &st) {
+        static void apply0(state_magic_build &st) {
             if (!st.has_range) {  // push the default range exp if no range specified
                 st.stk_exp.push(default_range());
             }
@@ -239,6 +279,14 @@ namespace peg::magic::action
     };
 
     template<>
+    struct [[maybe_unused]] action_magic< ::np_typ_relation::relation_default_opt > {
+        static void apply0(state_magic_build &st) {
+            st.stk_opt.push('=');
+            st.stk_typ.push(nullptr);
+        }
+    };
+
+    template<>
     struct [[maybe_unused]] action_magic< ::np_typ_relation::relation_str_val >
             : action_push_bin_exp_with_flag {
     };
@@ -246,6 +294,70 @@ namespace peg::magic::action
     template<>
     struct [[maybe_unused]] action_magic< ::np_typ_relation::relation_num_val >
             : action_push_bin_exp {
+    };
+
+    template<>
+    struct [[maybe_unused]] action_magic< ::np_description::description > {
+        template< class ActionInput >
+        static void apply(ActionInput &in, state_magic_build &st) {
+            st.description = in.string_view();
+        }
+    };
+
+    template<>
+    struct [[maybe_unused]] action_magic< ::np_type_code::type_code >
+            : to_integer_switcher< unsigned > {
+        template< class ParseInput >
+        static void success(ParseInput const&in, state_to_integer< unsigned > &s, state_magic_build &st) {
+            st.type_code = s.val;
+        }
+    };
+
+    template<>
+    struct [[maybe_unused]] action_magic< ::magic_line > {
+        template< class ActionInput >
+        static void apply(ActionInput &in, state_magic_build &st) {
+            assert(st.stk_exp.size() == 1);
+            assert(st.stk_opt.empty());
+            assert(st.stk_typ.empty());
+
+            auto entry = std::make_shared< tree_node< magic_entry > >(
+                    std::make_shared< magic_entry >(
+                            std_::pop(st.stk_exp), st.level, st.description, st.type_code));
+
+            st.reset_line_status();
+
+            if (entry->val->level == 0) {  // entry the first line of a magic tree
+                if (st.current_entry != nullptr) {  // push current tree root if there is one
+                    st.magic_trees.push_back(st.current_entry->root());
+                }
+                st.current_entry = entry;
+                return;
+            }
+
+            assert(st.current_entry != nullptr);
+            // level continues one by one, or backwards
+            assert(st.current_entry->val->level + 1 >= entry->val->level);
+
+            // find the parent entry
+            while (st.current_entry->val->level >= entry->val->level) {
+                st.current_entry = st.current_entry->parent;
+            }
+            // bind with the parent entry
+            st.current_entry->children.push_back(entry);
+            entry->parent = st.current_entry;
+            st.current_entry = entry;
+        }
+
+    };
+
+    template<>
+    struct [[maybe_unused]] action_magic< magic_file > {
+        static void apply0(state_magic_build &st) {
+            if (st.current_entry != nullptr) {
+                st.magic_trees.push_back(st.current_entry->root());
+            }
+        }
     };
 
 }

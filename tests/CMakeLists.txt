@@ -20,7 +20,7 @@ add_executable(test_all
     magic_ast/eval/test_type_lift.cpp
     magic_ast/eval/test_val_fetcher.cpp
     magic_ast/eval/test_eval_unop.cpp
-    )
+    test_magic_peg_builder/test_file_builder.cpp test_magic_peg_builder/test_description_type_code.cpp)
 
 target_link_libraries(
     test_all PRIVATE magic GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main
