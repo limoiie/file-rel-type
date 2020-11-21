@@ -218,6 +218,7 @@ namespace test_lines
                 {"# this is a test",     true},
                 {"! this is a strength", true},
                 {"",                     true},
+                {">>0 string x desc",    true},
                 {">>",                   false},
                 {"?",                    false},
         };
@@ -226,7 +227,7 @@ namespace test_lines
             std::cout << "  Case: " << pair.first << std::endl;
 
             memory_input in(pair.first, __FUNCTION__);
-            auto out = parse< sor< empty_line, comment_line, strength_line > >(in);
+            auto out = parse< seq< ::line, tao::pegtl::eof > >(in);
             ASSERT_EQ(out, pair.second);
         }
     }
