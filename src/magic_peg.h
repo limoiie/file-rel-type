@@ -102,13 +102,16 @@ namespace np_typ_relation
 {
     using namespace np_deref_mask;
 
+    struct relation_default_exp : seq< one< 'x' >, at< blank > > {};
+    struct relation_default_opt : success {};
+
     template< class Rule >
     struct relation_exp
-            : seq< opt< np_operator::compare_operator >, Rule > {
+            : seq< sor< np_operator::compare_operator, relation_default_opt >, Rule > {
     };
 
-    struct relation_str_val : relation_exp< ::string > {};
-    struct relation_num_val : relation_exp< ::number > {};
+    struct relation_str_val : sor< relation_default_exp, relation_exp< ::string > > {};
+    struct relation_num_val : sor< relation_default_exp, relation_exp< ::number > > {};
 
     struct typ_relation
             : tao::pegtl::switcher<
