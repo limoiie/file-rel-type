@@ -5,14 +5,14 @@ include_directories(../src)
 add_executable(test_all
     test_magic_peg.cpp
     test_pegtl_helper.hpp
-    pegtl-helper/test_integer.cpp
-    test_magic_peg_builder/test_offset_builder.cpp
-    pegtl-helper/test_integer_action.cpp
+    utils/tao/pegtl/test_integer.cpp
+    magic_peg_builder/test_offset_builder.cpp
+    utils/tao/pegtl/test_integer_action.cpp
     test_magic_peg_predefine_action.cpp
-    test_magic_peg_builder/test_deref_type_builder.cpp
+    magic_peg_builder/test_deref_type_builder.cpp
     test_magic_peg_predefine.cpp
-    pegtl-helper/test_switcher.cpp
-    pegtl-helper/test_change_action_and_states_in_place.cpp
+    utils/tao/pegtl/test_switcher.cpp
+    utils/tao/pegtl/test_change_action_and_states_in_place.cpp
     input/test_random_input.cpp
     magic_ast/test_read_number.cpp
     magic_ast/eval/test_type_cast.cpp
@@ -20,8 +20,8 @@ add_executable(test_all
     magic_ast/eval/test_type_lift.cpp
     magic_ast/eval/test_val_fetcher.cpp
     magic_ast/eval/test_eval_unop.cpp
-    test_magic_peg_builder/test_file_builder.cpp
-    test_magic_peg_builder/test_description_type_code.cpp
+    magic_peg_builder/test_file_builder.cpp
+    magic_peg_builder/test_description_type_code.cpp
     )
 
 target_link_libraries(
