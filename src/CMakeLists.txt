@@ -9,11 +9,11 @@ add_library(magic
     magic_peg_op_typ.h
     magic_type.h
     magic_type.cpp
-    pegtl-helper/change_action_and_states_in_place.hpp
-    pegtl-helper/exact.hpp
-    pegtl-helper/integer.hpp
-    pegtl-helper/line.hpp
-    pegtl-helper/switcher.hpp
+    utils/tao/pegtl/change_action_and_states_in_place.hpp
+    utils/tao/pegtl/exact.hpp
+    utils/tao/pegtl/integer.hpp
+    utils/tao/pegtl/line.hpp
+    utils/tao/pegtl/switcher.hpp
     magic_peg_builder.hpp
     magic_ast/exp.h
     magic_ast/var.cpp

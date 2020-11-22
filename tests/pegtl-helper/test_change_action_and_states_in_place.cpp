@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "pegtl-helper/change_action_and_states_in_place.hpp"
+#include "utils/tao/pegtl/change_action_and_states_in_place.hpp"
 
 using namespace tao::pegtl;
 

@@ -7,9 +7,9 @@
 #include <tao/pegtl/contrib/integer.hpp>
 #include <tao/pegtl/contrib/if_then.hpp>
 
-#include <magic_type.h>
+#include "../../../magic_type.h"
 
-#include "pegtl-helper/integer.hpp"
+#include "integer.hpp"
 
 using namespace tao::pegtl;
 

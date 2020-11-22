@@ -14,10 +14,10 @@
 #include "magic_type.h"
 #include "magic_peg_op_typ.h"
 
-#include "pegtl-helper/ascii.hpp"
-#include "pegtl-helper/integer.hpp"
-#include "pegtl-helper/line.hpp"
-#include "pegtl-helper/switcher.hpp"
+#include "utils/tao/pegtl/ascii.hpp"
+#include "utils/tao/pegtl/integer.hpp"
+#include "utils/tao/pegtl/line.hpp"
+#include "utils/tao/pegtl/switcher.hpp"
 
 using namespace tao::pegtl;
 

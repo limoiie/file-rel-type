@@ -13,7 +13,7 @@
 #include <magic_peg_op_typ.h>
 #include <magic_peg_builder.hpp>
 
-#include <pegtl-helper/switcher.hpp>
+#include <utils/tao/pegtl/switcher.hpp>
 
 #include "../test_pegtl_helper.hpp"
 

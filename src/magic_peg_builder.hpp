@@ -15,8 +15,8 @@
 #include <utils/tree.hpp>
 #include <utils/stl_container_helper.h>
 
-#include <pegtl-helper/integer.hpp>
-#include <pegtl-helper/ascii.hpp>
+#include <utils/tao/pegtl/integer.hpp>
+#include <utils/tao/pegtl/ascii.hpp>
 
 #include <val_sign_typ.h>
 #include <magic_peg.h>
