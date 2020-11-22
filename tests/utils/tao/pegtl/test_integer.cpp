@@ -11,7 +11,7 @@
 
 #include <magic_peg_op_typ.h>
 
-#include "../test_pegtl_helper.hpp"
+#include "../../../test_pegtl_helper.hpp"
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
