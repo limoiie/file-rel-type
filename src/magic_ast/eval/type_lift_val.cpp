@@ -22,6 +22,7 @@ void lift_type(val &l_val, val &r_val) {
         l_val.typ = sign_typ;
         r_val.typ = sign_typ;
     } else {
+        // todo: support across non-integer
         throw std::domain_error("type_lift(val): Not support cast between non-integer type yet!");
     }
 }

@@ -55,9 +55,9 @@ struct val_fetcher {
             fetch_num(v, typ.typ);
         } else {
             if (is_string_typ(typ.typ)) {
-                // todo
+                // todo: fetch string type
             }
-            throw std::logic_error("not implemented yet!");
+            throw std::logic_error("NonImplemented: fetching string value is not implemented yet!");
         }
 
         return std::make_shared< magic::ast::val >(val_sign_typ_t{flipped_typ, typ.is_unsigned}, v);

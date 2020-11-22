@@ -15,3 +15,7 @@ magic_entry::magic_entry(std::shared_ptr< magic::ast::exp > exp,
         , description(std::move(description))
         , type_code(type_code) {
 }
+
+std::string magic_entry::to_string() const {
+    return std::string(level, '>') + (exp == nullptr ? "nullptr" : exp->to_string());
+}

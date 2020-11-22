@@ -109,4 +109,6 @@ void cast_int(var &v, std::size_t from, std::size_t to, bool const is_from_unsig
     dispatcher_by_2sizes::dispatch< int_caster >(from, to, v, is_from_unsigned, is_to_unsigned);
 }
 
+// todo: support cast float or double
+
 #endif //FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_CAST_H_

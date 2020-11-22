@@ -15,9 +15,7 @@ struct magic_entry {
                 std::string description = "",
                 unsigned type_code = 0);
 
-    std::string to_string() const {
-        return std::string(level, '>') + (exp == nullptr ? "nullptr" : exp->to_string());
-    }
+    std::string to_string() const;
 
     std::shared_ptr< magic::ast::exp > exp;
     size_t level;

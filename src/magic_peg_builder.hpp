@@ -278,6 +278,14 @@ namespace peg::magic::action
             : action_push_operator {
     };
 
+    /* todo: implementation
+     struct [[maybe_unused]] action_magic< ::np_typ_relation::relation_default_exp > {
+         static void apply0() {
+             // mark as always true but also keep the original value
+         }
+     }
+     */
+
     template<>
     struct [[maybe_unused]] action_magic< ::np_typ_relation::relation_default_opt > {
         static void apply0(state_magic_build &st) {
@@ -288,12 +296,16 @@ namespace peg::magic::action
 
     template<>
     struct [[maybe_unused]] action_magic< ::np_typ_relation::relation_str_val >
-            : action_push_bin_exp_with_flag {
+            : action_push_bin_exp_with_flag {  // todo: instead of pushing bin exp, store lhs and rhs separately
+                                               //   so that later processing can get the lhs, which is the information
+                                               //   in the memory
     };
 
     template<>
     struct [[maybe_unused]] action_magic< ::np_typ_relation::relation_num_val >
-            : action_push_bin_exp {
+            : action_push_bin_exp {            // todo: instead of pushing bin exp, store lhs and rhs separately
+                                               //   so that later processing can get the lhs, which is the information
+                                               //   in the memory
     };
 
     template<>

@@ -11,6 +11,8 @@ namespace magic::ast
 {
     using p_ctx = std::shared_ptr< ctx_exp_t >;
 
+    // todo: consider using int64_t to present all the integer value?
+
     p_val_t compute_num(p_ctx const &ctx, num *e) {
         return std::make_shared< val >(*e->inner);
     }
@@ -26,7 +28,8 @@ namespace magic::ast
         return ::compute_binop(e->op, left_v, right_v);
     }
 
-    p_val_t compute_binop_str(p_ctx const &ctx, binop_str *e) {
+    p_val_t compute_binop_str(p_ctx const &ctx, binop_str *) {
+        // todo: need implementation
         return nullptr;
     }
 

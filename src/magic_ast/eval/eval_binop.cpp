@@ -27,9 +27,9 @@ namespace internal
         };
 
         switch (op) {
-            case '&': return maker(res_v = lhs_v & rhs_v);
-            case '|': return maker(res_v = lhs_v | rhs_v);
-            case '^': return maker(res_v = lhs_v ^ rhs_v);
+            case '&': return maker(res_v = lhs_v & rhs_v); // NOLINT(hicpp-signed-bitwise)
+            case '|': return maker(res_v = lhs_v | rhs_v); // NOLINT(hicpp-signed-bitwise)
+            case '^': return maker(res_v = lhs_v ^ rhs_v); // NOLINT(hicpp-signed-bitwise)
             case '+': return maker(res_v = lhs_v + rhs_v);
             case '-': return maker(res_v = lhs_v - rhs_v);
             case '*': return maker(res_v = lhs_v * rhs_v);

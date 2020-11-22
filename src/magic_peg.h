@@ -101,6 +101,7 @@ namespace np_deref_mask
 namespace np_typ_relation
 {
     using namespace np_deref_mask;
+    using namespace np_type::np_deref_type;
 
     struct relation_default_exp : seq< one< 'x' >, at< blank > > {};
     struct relation_default_opt : success {};
@@ -113,11 +114,16 @@ namespace np_typ_relation
     struct relation_str_val : sor< relation_default_exp, relation_exp< ::string > > {};
     struct relation_num_val : sor< relation_default_exp, relation_exp< ::number > > {};
 
+    template< class Rule >
+    struct relation_mask
+            : sor< relation_default_exp, Rule > {
+    };
+
     struct typ_relation
             : tao::pegtl::switcher<
-                    np_type::np_deref_type::formal_str_typ, seq< opt< deref_str_mask >, ___, relation_str_val >,
-                    np_type::np_deref_type::formal_non_typ, seq< opt< /* success  */ >, ___, relation_str_val >,
-                    np_type::np_deref_type::formal_num_typ, seq< opt< deref_num_mask >, ___, relation_num_val >
+                    formal_str_typ, seq< opt< deref_str_mask >, ___, relation_mask< relation_str_val > >,
+                    formal_non_typ, seq< opt< /* success  */ >, ___, relation_mask< relation_str_val > >,
+                    formal_num_typ, seq< opt< deref_num_mask >, ___, relation_mask< relation_num_val > >
             > {
     };
 }
@@ -150,6 +156,7 @@ struct empty_line : until< at< tao::pegtl::eolf >, blank > {};
 /// Comment line for description
 struct comment_line : seq< one< '#' >, until< at< tao::pegtl::eolf > > > {};
 
+// todo: support strength
 /// Annotation line for annotating the strength of the following magic line
 struct strength_line : seq< one< '!' >, until< at< tao::pegtl::eolf > > > {};
 
