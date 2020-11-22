@@ -2,15 +2,15 @@
 // Created by ligen on 11/18/2020.
 //
 
-#ifndef FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_CAST_H_
-#define FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_CAST_H_
+#ifndef FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_CAST_HPP_
+#define FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_CAST_HPP_
 
 #include <iostream>
 
 #include "../var.h"
 #include "../../make_int_type.hpp"
 
-#include "type_dispatcher.h"
+#include "type_dispatcher.hpp"
 
 using namespace magic::ast;
 
@@ -111,4 +111,4 @@ void cast_int(var &v, std::size_t from, std::size_t to, bool const is_from_unsig
 
 // todo: support cast float or double
 
-#endif //FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_CAST_H_
+#endif //FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_CAST_HPP_

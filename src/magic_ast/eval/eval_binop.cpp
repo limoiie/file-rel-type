@@ -7,7 +7,7 @@
 #include <memory>
 #include <cassert>
 
-#include "type_cast.h"
+#include "type_cast.hpp"
 #include "type_lift_val.h"
 
 using namespace magic::ast;
@@ -45,16 +45,17 @@ namespace internal
         throw std::logic_error("Failed to compute bin expression: unsupported operator!");
     }
 
-}
+    template< std::size_t S, bool IsUnsigned >
+    struct [[maybe_unused]] binop_computer {
+        static p_val_t on_dispatch(char const op, p_val_t const &lhs, p_val_t const &rhs) {
+            return internal::compute_binop_< S, IsUnsigned >(op, lhs, rhs);
+        }
+    };
 
-template< std::size_t S, bool IsUnsigned >
-struct [[maybe_unused]] binop_computer {
-    static p_val_t on_dispatch(char const op, p_val_t const &lhs, p_val_t const &rhs) {
-        return internal::compute_binop_< S, IsUnsigned >(op, lhs, rhs);
-    }
-};
+}
 
 p_val_t compute_binop(char const op, p_val_t const &lhs, p_val_t const &rhs) {
     lift_type(lhs, rhs);
-    return dispatch_by< binop_computer >(size_of_typ(lhs->typ.typ), lhs->typ.is_unsigned, op, lhs, rhs);
+    return dispatch_by< internal::binop_computer >(
+            size_of_typ(lhs->typ.typ), lhs->typ.is_unsigned, op, lhs, rhs);
 }

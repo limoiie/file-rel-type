@@ -3,7 +3,7 @@
 //
 
 #include "type_lift.h"
-#include "type_cast.h"
+#include "type_cast.hpp"
 
 void type_lift(std::size_t &l_size, bool &l_is_unsigned, var &l_var,
                std::size_t &r_size, bool &r_is_unsigned, var &r_var) {

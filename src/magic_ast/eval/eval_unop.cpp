@@ -4,7 +4,7 @@
 
 #include "eval_unop.h"
 
-#include "type_cast.h"
+#include "type_cast.hpp"
 #include "eval_binop.h"
 
 namespace internal
@@ -22,8 +22,8 @@ namespace internal
         if (ctx->offset_history.empty()) {
             throw std::domain_error("Failed to compute unop rel: cannot relatively fetch when no history");
         }
-        auto const& left = ctx->offset_history.top();
-        auto const& right = inner;
+        auto const &left = ctx->offset_history.top();
+        auto const &right = inner;
         return compute_binop('+', left, right);
     }
 
@@ -45,16 +45,18 @@ namespace internal
 
         throw std::logic_error("Failed to compute unop expression: unsupported operator!");
     }
+
+    template< std::size_t S, bool IsUnsigned >
+    struct [[maybe_unused]] unop_computer {
+        static
+        p_val_t on_dispatch(char const op, p_val_t const &inner, val_sign_typ_t const &typ, p_ctx_t const &ctx) {
+            return internal::compute_unop_< S, IsUnsigned >(op, inner, typ, ctx);
+        }
+    };
+
 }
 
-template< std::size_t S, bool IsUnsigned >
-struct [[maybe_unused]] unop_computer {
-    static
-    p_val_t on_dispatch(char const op, p_val_t const &inner, val_sign_typ_t const &typ, p_ctx_t const &ctx) {
-        return internal::compute_unop_< S, IsUnsigned >(op, inner, typ, ctx);
-    }
-};
-
 p_val_t compute_unop(char const op, p_val_t const &inner, val_sign_typ_t const &typ, p_ctx_t const &ctx) {
-    return dispatch_by< unop_computer >(size_of_typ(inner->typ.typ), inner->typ.is_unsigned, op, inner, typ, ctx);
+    return dispatch_by< internal::unop_computer >(
+            size_of_typ(inner->typ.typ), inner->typ.is_unsigned, op, inner, typ, ctx);
 }

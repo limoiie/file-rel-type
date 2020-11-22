@@ -7,7 +7,7 @@
 #include <cassert>
 
 #include "type_priority.h"
-#include "type_cast.h"
+#include "type_cast.hpp"
 
 void lift_type(val &l_val, val &r_val) {
     assert(endian_of_typ(l_val.typ.typ) == NORMAL_ENDIAN);

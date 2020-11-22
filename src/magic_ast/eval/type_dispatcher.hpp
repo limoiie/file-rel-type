@@ -2,8 +2,8 @@
 // Created by ligen on 11/19/2020.
 //
 
-#ifndef FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_DISPATCHER_H_
-#define FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_DISPATCHER_H_
+#ifndef FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_DISPATCHER_HPP_
+#define FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_DISPATCHER_HPP_
 
 #include <functional>
 #include <stdexcept>
@@ -110,4 +110,4 @@ using dispatcher_by_2sizes = dispatcher_by_sizes< _S, _S >;
 using dispatcher_by_3sizes = dispatcher_by_sizes< _S, _S, _S >;
 using dispatcher_by_4sizes = dispatcher_by_sizes< _S, _S, _S, _S >;
 
-#endif //FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_DISPATCHER_H_
+#endif //FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_DISPATCHER_HPP_

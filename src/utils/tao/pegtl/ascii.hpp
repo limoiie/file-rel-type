@@ -6,6 +6,7 @@
 #include <tao/pegtl/contrib/analyze.hpp>
 #include <tao/pegtl/contrib/integer.hpp>
 #include <tao/pegtl/contrib/if_then.hpp>
+#include <tao/pegtl/contrib/unescape.hpp>
 
 #include "../../../magic_type.h"
 

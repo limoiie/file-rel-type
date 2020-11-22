@@ -21,33 +21,22 @@ namespace magic::ast
     struct ctx_exp_t;
 
     struct exp {
-        exp() : exp(val_sign_typ_t::default_()) {
-        }
+        exp();
 
-        explicit exp(val_sign_typ_t const &typ)
-                : typ(typ) {
-        }
+        explicit exp(val_sign_typ_t const &typ);
 
         friend
-        bool operator==(exp const &lhs, exp const &rhs) {
-            return lhs.equal_to(rhs);
-        }
+        bool operator==(exp const &lhs, exp const &rhs);
 
         friend
-        bool operator!=(exp const &lhs, exp const &rhs) {
-            return !(lhs == rhs);
-        }
+        bool operator!=(exp const &lhs, exp const &rhs);
 
-        virtual std::string to_string() const {
-            return "< " + to_string_() + ":" + typ.to_string() + " >";
-        }
+        virtual std::string to_string() const;
 
         virtual p_val_t compute(std::shared_ptr< ctx_exp_t > const &ctx) = 0;
 
     protected:
-        [[nodiscard]] virtual bool equal_to(exp const &other) const {
-            return typ == other.typ;
-        }
+        [[nodiscard]] virtual bool equal_to(exp const &other) const;
 
         virtual std::string to_string_() const = 0;
 

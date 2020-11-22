@@ -32,17 +32,18 @@ add_library(magic
     magic_ast/eval/eval_binop.h
     magic_ast/eval/eval_unop.h
     magic_ast/eval/eval_unop.cpp
-    magic_ast/eval/val_fetcher.h
-    magic_ast/eval/type_cast.h
+    magic_ast/eval/val_fetcher.hpp
+    magic_ast/eval/type_cast.hpp
     magic_ast/eval/type_lift.cpp
     magic_ast/eval/type_lift.h
-    magic_ast/eval/type_dispatcher.h
+    magic_ast/eval/type_dispatcher.hpp
     magic_ast/eval/type_lift_val.cpp
     magic_ast/eval/type_lift_val.h
     magic_ast/eval/type_priority.cpp
     magic_ast/eval/type_priority.h
     utils/stl_container_helper.h
     utils/tree.hpp
+    input/random_istream_reader.cpp
     input/random_istream_reader.h
     input/random_buffer_input.hpp
     input/random_istream_input.hpp
@@ -52,7 +53,7 @@ add_library(magic
     val_sign_typ.h
     type_endian.cpp
     type_endian.h
-    magic_ast/eval/eval_binop.cpp)
+    magic_ast/eval/eval_binop.cpp magic_ast/exp.cpp magic_peg_op_typ.cpp)
 
 target_link_libraries(magic
     cpp-common-static

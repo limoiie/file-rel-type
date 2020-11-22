@@ -17,7 +17,7 @@
 #include "../../make_int_type.hpp"
 
 #include "read_number.hpp"
-#include "type_dispatcher.h"
+#include "type_dispatcher.hpp"
 
 template< size_t S >
 struct [[maybe_unused]] num_fetcher {

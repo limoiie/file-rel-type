@@ -6,7 +6,7 @@
 
 #include <sstream>
 
-#include "magic_ast/eval/val_fetcher.h"
+#include "magic_ast/eval/val_fetcher.hpp"
 
 using magic::ast::val;
 using magic::ast::var;

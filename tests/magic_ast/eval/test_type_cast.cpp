@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include <magic_ast/eval/type_cast.h>
+#include <magic_ast/eval/type_cast.hpp>
 
 #define CASE(FTyp, FVal, TTyp, TVal) { \
     {var::builder::make((std::make_unsigned_t<FTyp>) (FVal)), sizeof(FTyp), std::is_unsigned_v<FTyp>, #FTyp}, \
