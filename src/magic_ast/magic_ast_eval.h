@@ -15,7 +15,7 @@
 #include "exp_un.h"
 
 #include "../input/random_istream_input.hpp"
-#include "../make_int_type.hpp"
+#include "../utils/type_traits/make_int_type.hpp"
 #include "eval/val_fetcher.hpp"
 
 namespace magic::ast

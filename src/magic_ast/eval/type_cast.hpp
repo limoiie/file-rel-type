@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include "../var.h"
-#include "../../make_int_type.hpp"
+#include "../../utils/type_traits/make_int_type.hpp"
 
 #include "type_dispatcher.hpp"
 

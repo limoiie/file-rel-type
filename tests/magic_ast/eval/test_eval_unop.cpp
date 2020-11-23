@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "magic_ast/eval/eval_unop.h"
-#include "make_int_type.hpp"
+#include "utils/type_traits/make_int_type.hpp"
 
 using magic::ast::val;
 using magic::ast::var;

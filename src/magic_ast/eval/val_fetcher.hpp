@@ -14,7 +14,7 @@
 #include "../exp_bin.h"
 #include "../exp_un.h"
 #include "../../input/random_istream_input.hpp"
-#include "../../make_int_type.hpp"
+#include "../../utils/type_traits/make_int_type.hpp"
 
 #include "read_number.hpp"
 #include "type_dispatcher.hpp"

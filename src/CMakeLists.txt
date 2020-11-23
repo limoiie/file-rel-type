@@ -47,7 +47,7 @@ add_library(magic
     input/random_istream_reader.h
     input/random_buffer_input.hpp
     input/random_istream_input.hpp
-    make_int_type.hpp
+    utils/type_traits/make_int_type.hpp
     val_typ.h
     val_sign_typ.cpp
     val_sign_typ.h
