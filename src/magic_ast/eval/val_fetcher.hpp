@@ -15,6 +15,8 @@
 #include "../exp_un.h"
 #include "../../input/random_istream_input.hpp"
 #include "../../utils/type_traits/make_int_type.hpp"
+#include "../../val_typ_endian.h"
+#include "../../val_typ_name.h"
 
 #include "read_number.hpp"
 #include "type_dispatcher.hpp"

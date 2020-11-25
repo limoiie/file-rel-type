@@ -12,8 +12,6 @@
 #include <tao/pegtl/contrib/integer.hpp>
 #include <tao/pegtl/contrib/if_then.hpp>
 
-#include "../../../magic_type.h"
-
 using namespace tao::pegtl;
 
 namespace tao::pegtl::helper::integer

@@ -8,8 +8,6 @@
 #include <tao/pegtl/contrib/if_then.hpp>
 #include <tao/pegtl/contrib/unescape.hpp>
 
-#include "../../../magic_type.h"
-
 #include "integer.hpp"
 
 using namespace tao::pegtl;

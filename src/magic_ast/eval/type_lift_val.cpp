@@ -6,6 +6,8 @@
 
 #include <cassert>
 
+#include "../../val_typ_name.h"
+
 #include "type_priority.h"
 #include "type_cast.hpp"
 

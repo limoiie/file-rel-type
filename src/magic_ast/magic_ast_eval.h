@@ -9,14 +9,8 @@
 #include <memory>
 
 #include "val.h"
-#include "var.h"
-#include "exp_num.h"
-#include "exp_bin.h"
-#include "exp_un.h"
-
-#include "../input/random_istream_input.hpp"
-#include "../utils/type_traits/make_int_type.hpp"
 #include "eval/val_fetcher.hpp"
+#include "../input/random_istream_input.hpp"
 
 namespace magic::ast
 {

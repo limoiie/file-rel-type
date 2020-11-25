@@ -5,6 +5,9 @@
 #ifndef FILE_REL_TYPE_SRC_VAL_TYP_H_
 #define FILE_REL_TYPE_SRC_VAL_TYP_H_
 
+#include <string>
+#include <list>
+
 #define BIT(O) (1u << (O##u))
 
 enum val_typ_t {
@@ -59,21 +62,12 @@ enum val_typ_t {
     FILE_DER
 };
 
-enum val_fmt_t {
-    FILE_FMT_NONE = BIT(0),
-    FILE_FMT_STR = BIT(1),
-    FILE_FMT_INT = BIT(2),
-    FILE_FMT_QUAD = BIT(3),
-    FILE_FMT_FLOAT = BIT(4),
-    FILE_FMT_DOUBLE = BIT(5),
-    FILE_FMT_DATE = BIT(6)
-};
+bool is_number_typ(val_typ_t typ);
 
-enum val_endian_t {
-    NORMAL_ENDIAN,
-    BIGGER_ENDIAN,
-    MIDDLE_ENDIAN,
-    LITTLE_ENDIAN
-};
+bool is_integer_typ(val_typ_t typ);
+
+bool is_string_typ(val_typ_t typ);
+
+size_t size_of_typ(val_typ_t typ);
 
 #endif //FILE_REL_TYPE_SRC_VAL_TYP_H_

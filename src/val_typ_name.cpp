@@ -1,11 +1,11 @@
 //
-// Created by ligen on 11/5/2020.
+// Created by ligen on 11/25/2020.
 //
 
-#include "magic_type.h"
+#include "val_typ_name.h"
 
-auto map_type() -> std::list< std::tuple< std::string, val_typ_t, val_fmt_t>> const & {
-    static auto m = std::list< std::tuple< std::string, val_typ_t, val_fmt_t>>{
+std::list< std::tuple< std::string, val_typ_t, val_format_t>> const &map_type() {
+    static auto m = std::list< std::tuple< std::string, val_typ_t, val_format_t>>{
             {"invalid",    FILE_INVALID,    FILE_FMT_NONE},
             {"default",    FILE_DEFAULT,    FILE_FMT_NONE},
 
@@ -83,9 +83,9 @@ auto map_type_name() -> const std::map< val_typ_t, std::string > & {
     return mapping;
 }
 
-auto map_type_fmt() -> const std::map< val_typ_t, val_fmt_t > & {
+std::map< val_typ_t, val_format_t > const &map_type_fmt() {
     auto const &meta_data = map_type();
-    static auto type_fmt_mapping = std::map< val_typ_t, val_fmt_t >();
+    static auto type_fmt_mapping = std::map< val_typ_t, val_format_t >();
     if (type_fmt_mapping.empty()) {
         for (auto const &name_typ_fmt : meta_data) {
             type_fmt_mapping[std::get< 1 >(name_typ_fmt)] = std::get< 2 >(name_typ_fmt);
@@ -94,97 +94,14 @@ auto map_type_fmt() -> const std::map< val_typ_t, val_fmt_t > & {
     return type_fmt_mapping;
 }
 
+std::string name_of_typ(val_typ_t const typ) {
+    return map_type_name().at(typ);
+}
+
 val_typ_t parse_typ(const std::string &name) {
     auto const &mapping = map_name_type();
     if (mapping.count(name)) {
         return mapping.at(name);
     }
     return val_typ_t::FILE_INVALID;
-}
-
-val_fmt_t fmt_of_typ(val_typ_t typ) {
-    auto const &mapping = map_type_fmt();
-    if (mapping.count(typ)) {
-        return mapping.at(typ);
-    }
-    return val_fmt_t::FILE_FMT_NONE;
-}
-
-size_t size_of_typ(val_typ_t typ) {
-    switch (typ) {
-        case FILE_BYTE: return (size_t) 1;
-
-        case FILE_SHORT:
-        case FILE_LESHORT:
-        case FILE_BESHORT: return (size_t) 2;
-
-        case FILE_LONG:
-        case FILE_LELONG:
-        case FILE_BELONG:
-        case FILE_MELONG:
-
-        case FILE_DATE:
-        case FILE_LEDATE:
-        case FILE_BEDATE:
-        case FILE_MEDATE:
-        case FILE_LDATE:
-        case FILE_LELDATE:
-        case FILE_BELDATE:
-        case FILE_MELDATE:
-        case FILE_FLOAT:
-        case FILE_BEFLOAT:
-        case FILE_LEFLOAT: return (size_t) 4;
-
-        case FILE_QUAD:
-        case FILE_BEQUAD:
-        case FILE_LEQUAD:
-        case FILE_QDATE:
-        case FILE_LEQDATE:
-        case FILE_BEQDATE:
-        case FILE_QLDATE:
-        case FILE_LEQLDATE:
-        case FILE_BEQLDATE:
-        case FILE_QWDATE:
-        case FILE_LEQWDATE:
-        case FILE_BEQWDATE:
-        case FILE_DOUBLE:
-        case FILE_BEDOUBLE:
-        case FILE_LEDOUBLE: return (size_t) 8;
-
-        default: return (size_t) ~(size_t) 0;
-    }
-}
-
-std::string name_of_typ(val_typ_t const typ) {
-    return map_type_name().at(typ);
-}
-
-bool is_number_typ(val_typ_t const typ) {
-    auto const format = fmt_of_typ(typ);
-    return is_number_fmt(format);
-}
-
-bool is_number_fmt(val_fmt_t const fmt) {
-    return fmt == FILE_FMT_INT ||
-           fmt == FILE_FMT_QUAD ||
-           fmt == FILE_FMT_FLOAT ||
-           fmt == FILE_FMT_DOUBLE;
-}
-
-bool is_integer_typ(val_typ_t const typ) {
-    return is_integer_fmt(fmt_of_typ(typ));
-}
-
-bool is_integer_fmt(val_fmt_t const fmt) {
-    return fmt == FILE_FMT_INT ||
-           fmt == FILE_FMT_QUAD;
-}
-
-bool is_string_typ(val_typ_t const typ) {
-    auto const format = fmt_of_typ(typ);
-    return is_string_fmt(format);
-}
-
-bool is_string_fmt(val_fmt_t const fmt) {
-    return fmt == FILE_FMT_STR;
 }

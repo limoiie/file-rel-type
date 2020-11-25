@@ -4,7 +4,7 @@
 
 #include "val_sign_typ.h"
 
-#include "magic_type.h"
+#include "val_typ_name.h"
 
 val_sign_typ_t::val_sign_typ_t(val_typ_t typ, bool is_unsigned)
         : typ(typ), is_unsigned(is_unsigned) {
@@ -14,12 +14,6 @@ val_sign_typ_t val_sign_typ_t::default_() {
     return {
             FILE_LONG, false
     };
-}
-
-std::shared_ptr< val_sign_typ_t > val_sign_typ_t::default_ptr() {
-    return std::make_shared< val_sign_typ_t >(
-            FILE_LONG, false
-    );
 }
 
 bool val_sign_typ_t::operator==(const val_sign_typ_t &rhs) const {

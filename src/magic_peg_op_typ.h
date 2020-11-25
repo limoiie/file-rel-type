@@ -16,8 +16,8 @@
 #include "utils/tao/pegtl/exact.hpp"
 #include "utils/tao/pegtl/change_action_and_states_in_place.hpp"
 
-#include "magic_type.h"
 #include "val_sign_typ.h"
+#include "val_typ_name.h"
 
 namespace np_operator
 {
@@ -143,7 +143,7 @@ namespace np_type
                 return false;
             }
 
-            static bool is_invalid_fmt(val_fmt_t const fmt) {
+            static bool is_invalid_fmt(val_format_t const fmt) {
                 return 0 == ((unsigned) fmt & Fmt);
             }
 
@@ -155,20 +155,20 @@ namespace np_type
         };
 
         struct formal_str_typ
-                : seq< formal_typ< (unsigned) val_fmt_t::FILE_FMT_STR > > {
+                : seq< formal_typ< (unsigned) val_format_t::FILE_FMT_STR > > {
         };
 
         struct formal_num_typ
                 : seq< formal_typ<
-                        (unsigned) val_fmt_t::FILE_FMT_INT |
-                        (unsigned) val_fmt_t::FILE_FMT_QUAD |
-                        (unsigned) val_fmt_t::FILE_FMT_FLOAT |
-                        (unsigned) val_fmt_t::FILE_FMT_DOUBLE
+                        (unsigned) val_format_t::FILE_FMT_INT |
+                        (unsigned) val_format_t::FILE_FMT_QUAD |
+                        (unsigned) val_format_t::FILE_FMT_FLOAT |
+                        (unsigned) val_format_t::FILE_FMT_DOUBLE
                 > > {
         };
 
         struct formal_non_typ
-                : seq< formal_typ< (unsigned) val_fmt_t::FILE_FMT_NONE > > {
+                : seq< formal_typ< (unsigned) val_format_t::FILE_FMT_NONE > > {
         };
 
         namespace action

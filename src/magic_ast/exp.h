@@ -10,7 +10,6 @@
 #include <string>
 #include <utility>
 
-#include "../magic_type.h"
 #include "../val_sign_typ.h"
 
 #include "var.h"

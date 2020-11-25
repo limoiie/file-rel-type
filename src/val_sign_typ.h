@@ -21,8 +21,6 @@ struct val_sign_typ_t {
 
     static val_sign_typ_t default_();
 
-    static std::shared_ptr< val_sign_typ_t > default_ptr();
-
     bool operator==(const val_sign_typ_t &rhs) const;
 
     bool operator!=(const val_sign_typ_t &rhs) const;

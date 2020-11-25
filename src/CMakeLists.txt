@@ -6,15 +6,20 @@ add_library(magic
     magic_entry.cpp
     magic_entry.h
     magic_peg.h
+    magic_peg_op_typ.cpp
     magic_peg_op_typ.h
-    magic_type.h
-    magic_type.cpp
+    magic_peg_builder.hpp
+
     utils/tao/pegtl/change_action_and_states_in_place.hpp
     utils/tao/pegtl/exact.hpp
     utils/tao/pegtl/integer.hpp
     utils/tao/pegtl/line.hpp
     utils/tao/pegtl/switcher.hpp
-    magic_peg_builder.hpp
+    utils/stl_container_helper.h
+    utils/tree.hpp
+    utils/type_traits/make_int_type.hpp
+
+    magic_ast/exp.cpp
     magic_ast/exp.h
     magic_ast/var.cpp
     magic_ast/val.cpp
@@ -29,6 +34,7 @@ add_library(magic
     magic_ast/magic_ast.h
     magic_ast/eval/read_number.hpp
     magic_ast/eval/read_string.hpp
+    magic_ast/eval/eval_binop.cpp
     magic_ast/eval/eval_binop.h
     magic_ast/eval/eval_unop.h
     magic_ast/eval/eval_unop.cpp
@@ -41,14 +47,14 @@ add_library(magic
     magic_ast/eval/type_lift_val.h
     magic_ast/eval/type_priority.cpp
     magic_ast/eval/type_priority.h
-    utils/stl_container_helper.h
-    utils/tree.hpp
     input/random_istream_reader.cpp
     input/random_istream_reader.h
     input/random_buffer_input.hpp
     input/random_istream_input.hpp
     utils/type_traits/make_int_type.hpp
     val_typ.h
+    val_typ_name.cpp
+    val_typ_name.h
     val_sign_typ.cpp
     val_sign_typ.h
     type_endian.cpp

@@ -11,7 +11,6 @@
 #include <tao/pegtl/contrib/integer.hpp>
 #include <tao/pegtl/contrib/if_then.hpp>
 
-#include "magic_type.h"
 #include "magic_peg_op_typ.h"
 
 #include "utils/tao/pegtl/ascii.hpp"

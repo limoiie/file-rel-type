@@ -3,6 +3,7 @@
 //
 
 #include "val.h"
+#include "../val_typ_name.h"
 
 namespace magic::ast
 {
@@ -12,7 +13,7 @@ namespace magic::ast
 
     bool val::operator==(val const &rhs) const {
         if (typ != rhs.typ) return false;
-        switch (fmt_of_typ(typ.typ)) {
+        switch (format_of(typ.typ)) {
             case FILE_FMT_STR: return std::string_view(data.s) == std::string_view(rhs.data.s);
             case FILE_FMT_INT:
             case FILE_FMT_QUAD:
@@ -35,7 +36,7 @@ namespace magic::ast
 
     std::string val::to_string() const {
         auto fn_val = [this]() {
-            switch (fmt_of_typ(typ.typ)) {
+            switch (format_of(typ.typ)) {
                 case FILE_FMT_STR: return std::string(data.s);
                 case FILE_FMT_INT:
                 case FILE_FMT_QUAD:
