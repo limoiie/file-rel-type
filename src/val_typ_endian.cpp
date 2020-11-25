@@ -2,7 +2,7 @@
 // Created by ligen on 11/20/2020.
 //
 
-#include "type_endian.h"
+#include "val_typ_endian.h"
 
 val_endian_t endian_of_typ(val_typ_t typ) {
     switch (typ) {

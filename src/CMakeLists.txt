@@ -51,15 +51,18 @@ add_library(magic
     input/random_istream_reader.h
     input/random_buffer_input.hpp
     input/random_istream_input.hpp
-    utils/type_traits/make_int_type.hpp
+
+    val_typ.cpp
     val_typ.h
     val_typ_name.cpp
     val_typ_name.h
     val_sign_typ.cpp
     val_sign_typ.h
-    type_endian.cpp
-    type_endian.h
-    magic_ast/eval/eval_binop.cpp magic_ast/exp.cpp magic_peg_op_typ.cpp)
+    val_typ_endian.cpp
+    val_typ_endian.h
+    val_typ_format.cpp
+    val_typ_format.h
+    )
 
 target_link_libraries(magic
     cpp-common-static
