@@ -3,7 +3,7 @@
 //
 
 #include "val.h"
-#include "../val_typ_name.h"
+#include "val_typ_name.h"
 
 namespace magic::ast
 {

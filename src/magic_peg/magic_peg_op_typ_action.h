@@ -11,12 +11,12 @@
 #include <tao/pegtl/contrib/integer.hpp>
 #include <tao/pegtl/contrib/if_then.hpp>
 
-#include "utils/tao/pegtl/ascii.hpp"
-#include "utils/tao/pegtl/integer.hpp"
-#include "utils/tao/pegtl/exact.hpp"
-#include "utils/tao/pegtl/change_action_and_states_in_place.hpp"
-#include "val_sign_typ.h"
-#include "val_typ_name.h"
+#include "../utils/tao/pegtl/ascii.hpp"
+#include "../utils/tao/pegtl/integer.hpp"
+#include "../utils/tao/pegtl/exact.hpp"
+#include "../utils/tao/pegtl/change_action_and_states_in_place.hpp"
+#include "../magic_ast/elem/val_sign_typ.h"
+#include "../magic_ast/elem/val_typ_name.h"
 #include "magic_peg_op_typ.h"
 
 namespace np_type

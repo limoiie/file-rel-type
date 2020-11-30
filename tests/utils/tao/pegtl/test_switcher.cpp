@@ -9,9 +9,9 @@
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/unescape.hpp>
 
-#include <magic_peg.h>
-#include <magic_peg_op_typ.h>
-#include <magic_peg_action.hpp>
+#include <magic_peg/magic_peg.h>
+#include <magic_peg/magic_peg_op_typ.h>
+#include <magic_peg/magic_peg_action.hpp>
 
 #include <utils/tao/pegtl/switcher.hpp>
 

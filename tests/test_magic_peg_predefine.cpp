@@ -9,7 +9,7 @@
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/unescape.hpp>
 
-#include <magic_peg.h>
+#include <magic_peg/magic_peg.h>
 
 #include "test_pegtl_helper.hpp"
 

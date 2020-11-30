@@ -6,8 +6,8 @@
 #define FILE_REL_TYPE_SRC_MAGIC_AST_MAGIC_AST_H_
 
 #include "exp.h"
-#include "var.h"
-#include "val.h"
+#include "magic_ast/elem/var.h"
+#include "magic_ast/elem/val.h"
 #include "exp_num.h"
 #include "exp_bin.h"
 #include "exp_un.h"

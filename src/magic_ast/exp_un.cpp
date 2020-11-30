@@ -4,7 +4,7 @@
 
 #include "exp_un.h"
 
-#include "magic_ast_eval.h"
+#include "eval/magic_ast_eval.h"
 
 namespace magic::ast
 {

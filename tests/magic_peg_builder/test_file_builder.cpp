@@ -6,7 +6,7 @@
 
 #include <tao/pegtl.hpp>
 
-#include <magic_peg_action.hpp>
+#include <magic_peg/magic_peg_action.hpp>
 
 namespace testing_internal
 {

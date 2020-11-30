@@ -5,7 +5,7 @@
 #ifndef FILE_REL_TYPE_SRC_MAGIC_AST_READ_NUMBER_HPP_
 #define FILE_REL_TYPE_SRC_MAGIC_AST_READ_NUMBER_HPP_
 
-#include "../var.h"
+#include "../elem/var.h"
 
 template< class Int >
 Int read_normal_endian(magic::ast::var const *v) {

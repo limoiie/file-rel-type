@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "../var.h"
+#include "../elem/var.h"
 
 //std::string read_nm_string(magic::ast::var *v) {
 //

@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "magic_ast/eval/type_lift_val.h"
-#include "val_sign_typ.h"
+#include "magic_ast/elem/val_sign_typ.h"
 
 TEST(TestTypeLift, test_lift_type) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing" <<  __FUNCTION__ << " ..." << std::endl;

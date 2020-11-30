@@ -8,9 +8,9 @@
 #include <stdexcept>
 #include <memory>
 
-#include "val.h"
-#include "eval/val_fetcher.hpp"
-#include "../input/random_istream_input.hpp"
+#include "../elem/val.h"
+#include "val_fetcher.hpp"
+#include "../../input/random_istream_input.hpp"
 
 namespace magic::ast
 {

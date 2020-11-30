@@ -5,7 +5,7 @@
 #ifndef FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_LIFT_VAL_H_
 #define FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_LIFT_VAL_H_
 
-#include "../val.h"
+#include "../elem/val.h"
 
 using magic::ast::val;
 using magic::ast::p_val_t;

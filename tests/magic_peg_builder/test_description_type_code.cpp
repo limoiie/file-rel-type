@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "magic_peg_action.hpp"
+#include "magic_peg/magic_peg_action.hpp"
 
 using namespace magic::peg::action;
 

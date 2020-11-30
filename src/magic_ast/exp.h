@@ -10,10 +10,10 @@
 #include <string>
 #include <utility>
 
-#include "../val_sign_typ.h"
+#include "elem/val_sign_typ.h"
 
-#include "var.h"
-#include "val.h"
+#include "elem/var.h"
+#include "elem/val.h"
 
 namespace magic::ast
 {

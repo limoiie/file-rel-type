@@ -5,8 +5,8 @@
 #ifndef FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_EVAL_UNOP_H_
 #define FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_EVAL_UNOP_H_
 
-#include "../val.h"
-#include "../magic_ast_eval.h"
+#include "../elem/val.h"
+#include "magic_ast_eval.h"
 
 using magic::ast::p_val_t;
 using magic::ast::p_ctx_t;

@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "magic_ast/eval/eval_binop.h"
-#include "val_sign_typ.h"
+#include "magic_ast/elem/val_sign_typ.h"
 
 using namespace magic::ast;
 

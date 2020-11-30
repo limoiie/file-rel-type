@@ -7,7 +7,7 @@
 
 #include "exp.h"
 
-#include "../val_sign_typ.h"
+#include "elem/val_sign_typ.h"
 
 namespace magic::ast
 {

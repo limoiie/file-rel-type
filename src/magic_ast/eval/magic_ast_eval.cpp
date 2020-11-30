@@ -4,8 +4,8 @@
 
 #include "magic_ast_eval.h"
 
-#include "eval/eval_binop.h"
-#include "eval/eval_unop.h"
+#include "eval_binop.h"
+#include "eval_unop.h"
 
 namespace magic::ast
 {

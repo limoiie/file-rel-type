@@ -1,13 +1,11 @@
 find_package(pegtl CONFIG REQUIRED)
 
 add_library(magic
-    ParseMagicFile.cpp
-    ParseMagicFile.h
     magic_entry.cpp
     magic_entry.h
-    magic_peg.h
-    magic_peg_op_typ.h
-    magic_peg_action.hpp
+    magic_peg/magic_peg.h
+    magic_peg/magic_peg_op_typ.h
+    magic_peg/magic_peg_action.hpp
 
     utils/tao/pegtl/change_action_and_states_in_place.hpp
     utils/tao/pegtl/exact.hpp
@@ -20,16 +18,16 @@ add_library(magic
 
     magic_ast/exp.cpp
     magic_ast/exp.h
-    magic_ast/var.cpp
-    magic_ast/val.cpp
+    magic_ast/elem/var.cpp
+    magic_ast/elem/val.cpp
     magic_ast/exp_num.cpp
     magic_ast/exp_num.h
     magic_ast/exp_un.cpp
     magic_ast/exp_un.h
     magic_ast/exp_bin.cpp
     magic_ast/exp_bin.h
-    magic_ast/magic_ast_eval.cpp
-    magic_ast/magic_ast_eval.h
+    magic_ast/eval/magic_ast_eval.cpp
+    magic_ast/eval/magic_ast_eval.h
     magic_ast/magic_ast.h
     magic_ast/eval/read_number.hpp
     magic_ast/eval/read_string.hpp
@@ -51,20 +49,20 @@ add_library(magic
     input/random_buffer_input.hpp
     input/random_istream_input.hpp
 
-    val_typ.cpp
-    val_typ.h
-    val_typ_name.cpp
-    val_typ_name.h
-    val_sign_typ.cpp
-    val_sign_typ.h
-    val_typ_endian.cpp
-    val_typ_endian.h
-    val_typ_format.cpp
-    val_typ_format.h
+    magic_ast/elem/val_typ.cpp
+    magic_ast/elem/val_typ.h
+    magic_ast/elem/val_typ_name.cpp
+    magic_ast/elem/val_typ_name.h
+    magic_ast/elem/val_sign_typ.cpp
+    magic_ast/elem/val_sign_typ.h
+    magic_ast/elem/val_typ_endian.cpp
+    magic_ast/elem/val_typ_endian.h
+    magic_ast/elem/val_typ_format.cpp
+    magic_ast/elem/val_typ_format.h
 
-    str_flag_t.h
-    str_flag_t.cpp
-    magic_peg_op_typ_action.h magic_peg_op_typ_action.cpp)
+    magic_ast/elem/str_flag_t.h
+    magic_ast/elem/str_flag_t.cpp
+    magic_peg/magic_peg_op_typ_action.h magic_peg/magic_peg_op_typ_action.cpp)
 
 target_link_libraries(magic
     cpp-common-static

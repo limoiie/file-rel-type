@@ -12,18 +12,18 @@
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/unescape.hpp>
 
-#include <utils/tree.hpp>
-#include <utils/stl_container_helper.h>
+#include "../utils/tree.hpp"
+#include "../utils/stl_container_helper.h"
 
-#include <utils/tao/pegtl/integer.hpp>
-#include <utils/tao/pegtl/ascii.hpp>
+#include "../utils/tao/pegtl/integer.hpp"
+#include "../utils/tao/pegtl/ascii.hpp"
 
-#include <val_sign_typ.h>
-#include <magic_peg.h>
-#include <magic_entry.h>
-#include <magic_ast/magic_ast.h>
-#include <magic_ast/eval/type_lift_val.h>
-#include <str_flag_t.h>
+#include "magic_ast/elem/val_sign_typ.h"
+#include "magic_peg.h"
+#include "magic_entry.h"
+#include "../magic_ast/magic_ast.h"
+#include "../magic_ast/eval/type_lift_val.h"
+#include "magic_ast/elem/str_flag_t.h"
 #include "magic_peg_op_typ_action.h"
 
 namespace magic::peg::action

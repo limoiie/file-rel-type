@@ -5,7 +5,7 @@
 #ifndef FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_LIFT_H_
 #define FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_TYPE_LIFT_H_
 
-#include "../var.h"
+#include "../elem/var.h"
 
 using magic::ast::var;
 

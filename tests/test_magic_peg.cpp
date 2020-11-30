@@ -9,11 +9,11 @@
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/unescape.hpp>
 
-#include <magic_peg.h>
-#include <magic_peg_op_typ.h>
+#include <magic_peg/magic_peg.h>
+#include <magic_peg/magic_peg_op_typ.h>
 
 #include "test_pegtl_helper.hpp"
-#include "magic_peg_op_typ_action.h"
+#include "magic_peg/magic_peg_op_typ_action.h"
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
