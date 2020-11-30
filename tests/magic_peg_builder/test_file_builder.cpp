@@ -6,7 +6,7 @@
 
 #include <tao/pegtl.hpp>
 
-#include <magic_peg_builder.hpp>
+#include <magic_peg_action.hpp>
 
 namespace testing_internal
 {
@@ -43,8 +43,8 @@ TEST(TestMagicPeg, test_file_builder_only_matching) { // NOLINT(cert-err58-cpp)
         std::cout << "  Case: " << pair.first << std::endl;
 
         memory_input in(pair.first, __FUNCTION__);
-        auto st = peg::magic::action::state_magic_build();
-        auto out = parse< contrib::exact< magic_file >, peg::magic::action::action_magic >(in, st);
+        auto st = magic::peg::action::state_magic_build();
+        auto out = parse< contrib::exact< magic_file >, magic::peg::action::action_magic >(in, st);
 
         testing_internal::print_tree_node(st.current_entry->root());
         ASSERT_EQ(out, pair.second);

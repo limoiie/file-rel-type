@@ -11,7 +11,7 @@
 
 #include <magic_peg.h>
 #include <magic_peg_op_typ.h>
-#include <magic_peg_builder.hpp>
+#include <magic_peg_action.hpp>
 
 #include <utils/tao/pegtl/switcher.hpp>
 

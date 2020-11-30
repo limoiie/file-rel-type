@@ -12,33 +12,19 @@
 
 using namespace tao::pegtl;
 
-struct __
-        : star< blank > {
-};
+struct __ : star< blank > {};
 
-struct ___
-        : plus< blank > {
-};
+struct ___ : plus< blank > {};
 
-struct odigit
-        : range< '0', '7' > {
-};
+struct odigit : range< '0', '7' > {};
 
-struct word_edge
-        : sor< space, tao::pegtl::eof > {
-};
+struct word_edge : sor< space, tao::pegtl::eof > {};
 
-struct escaped_one
-        : one< '\'', '"', '?', '\\', 'a', 'b', 'f', 'n', 'r', 't', 'v', ' ' > {
-};
+struct escaped_one : one< '\'', '"', '?', '\\', 'a', 'b', 'f', 'n', 'r', 't', 'v', ' ' > {};
 
-struct escaped_oct_char
-        : internal::rep_min_max< 1, 3, odigit > {
-};
+struct escaped_oct_char : internal::rep_min_max< 1, 3, odigit > {};
 
-struct escaped_hex_char
-        : internal::rep_min_max< 1, 2, xdigit > {
-};
+struct escaped_hex_char : internal::rep_min_max< 1, 2, xdigit > {};
 
 struct escaped_with_hex_oct
         : sor<
@@ -48,21 +34,15 @@ struct escaped_with_hex_oct
         > {
 };
 
-struct plain_in_word
-        : internal::rematch< print, not_at< word_edge > > {
-};
+struct plain_in_word : internal::rematch< print, not_at< word_edge > > {};
 
-struct char_in_word_with_hex_oct
-        : if_then_else< one< '\\' >, escaped_with_hex_oct, plain_in_word > {
-};
+struct char_in_word_with_hex_oct : if_then_else< one< '\\' >, escaped_with_hex_oct, plain_in_word > {};
 
-struct word_with_hex_oct
-        : internal::plus< char_in_word_with_hex_oct > {
-};
+struct word_with_hex_oct : internal::plus< char_in_word_with_hex_oct > {};
 
 namespace action
 {
-    using tao::pegtl::helper::integer::action::internal::accumulate_digits;
+    using tao::pegtl::contrib::integer::action::internal::accumulate_digits;
 
     struct plain {
         template< class ActionInput >

@@ -13,8 +13,8 @@
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
-using namespace tao::pegtl::helper::integer;
-using namespace tao::pegtl::helper::integer::action;
+using namespace tao::pegtl::contrib::integer;
+using namespace tao::pegtl::contrib::integer::action;
 
 #define PAIR(NUM) { #NUM, NUM }
 

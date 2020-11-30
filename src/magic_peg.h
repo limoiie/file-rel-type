@@ -20,160 +20,106 @@
 
 using namespace tao::pegtl;
 
-struct number_ : helper::integer::signed_integer {};
+struct number_ : contrib::integer::signed_integer {};
 struct string_ : word_with_hex_oct {};
 
 struct number : seq< number_ > {};
 struct string : seq< string_ > {};
 
-struct continue_level
-        : star< one< '>' > > {
-};
+struct continue_level : star< one< '>' > > {};
 
 namespace np_offset
 {
-    struct abbrev_sign_typ
-            : np_type::np_indirect_type::abbrev_sign_typ {
-    };
+    struct _sign_typ : np_type::abbrev::sign_typ {};
 
-    struct offset_general;
+    struct exp;
 
-    struct offset_num
-            : seq<
-                    number,
-                    opt< abbrev_sign_typ >
-            > {
-    };
+    struct _exp_num : seq< number, opt< _sign_typ > > {};
+    struct _exp_bin : seq< np_opt::bin_aux, exp > {};
 
-    struct offset_bin
-            : seq<
-                    np_operator::mask_operator,
-                    offset_general
-            > {
-    };
+    struct _exp_indirect : seq< np_opt::un_ind, exp, np_opt::un_ind_ > {};
+    struct _exp_relative : seq< np_opt::un_rel, exp > {};
 
-    struct offset_ind : seq< np_operator::unop_ind, offset_general, np_operator::unop_ind_end > {};
-    struct offset_rel : seq< np_operator::unop_rel, offset_general > {};
-
-    struct offset_num_or_bin
-            : seq<
-                    offset_num,
-                    opt< offset_bin >
-            > {
-    };
-
-    struct offset_general
+    struct exp
             : sor<
-                    offset_ind,
-                    offset_rel,
-                    offset_num_or_bin
+                    _exp_indirect,
+                    _exp_relative,
+                    seq< _exp_num, opt< _exp_bin > >
             > {
     };
-
 }
 
-namespace np_deref_mask
+namespace np_deref
 {   /// region de-reference mask (additional computation)
-    struct deref_mask_num
-            : number {
-    };
+    struct nan_typ : np_type::formal::formal_nan_typ {};
+    struct num_typ : np_type::formal::formal_num_typ {};
 
-    struct deref_mask_item
-            : seq<
-                    opt< one< '/' > >,
-                    sor<
-                            deref_mask_num,
-                            np_flag::deref_mask_flag
-                    >
-            > {
-    };
+    struct _number : number {};
 
-    struct deref_mask_str
-            : plus< deref_mask_item > {
-    };
+    struct _str_flag : seq< opt< one< '/' > >, sor< _number, np_flag::str > > {};
 
-    struct deref_num_mask : seq< np_operator::mask_operator, deref_mask_num > {};
-    struct deref_str_mask : seq< np_operator::mask_operator, deref_mask_str > {};
+    struct _str_flags : plus< _str_flag > {};
 
+    struct num_mask : seq< np_opt::bin_aux, _number > {};
+    struct str_mask : seq< np_opt::bin_aux, _str_flags > {};
 }
 
-namespace np_typ_relation
+namespace np_relation
 {
-    using namespace np_deref_mask;
-    using namespace np_type::np_deref_type;
-
-    struct relation_default_exp : seq< one< 'x' >, at< blank > > {};
-    struct relation_default_opt : success {};
+    struct _default_opt : success {};
+    struct _default_exp : seq< one< 'x' >, at< blank > > {};
 
     template< class Rule >
-    struct relation_exp
-            : seq< sor< np_operator::compare_operator, relation_default_opt >, Rule > {
-    };
+    struct _exp : seq< sor< np_opt::bin_cmpr, _default_opt >, Rule > {};
 
-    struct relation_str_val : sor< relation_default_exp, relation_exp< ::string > > {};
-    struct relation_num_val : sor< relation_default_exp, relation_exp< ::number > > {};
+    struct _exp_str : sor< _default_exp, _exp< ::string > > {};
+    struct _exp_num : sor< _default_exp, _exp< ::number > > {};
 
     template< class Rule >
-    struct relation_mask
-            : sor< relation_default_exp, Rule > {
-    };
+    struct _mask : sor< _default_exp, Rule > {};
 
-    struct typ_relation
-            : tao::pegtl::switcher<
-                    formal_str_typ, seq< opt< deref_str_mask >, ___, relation_mask< relation_str_val > >,
-                    formal_non_typ, seq< opt< /* success  */ >, ___, relation_mask< relation_str_val > >,
-                    formal_num_typ, seq< opt< deref_num_mask >, ___, relation_mask< relation_num_val > >
-            > {
-    };
+    struct str_mask : _mask< _exp_str > {};
+    struct num_mask : _mask< _exp_num > {};
 }
 
-namespace np_description
+namespace np_desc
 {
-    struct splitter : one< '|' > {};
+    struct _ : one< '|' > {};
 
-    struct description_end
-            : sor< splitter, tao::pegtl::eolf > {
-    };
+    struct _desc_end : sor< _, eolf > {};
 
-    struct description
-            : internal::until< at< description_end > > {
-    };
-
+    struct desc : internal::until< at< _desc_end > > {};
 }
 
-namespace np_type_code
+namespace np_code
 {
-    struct type_code
-            : helper::integer::unsigned_decimal {
-    };
-
+    struct code : contrib::integer::unsigned_decimal {};
 }
 
 /// Empty line for helping organizing rule blocks
-struct empty_line : until< at< tao::pegtl::eolf >, blank > {};
+struct empty_line : until< at< eolf >, blank > {};
 
 /// Comment line for description
-struct comment_line : seq< one< '#' >, until< at< tao::pegtl::eolf > > > {};
+struct comment_line : seq< one< '#' >, until< at< eolf > > > {};
 
 // todo: support strength
 /// Annotation line for annotating the strength of the following magic line
-struct strength_line : seq< one< '!' >, until< at< tao::pegtl::eolf > > > {};
+struct strength_line : seq< one< '!' >, until< at< eolf > > > {};
 
 /// The rule line that defines the step matching mechanism
 struct magic_line
         : seq<
                 continue_level,
                 __,
-                np_offset::offset_general,
+                np_offset::exp,
                 ___,
-                np_typ_relation::typ_relation,
+                contrib::switcher<
+                        np_deref::nan_typ, seq< opt< np_deref::str_mask >, ___, np_relation::str_mask >,
+                        np_deref::num_typ, seq< opt< np_deref::num_mask >, ___, np_relation::num_mask >
+                >,
                 __,
-                opt< np_description::description >,
-                if_then_else<
-                        np_description::splitter,
-                        np_type_code::type_code,
-                        success
-                >
+                np_desc::desc,
+                opt< np_desc::_, np_code::code >
         > {
 };
 
@@ -186,8 +132,6 @@ struct line
         > {
 };
 
-struct magic_file
-        : list< ::line, tao::pegtl::eol > {
-};
+struct magic_file : list< ::line, eol > {};
 
 #endif //FILE_REL_TYPE_MAGIC_PEG_H

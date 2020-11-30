@@ -15,7 +15,7 @@
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
-using namespace tao::pegtl::helper::integer;
+using namespace tao::pegtl::contrib::integer;
 
 auto make_good_unsigned_decimal_cases() {
     return std::list<std::pair<std::string, bool>>{

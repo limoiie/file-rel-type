@@ -14,62 +14,22 @@
 
 using namespace tao::pegtl;
 
-namespace tao::pegtl::helper::integer
+namespace TAO_PEGTL_NAMESPACE::contrib::integer
 {
+    struct sign : one< '+', '-' > {};
+    struct prefix_0x : string< '0', 'x' > {};
 
-    struct sign
-            : one< '+', '-' > {
-    };
+    struct digits : plus< digit > {};
+    struct xdigits : plus< xdigit > {};
 
-    struct digits : plus< digit > {
-    };
+    struct unsigned_decimal : seq< digits > {};
+    struct signed_decimal : seq< opt< sign >, digits > {};
 
-    struct xdigits : plus< xdigit > {
-    };
+    struct unsigned_0x_hex : seq< prefix_0x, xdigits > {};
+    struct signed_0x_hex : seq< opt< sign >, prefix_0x, xdigits > {};
 
-    struct unsigned_decimal
-            : seq< digits > {  // NOTE: do NOT REMOVE the action `seq`. it because base classes are not taken into
-        // consideration by the C++ language when choosing a specialisation. see also the
-        // official doc page doc/Actions-and-States.md#Specialising for more information
-    };
-
-    struct signed_decimal
-            : seq< opt< sign >, digits > {
-    };
-
-    struct prefix_0x
-            : string< '0', 'x' > {
-    };
-
-    struct unsigned_0x_hex
-            : seq<
-                    prefix_0x,
-                    xdigits
-            > {
-    };
-
-    struct signed_0x_hex
-            : seq<
-                    opt< sign >,
-                    prefix_0x,
-                    xdigits
-            > {
-    };
-
-
-    struct unsigned_integer
-            : sor<
-                    unsigned_0x_hex,
-                    unsigned_decimal
-            > {
-    };
-
-    struct signed_integer
-            : sor<
-                    signed_0x_hex,
-                    signed_decimal
-            > {
-    };
+    struct unsigned_integer : sor< unsigned_0x_hex, unsigned_decimal > {};
+    struct signed_integer : sor< signed_0x_hex, signed_decimal > {};
 
     namespace action
     {

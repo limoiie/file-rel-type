@@ -15,7 +15,7 @@
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
-using namespace np_typ_relation;
+using namespace np_relation;
 
 TEST(TestMagicPegPredefine, test_format_str_typ) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing test_format_str_typ ..." << std::endl;
@@ -28,7 +28,7 @@ TEST(TestMagicPegPredefine, test_format_str_typ) { // NOLINT(cert-err58-cpp)
     for (auto const &pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        auto out = match_with< np_type::np_deref_type::formal_str_typ >(pair.first);
+        auto out = match_with< np_type::formal::formal_str_typ >(pair.first);
         ASSERT_EQ(out, pair.second);
     }
 }
@@ -45,7 +45,7 @@ TEST(TestMagicPegPredefine, test_format_num_typ) { // NOLINT(cert-err58-cpp)
     for (auto const &pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        auto out = match_with< np_type::np_deref_type::formal_num_typ >(pair.first);
+        auto out = match_with< np_type::formal::formal_num_typ >(pair.first);
         ASSERT_EQ(out, pair.second);
     }
 }

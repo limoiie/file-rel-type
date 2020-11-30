@@ -4,18 +4,18 @@
 
 #include <gtest/gtest.h>
 
-#include "magic_peg_builder.hpp"
+#include "magic_peg_action.hpp"
 
-using namespace peg::magic::action;
+using namespace magic::peg::action;
 
 namespace testing_internal
 {
     struct desc_type_code
             : seq<
-                    np_description::description,
+                    np_desc::desc,
                     if_then_else<
-                            np_description::splitter,
-                            np_type_code::type_code,
+                            np_desc::_,
+                            np_code::code,
                             success
                     >
             > {
@@ -41,7 +41,7 @@ TEST(TestMagicPeg, test_desc_type_code) { // NOLINT(cert-err58-cpp)
     for (auto const &pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        peg::magic::action::state_magic_build st;
+        magic::peg::action::state_magic_build st;
         memory_input in(pair.first, __FUNCTION__);
 
         parse< contrib::exact< testing_internal::desc_type_code >, action_magic >(in, st);

@@ -11,9 +11,10 @@
 
 #include <magic_peg.h>
 #include <magic_peg_op_typ.h>
-#include <magic_peg_builder.hpp>
+#include <magic_peg_action.hpp>
 
 #include "val_sign_typ.h"
+#include "magic_peg_op_typ_action.h"
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
@@ -21,12 +22,12 @@ using namespace tao::pegtl::contrib;
 #define PAIR(NUM) { #NUM, NUM }
 
 template< class Rule >
-peg::magic::action::state_magic_build parse_magic(std::string const &stmt) {
-    auto st = peg::magic::action::state_magic_build{};
+magic::peg::action::state_magic_build parse_magic(std::string const &stmt) {
+    auto st = magic::peg::action::state_magic_build{};
     tao::pegtl::memory_input in(stmt, __FUNCTION__);
 
     parse< exact< Rule >,
-           peg::magic::action::action_magic >(in, st);
+           magic::peg::action::action_magic >(in, st);
     return st;
 }
 
@@ -83,9 +84,9 @@ namespace testing_internal
 namespace testing_internal
 {
     inline
-    std::list< std::pair< std::string, std::shared_ptr< peg::magic::action::exp>> >
+    std::list< std::pair< std::string, std::shared_ptr< magic::peg::action::exp>> >
     make_offset_indirect_exp() {
-        using np_type::np_indirect_type::action::internal::sign_type;
+        using np_type::action::abbrev::internal::sign_type;
         return {
                 {"(123)",                testing_internal::make_unop_def(123)},
                 {"(-123)",               testing_internal::make_unop_def(-123)},
@@ -141,9 +142,9 @@ namespace testing_internal
     }
 
     inline
-    std::list< std::pair< std::string, std::shared_ptr< peg::magic::action::exp>> >
+    std::list< std::pair< std::string, std::shared_ptr< magic::peg::action::exp>> >
     make_offset_relative_indirect_exp() {
-        using np_type::np_indirect_type::action::internal::sign_type;
+        using np_type::action::abbrev::internal::sign_type;
 
         auto cases = make_offset_indirect_exp();
         for (auto &pair : cases) {
@@ -161,7 +162,7 @@ TEST(TestMagicPegBuilder, test_build_offset_general) { // NOLINT(cert-err58-cpp)
     for (auto const &pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        auto st = parse_magic< np_offset::offset_general >(pair.first);
+        auto st = parse_magic< np_offset::exp >(pair.first);
         auto const& left = *st.stk_exp.top();
         auto const& right = *pair.second;
         std::cout << "    l: " << left.to_string() << std::endl;
@@ -178,7 +179,7 @@ TEST(TestMagicPegBuilder, test_build_offset) { // NOLINT(cert-err58-cpp)
     for (auto const &pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        auto st = parse_magic< np_offset::offset_general >(pair.first);
+        auto st = parse_magic< np_offset::exp >(pair.first);
         ASSERT_EQ(*st.stk_exp.top(), *pair.second);
     }
 }

@@ -12,13 +12,14 @@
 #include <magic_peg_op_typ.h>
 
 #include "val_sign_typ.h"
+#include "magic_peg_op_typ_action.h"
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
 
 using np_type::action::state_to_deref_typ;
-using np_type::np_indirect_type::abbrev_sign_typ;
-using np_type::np_indirect_type::action::action_to_deref_typ;
+using np_type::abbrev::sign_typ;
+using np_type::action::abbrev::action_to_deref_typ;
 
 TEST(TestMagicPegPredefineAction, test_to_deref_typ) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing test_to_deref_typ ..." << std::endl;
@@ -34,7 +35,7 @@ TEST(TestMagicPegPredefineAction, test_to_deref_typ) { // NOLINT(cert-err58-cpp)
         memory_input in(pair.first, __FUNCTION__);
         np_type::action::state_to_deref_typ st;
 
-        parse< abbrev_sign_typ, action_to_deref_typ >(in, st);
+        parse< sign_typ, np_type::action::abbrev::action_to_deref_typ >(in, st);
         ASSERT_EQ(st.typ, pair.second);
     }
 
@@ -45,7 +46,7 @@ namespace testing_internal
     struct rule_dump
             : seq<
                     one< '{' >,
-                    abbrev_sign_typ,
+                    sign_typ,
                     one< '}' >
             > {
     };
@@ -57,7 +58,7 @@ namespace testing_internal
 
     template<>
     struct [[maybe_unused]] action_dump< rule_dump >
-            : np_type::np_indirect_type::to_typ_switcher {
+            : np_type::action::abbrev::to_typ_switcher {
 
         template< typename ParseInput >
         static void success(const ParseInput & /*unused*/, state_to_deref_typ &s, val_sign_typ_t &st) {
@@ -89,8 +90,8 @@ TEST(TestMagicPegPredefineAction, test_to_typ_switcher) { // NOLINT(cert-err58-c
 
 namespace testing_internal
 {
-    using np_type::np_deref_type::formal_str_typ;
-    using np_type::np_deref_type::formal_num_typ;
+    using np_type::formal::formal_str_typ;
+    using np_type::formal::formal_num_typ;
 
     struct rule_formal_dump
             : seq<
@@ -110,7 +111,7 @@ namespace testing_internal
 
     template<>
     struct [[maybe_unused]] action_formal_dump< rule_formal_dump >
-            : np_type::np_deref_type::to_typ_switcher {
+            : np_type::action::formal::to_typ_switcher {
 
         template< typename ParseInput >
         static void success(const ParseInput & /*unused*/, state_to_deref_typ &s, val_sign_typ_t &st) {

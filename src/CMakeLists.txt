@@ -6,9 +6,8 @@ add_library(magic
     magic_entry.cpp
     magic_entry.h
     magic_peg.h
-    magic_peg_op_typ.cpp
     magic_peg_op_typ.h
-    magic_peg_builder.hpp
+    magic_peg_action.hpp
 
     utils/tao/pegtl/change_action_and_states_in_place.hpp
     utils/tao/pegtl/exact.hpp
@@ -62,7 +61,10 @@ add_library(magic
     val_typ_endian.h
     val_typ_format.cpp
     val_typ_format.h
-    )
+
+    str_flag_t.h
+    str_flag_t.cpp
+    magic_peg_op_typ_action.h magic_peg_op_typ_action.cpp)
 
 target_link_libraries(magic
     cpp-common-static

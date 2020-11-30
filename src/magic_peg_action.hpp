@@ -23,11 +23,13 @@
 #include <magic_entry.h>
 #include <magic_ast/magic_ast.h>
 #include <magic_ast/eval/type_lift_val.h>
+#include <str_flag_t.h>
+#include "magic_peg_op_typ_action.h"
 
-namespace peg::magic::action
+namespace magic::peg::action
 {
-    using namespace tao::pegtl::helper::integer;
-    using namespace tao::pegtl::helper::integer::action;
+    using namespace tao::pegtl::contrib::integer;
+    using namespace tao::pegtl::contrib::integer::action;
 
     using namespace ::magic::ast;
     using ::magic::ast::exp;
@@ -78,81 +80,82 @@ namespace peg::magic::action
 
     };
 
-    struct action_push_operator {
-        template< typename ActionInput >
-        static void apply(const ActionInput &in, state_magic_build &st) {
-            auto const op = in.peek_char() != '(' ? in.peek_char() : '*';
-            st.stk_opt.push(op);
-            st.stk_typ.push(nullptr);
-        }
-    };
-
-    struct [[maybe_unused]] action_fresh_typ
-            : np_type::np_deref_type::to_typ_switcher {
-        template< class ParseInput >
-        static void success(ParseInput &in, np_type::action::state_to_deref_typ &s, state_magic_build &st) {
-            st.typ = std::make_shared< val_sign_typ_t >(s.typ);
-            auto tmp_stk_opt = std::stack< char >();
-            auto tmp_stk_typ = std::stack< std::shared_ptr< val_sign_typ_t>>();
-            while (!st.stk_opt.empty() && st.stk_opt.top() != '*') {
-                tmp_stk_opt.push(std_::pop(st.stk_opt));
-                tmp_stk_typ.push(std_::pop(st.stk_typ));
+    namespace internal
+    {
+        struct [[maybe_unused]] push_operator {
+            template< typename ActionInput >
+            static void apply(const ActionInput &in, state_magic_build &st) {
+                auto const op = in.peek_char() != '(' ? in.peek_char() : '*';
+                st.stk_opt.push(op);
+                st.stk_typ.push(nullptr);
             }
-            if (!st.stk_typ.empty()) {
-                st.stk_typ.top() = st.typ;
+        };
+
+        struct [[maybe_unused]] fresh_typ
+                : np_type::action::formal::to_typ_switcher {
+            template< class ParseInput >
+            static void success(ParseInput &in, np_type::action::state_to_deref_typ &s, state_magic_build &st) {
+                st.typ = std::make_shared< val_sign_typ_t >(s.typ);
+                auto tmp_stk_opt = std::stack< char >();
+                auto tmp_stk_typ = std::stack< std::shared_ptr< val_sign_typ_t>>();
+                while (!st.stk_opt.empty() && st.stk_opt.top() != '*') {
+                    tmp_stk_opt.push(std_::pop(st.stk_opt));
+                    tmp_stk_typ.push(std_::pop(st.stk_typ));
+                }
+                if (!st.stk_typ.empty()) {
+                    st.stk_typ.top() = st.typ;
+                }
+                while (!tmp_stk_opt.empty()) {
+                    st.stk_opt.push(std_::pop(tmp_stk_opt));
+                    st.stk_typ.push(std_::pop(tmp_stk_typ));
+                }
             }
-            while (!tmp_stk_opt.empty()) {
-                st.stk_opt.push(std_::pop(tmp_stk_opt));
-                st.stk_typ.push(std_::pop(tmp_stk_typ));
+        };
+
+        struct [[maybe_unused]] push_un_exp {
+            static void apply0(state_magic_build &st) {
+                auto inner = std_::pop(st.stk_exp);
+                auto typ = std_::pop(st.stk_typ);
+                auto op = std_::pop(st.stk_opt);
+
+                inner = unop::builder::make_ptr(op, inner, typ ? *typ : inner->typ);
+                st.stk_exp.push(inner);
             }
-        }
-    };
+        };
 
-    struct [[maybe_unused]] action_push_un_exp {
-        static void apply0(state_magic_build &st) {
-            auto inner = std_::pop(st.stk_exp);
-            auto typ = std_::pop(st.stk_typ);
-            auto op = std_::pop(st.stk_opt);
+        struct [[maybe_unused]] push_bin_exp {
+            static void apply0(state_magic_build &st) {
+                auto right = std_::pop(st.stk_exp);
+                auto left = std_::pop(st.stk_exp);
+                auto typ = std_::pop(st.stk_typ);
+                auto opt = std_::pop(st.stk_opt);
 
-            inner = unop::builder::make_ptr(op, inner, typ ? *typ : inner->typ);
-            st.stk_exp.push(inner);
-        }
-    };
+                auto typ_ = typ ? *typ : lift_type(left->typ, right->typ);
+                auto inner = binop::builder::make_ptr(opt, left, right, typ_);
+                st.stk_exp.push(inner);
 
-    struct [[maybe_unused]] action_push_bin_exp {
-        static void apply0(state_magic_build &st) {
-            auto right = std_::pop(st.stk_exp);
-            auto left = std_::pop(st.stk_exp);
-            auto typ = std_::pop(st.stk_typ);
-            auto opt = std_::pop(st.stk_opt);
-
-            auto typ_ = typ ? *typ : lift_type(left->typ, right->typ);
-            auto inner = binop::builder::make_ptr(opt, left, right, typ_);
-            st.stk_exp.push(inner);
-
-            if (!st.stk_opt.empty() && st.stk_opt.top() == '~') {
-                action_push_un_exp::apply0(st);
+                if (!st.stk_opt.empty() && st.stk_opt.top() == '~') {
+                    push_un_exp::apply0(st);
+                }
             }
-        }
-    };
+        };
 
-    struct [[maybe_unused]] action_push_bin_exp_with_flag {
-        static void apply0(state_magic_build &st) {
-            auto right = std_::pop(st.stk_exp);
-            auto left = std_::pop(st.stk_exp);
-            auto typ = std_::pop(st.stk_typ);
-            auto opt = std_::pop(st.stk_opt);
+        struct [[maybe_unused]] push_bin_exp_with_flag {
+            static void apply0(state_magic_build &st) {
+                auto right = std_::pop(st.stk_exp);
+                auto left = std_::pop(st.stk_exp);
+                auto typ = std_::pop(st.stk_typ);
+                auto opt = std_::pop(st.stk_opt);
 
-            auto typ_ = typ ? *typ : lift_type(left->typ, right->typ);
-            auto inner = binop::builder::make_ptr(opt, left, right, typ_, st.flag);
-            st.stk_exp.push(inner);
-        }
-    };
+                auto typ_ = typ ? *typ : lift_type(left->typ, right->typ);
+                auto inner = binop::builder::make_ptr(opt, left, right, typ_, st.flag);
+                st.stk_exp.push(inner);
+            }
+        };
+    }
 
     template< class Rule >
-    struct [[maybe_unused]] action_magic
-            : tao::pegtl::nothing< Rule > {
-    };
+    struct [[maybe_unused]] action_magic : tao::pegtl::nothing< Rule > {};
 
     template<>
     struct [[maybe_unused]] action_magic< number_ >
@@ -187,68 +190,52 @@ namespace peg::magic::action
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< np_offset::abbrev_sign_typ >
-            : action_fresh_typ {
-    };
+    struct [[maybe_unused]] action_magic< np_offset::_sign_typ > : internal::fresh_typ {};
 
     template<>
-    struct [[maybe_unused]] action_magic< np_operator::mask_base_operator >
-            : action_push_operator {
-    };
+    struct [[maybe_unused]] action_magic< np_opt::bin_calc > : internal::push_operator {};
 
     template<>
-    struct [[maybe_unused]] action_magic< np_operator::mask_aux_operator >
-            : action_push_operator {
-    };
+    struct [[maybe_unused]] action_magic< np_opt::un_inv > : internal::push_operator {};
 
     template<>
-    struct [[maybe_unused]] action_magic< np_operator::unop_rel >
-            : action_push_operator {
-    };
+    struct [[maybe_unused]] action_magic< np_opt::un_rel > : internal::push_operator {};
 
     template<>
-    struct [[maybe_unused]] action_magic< np_operator::unop_ind >
-            : action_push_operator {
-    };
+    struct [[maybe_unused]] action_magic< np_opt::un_ind > : internal::push_operator {};
 
     template<>
-    struct [[maybe_unused]] action_magic< np_offset::offset_bin >
-            : action_push_bin_exp {
-    };
+    struct [[maybe_unused]] action_magic< np_offset::_exp_bin > : internal::push_bin_exp {};
 
     template<>
-    struct [[maybe_unused]] action_magic< np_offset::offset_ind >
-            : action_push_un_exp {
-    };
+    struct [[maybe_unused]] action_magic< np_offset::_exp_indirect > : internal::push_un_exp {};
 
     template<>
-    struct [[maybe_unused]] action_magic< np_offset::offset_rel >
-            : action_push_un_exp {
-    };
+    struct [[maybe_unused]] action_magic< np_offset::_exp_relative > : internal::push_un_exp {};
 
     template< unsigned Fmt >
-    struct [[maybe_unused]] action_magic< np_type::np_deref_type::formal_typ< Fmt > >
-            : action_fresh_typ, action_push_un_exp {
+    struct [[maybe_unused]] action_magic< np_type::formal::formal_typ< Fmt > >
+            : internal::fresh_typ, internal::push_un_exp {
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< np_deref_mask::deref_mask_num > {
+    struct [[maybe_unused]] action_magic< np_deref::_number > {
         static void apply0(state_magic_build &st) {
             st.has_range = true;
         }
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< np_flag::deref_mask_flag > {
+    struct [[maybe_unused]] action_magic< np_flag::str > {
         template< class ActionInput >
         static void apply(ActionInput &in, state_magic_build &st) {
             assert(st.typ->is_string());
-            st.flag |= (unsigned) np_flag::convert_flag(in.peek_char());
+            st.flag |= (unsigned) convert_flag(in.peek_char());
         }
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< np_deref_mask::deref_mask_str > {
+    struct [[maybe_unused]] action_magic< np_deref::_str_flags > {
         static void apply0(state_magic_build &st) {
             if (!st.has_range) {  // push the default range exp if no range specified
                 st.stk_exp.push(default_range());
@@ -264,22 +251,16 @@ namespace peg::magic::action
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< np_deref_mask::deref_num_mask >
-            : action_push_bin_exp {
-    };
+    struct [[maybe_unused]] action_magic< np_deref::num_mask > : internal::push_bin_exp {};
 
     template<>
-    struct [[maybe_unused]] action_magic< np_deref_mask::deref_str_mask >
-            : action_push_bin_exp {
-    };
+    struct [[maybe_unused]] action_magic< np_deref::str_mask > : internal::push_bin_exp {};
 
     template<>
-    struct [[maybe_unused]] action_magic< np_operator::compare_operator >
-            : action_push_operator {
-    };
+    struct [[maybe_unused]] action_magic< np_opt::bin_cmpr > : internal::push_operator {};
 
     /* todo: implementation
-     struct [[maybe_unused]] action_magic< ::np_typ_relation::relation_default_exp > {
+     struct [[maybe_unused]] action_magic< ::np_relation::_default_exp > {
          static void apply0() {
              // mark as always true but also keep the original value
          }
@@ -287,7 +268,7 @@ namespace peg::magic::action
      */
 
     template<>
-    struct [[maybe_unused]] action_magic< ::np_typ_relation::relation_default_opt > {
+    struct [[maybe_unused]] action_magic< ::np_relation::_default_opt > {
         static void apply0(state_magic_build &st) {
             st.stk_opt.push('=');
             st.stk_typ.push(nullptr);
@@ -295,21 +276,20 @@ namespace peg::magic::action
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< ::np_typ_relation::relation_str_val >
-            : action_push_bin_exp_with_flag {  // todo: instead of pushing bin exp, store lhs and rhs separately
-                                               //   so that later processing can get the lhs, which is the information
-                                               //   in the memory
+    struct [[maybe_unused]] action_magic< ::np_relation::_exp_str >
+            : internal::push_bin_exp_with_flag {
+        // todo: instead of pushing bin exp, store lhs and rhs
+        //   separately so that later processing can get the lhs,
+        //   which is the information in the memory
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< ::np_typ_relation::relation_num_val >
-            : action_push_bin_exp {            // todo: instead of pushing bin exp, store lhs and rhs separately
-                                               //   so that later processing can get the lhs, which is the information
-                                               //   in the memory
+    struct [[maybe_unused]] action_magic< ::np_relation::_exp_num >
+            : internal::push_bin_exp {
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< ::np_description::description > {
+    struct [[maybe_unused]] action_magic< ::np_desc::desc > {
         template< class ActionInput >
         static void apply(ActionInput &in, state_magic_build &st) {
             st.description = in.string_view();
@@ -317,10 +297,10 @@ namespace peg::magic::action
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< ::np_type_code::type_code >
+    struct [[maybe_unused]] action_magic< ::np_code::code >
             : to_integer_switcher< unsigned > {
         template< class ParseInput >
-        static void success(ParseInput const&in, state_to_integer< unsigned > &s, state_magic_build &st) {
+        static void success(ParseInput const &in, state_to_integer< unsigned > &s, state_magic_build &st) {
             st.type_code = s.val;
         }
     };

@@ -10,17 +10,18 @@
 #include <tao/pegtl/contrib/unescape.hpp>
 
 #include <magic_peg_op_typ.h>
-#include <magic_peg_builder.hpp>
+#include <magic_peg_action.hpp>
 
 #include "val_sign_typ.h"
+#include "str_flag_t.h"
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
-using namespace np_typ_relation;
+using namespace np_relation;
 
 #define PAIR(NUM) { #NUM, NUM }
 
-#define CASE(TYP, OP, NUM, FLAGS) { TYP#OP#NUM#FLAGS,   {testing_internal::make_exp(TYP, #OP, NUM), np_flag::convert_flags(#FLAGS)}}
+#define CASE(TYP, OP, NUM, FLAGS) { TYP#OP#NUM#FLAGS,   {testing_internal::make_exp(TYP, #OP, NUM), convert_flags(#FLAGS)}}
 
 static
 auto ph_exp() {
@@ -29,20 +30,19 @@ auto ph_exp() {
 }
 
 template< class Rule >
-peg::magic::action::state_magic_build parse_magic(std::string const &stmt) {
-    auto st = peg::magic::action::state_magic_build{};
+magic::peg::action::state_magic_build parse_magic(std::string const &stmt) {
+    auto st = magic::peg::action::state_magic_build{};
     tao::pegtl::memory_input in(stmt, __FUNCTION__);
 
     st.stk_exp.push(ph_exp());
 
     parse< exact< Rule >,
-            peg::magic::action::action_magic >(in, st);
+           magic::peg::action::action_magic >(in, st);
     return st;
 }
 
 namespace testing_internal
 {
-    using np_flag::str_flag_t;
     using ::magic::ast::exp;
     using ::magic::ast::var;
     using ::magic::ast::num;
@@ -79,7 +79,7 @@ TEST(TestMagicPegBuilder, test_build_typ_str_mask) { // NOLINT(cert-err58-cpp)
         std::cout << "  Case: " << pair.first << std::endl;
 
         auto out = parse_magic< seq<
-                np_type::np_deref_type::formal_str_typ, opt< deref_str_mask >
+                np_type::formal::formal_str_typ, opt< np_deref::str_mask >
         >>(pair.first);
         ASSERT_EQ(*out.stk_exp.top(), *pair.second.first);
         ASSERT_EQ(out.flag, pair.second.second);
@@ -99,7 +99,7 @@ TEST(TestMagicPegBuilder, test_build_typ_num_mask) { // NOLINT(cert-err58-cpp)
         std::cout << "  Case: " << pair.first << std::endl;
 
         auto out = parse_magic< seq<
-                np_type::np_deref_type::formal_num_typ, opt< deref_num_mask >
+                np_type::formal::formal_num_typ, opt< np_deref::num_mask >
         >>(pair.first);
         ASSERT_EQ(*out.stk_exp.top(), *pair.second.first);
         ASSERT_EQ(out.flag, pair.second.second);

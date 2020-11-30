@@ -10,7 +10,7 @@
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/if_then.hpp>
 
-namespace TAO_PEGTL_NAMESPACE
+namespace TAO_PEGTL_NAMESPACE::contrib
 {
     using namespace tao::pegtl;
 

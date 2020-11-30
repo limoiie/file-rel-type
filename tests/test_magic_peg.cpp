@@ -13,16 +13,17 @@
 #include <magic_peg_op_typ.h>
 
 #include "test_pegtl_helper.hpp"
+#include "magic_peg_op_typ_action.h"
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
-using namespace np_typ_relation;
+using namespace np_relation;
 
 namespace type_whole
 {
     bool is_unsigned(std::string const &str) {
-        using namespace np_type::np_deref_type;
-        np_type::np_deref_type::action::state_to_deref_typ st;
+        using namespace np_type::formal;
+        np_type::action::formal::state_to_deref_typ st;
         memory_input in(str, __FUNCTION__);
         parse< exact< sor<
                 formal_str_typ,
@@ -70,7 +71,7 @@ namespace test_type_mask
         };
 
         for (auto const &pair : cases) {
-            auto const out = match_with< exact< ::np_typ_relation::deref_str_mask>>(pair.first);
+            auto const out = match_with< exact< ::np_relation::str_mask>>(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -83,7 +84,7 @@ namespace test_type_mask
         };
 
         for (auto const &pair : cases) {
-            auto const out = match_with< exact< ::np_typ_relation::deref_num_mask>>(pair.first);
+            auto const out = match_with< exact< ::np_relation::num_mask>>(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -116,7 +117,7 @@ namespace test_offset
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto const out = match_with< exact< np_offset::offset_general > >(pair.first);
+            auto const out = match_with< exact< np_offset::exp > >(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -146,7 +147,7 @@ namespace test_typ_relation
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto out = match_with< exact< relation_str_val>>(pair.first);
+            auto out = match_with< exact< _exp_str>>(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -170,7 +171,10 @@ namespace test_typ_relation
         for (auto const &pair : cases) {
             std::cout << "  Case: " << pair.first << std::endl;
 
-            auto out = match_with< exact< ::np_typ_relation::typ_relation > >(pair.first);
+            auto out = match_with< exact< contrib::switcher<
+                    np_deref::nan_typ, seq< opt< np_deref::str_mask >, ___, np_relation::str_mask >,
+                    np_deref::num_typ, seq< opt< np_deref::num_mask >, ___, np_relation::num_mask >
+            > > >(pair.first);
             ASSERT_EQ(out, pair.second);
         }
     }
@@ -180,12 +184,8 @@ namespace test_description_and_type_code
 {
     struct full_desc_and_type_code
             : must<
-                    np_description::description,
-                    if_then_else<
-                            np_description::splitter,
-                            np_type_code::type_code,
-                            success
-                    >,
+                    np_desc::desc,
+                    opt< np_desc::_, np_code::code >,
                     tao::pegtl::eof
             > {
     };
