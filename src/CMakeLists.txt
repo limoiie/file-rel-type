@@ -26,8 +26,8 @@ add_library(magic
     magic_ast/exp_un.h
     magic_ast/exp_bin.cpp
     magic_ast/exp_bin.h
-    magic_ast/eval/magic_ast_eval.cpp
-    magic_ast/eval/magic_ast_eval.h
+    magic_ast/eval/eval_exp.cpp
+    magic_ast/eval/eval_exp.h
     magic_ast/magic_ast.h
     magic_ast/eval/read_number.hpp
     magic_ast/eval/read_string.hpp
@@ -62,7 +62,7 @@ add_library(magic
 
     magic_ast/elem/str_flag_t.h
     magic_ast/elem/str_flag_t.cpp
-    magic_peg/magic_peg_op_typ_action.h magic_peg/magic_peg_op_typ_action.cpp)
+    magic_peg/magic_peg_op_typ_action.h magic_peg/magic_peg_op_typ_action.cpp magic_tree.h magic_tree.cpp magic_ast/eval/eval_magic_tree.cpp magic_ast/eval/eval_magic_tree.h)
 
 target_link_libraries(magic
     cpp-common-static

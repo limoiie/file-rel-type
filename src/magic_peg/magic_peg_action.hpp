@@ -18,13 +18,16 @@
 #include "../utils/tao/pegtl/integer.hpp"
 #include "../utils/tao/pegtl/ascii.hpp"
 
-#include "magic_ast/elem/val_sign_typ.h"
+#include "magic_peg_op_typ_action.h"
+
 #include "magic_peg.h"
 #include "magic_entry.h"
-#include "../magic_ast/magic_ast.h"
-#include "../magic_ast/eval/type_lift_val.h"
+#include "magic_tree.h"
+
+#include "magic_ast/magic_ast.h"
+#include "magic_ast/eval/type_lift_val.h"
 #include "magic_ast/elem/str_flag_t.h"
-#include "magic_peg_op_typ_action.h"
+#include "magic_ast/elem/val_sign_typ.h"
 
 namespace magic::peg::action
 {
@@ -55,14 +58,14 @@ namespace magic::peg::action
 
         /// file status -----------------------------------------------------
 
-        // a series of lines that starts with a level-0 line represents one magic tree
         // one file may contain several magic trees
-        std::list< std::shared_ptr< tree_node< magic_entry > > > magic_trees;
+        std::list< p_magic_tree_t > magic_trees;
 
         /// tree status -----------------------------------------------------
 
+        // a series of lines that starts with a level-0 line represents one magic tree
         // one line corresponds to one entry
-        std::shared_ptr< tree_node< magic_entry > > current_entry;
+        p_magic_tree_t current_entry;
 
         /// line statues -----------------------------------------------------
 
@@ -321,7 +324,7 @@ namespace magic::peg::action
 
             if (entry->val->level == 0) {  // entry the first line of a magic tree
                 if (st.current_entry != nullptr) {  // push current tree root if there is one
-                    st.magic_trees.push_back(st.current_entry->root());
+                    st.magic_trees.emplace_back(st.current_entry->root());
                 }
                 st.current_entry = entry;
                 return;
@@ -347,7 +350,7 @@ namespace magic::peg::action
     struct [[maybe_unused]] action_magic< magic_file > {
         static void apply0(state_magic_build &st) {
             if (st.current_entry != nullptr) {
-                st.magic_trees.push_back(st.current_entry->root());
+                st.magic_trees.emplace_back(st.current_entry->root());
             }
         }
     };
