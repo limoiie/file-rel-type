@@ -90,13 +90,12 @@ struct [[maybe_unused]] int_caster {
         auto &to = caster_int< To >::get(v);
         auto &from = caster_int< From >::get(v);
 
-        switch ((is_from_unsigned ? 0b00 : 0b10) | (is_to_unsigned ? 0b00 : 0b01)) {
+        switch ((is_from_unsigned ? 0b00u : 0b10u) | (is_to_unsigned ? 0b00u : 0b01u)) {
             case 0b00: to = (uint_to_t) from;
                 break;
             case 0b01: to = (uint_to_t) (int_to_t) from;
                 break;
-            case 0b10: to = (uint_to_t) (int_from_t) from;
-                break;
+            case 0b10:
             case 0b11: to = (uint_to_t) (int_to_t) (int_from_t) from;
                 break;
         }

@@ -7,12 +7,13 @@
 #include <gtest/gtest.h>
 
 #include <tao/pegtl.hpp>
-#include <tao/pegtl/contrib/unescape.hpp>
 
 #include <magic_peg/magic_peg_op_typ.h>
 #include <magic_peg/magic_peg_action.hpp>
+#include <magic_ast/eval/eval_exp.h>
 
 #include "../test_pegtl_helper.hpp"
+#include "../print_memory.h"
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
@@ -50,6 +51,18 @@ namespace testing_internal
             return unop::builder::make_ptr('~', inner, inner_typ);
         }
         return inner;
+    }
+
+    std::pair< std::pair< std::string, std::string >, std::pair< val, val > >
+    create_case_for_cache_eval(int offset, int value) {
+        auto rule_str = std::to_string(offset) + std::string(" long");
+        auto mem_str = std::string(offset, '0') + std::string((char const *) (void *) &value, sizeof(value));
+        auto val_off = val{val_sign_typ_t::default_(), magic::ast::var::builder::make((uint32_t) offset)};
+        auto val_val = val{val_sign_typ_t::default_(), magic::ast::var::builder::make((uint32_t) value)};
+        return {
+                {rule_str, mem_str},
+                {val_off,  val_val}
+        };
     }
 
 }
@@ -114,5 +127,35 @@ TEST(TestMagicPegAction, test_deref_val_off) { // NOLINT(cert-err58-cpp)
 
         ASSERT_EQ(*out.e_off, *pair.second[0]);
         ASSERT_EQ(*out.e_val, *pair.second[1]);
+    }
+}
+
+TEST(TestMagicPegAction, test_deref_val_off_cache_eval) { // NOLINT(cert-err58-cpp)
+    std::cout << "Testing" << __FUNCTION__ << " ..." << std::endl;
+    auto cases = std::list< std::pair< std::pair< std::string, std::string >,
+                                       std::pair< val, val > > >{
+            testing_internal::create_case_for_cache_eval(2, 10),
+    };
+
+    for (auto const &pair : cases) {
+        auto const &rule_str = pair.first.first;
+        auto const &mem_str = pair.first.second;
+
+        std::cout << "  Case: offset - " << rule_str << ", memory - " << print_memory(mem_str) << std::endl;
+
+        auto st = parse_magic< seq<
+                np_offset::exp, ___, sor< np_deref::nan_typ, np_deref::num_typ > > >(rule_str);
+        std::stringstream ss(mem_str);
+        auto ctx = std::make_shared< magic::ast::ctx_exp_t >(ss);
+
+        st.stk_exp.top()->compute(ctx);
+
+        std::cout << "    Expect - Off: " << st.e_off->cached_result()->to_string() << std::endl;
+        std::cout << "    Expect - Off: " << pair.second.first.to_string() << std::endl;
+        ASSERT_EQ(*st.e_off->cached_result(), pair.second.first);
+
+        std::cout << "    Expect - Val: " << st.e_val->cached_result()->to_string() << std::endl;
+        std::cout << "    Output - Val: " << pair.second.second.to_string() << std::endl;
+        ASSERT_EQ(*st.e_val->cached_result(), pair.second.second);
     }
 }

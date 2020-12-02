@@ -242,6 +242,8 @@ namespace magic::peg::action
             auto deref_val = std::dynamic_pointer_cast< unop >(st.stk_exp.top());
             st.e_val = deref_val;
             st.e_off = deref_val->inner;
+            st.e_val->enable_cache(true);
+            st.e_off->enable_cache(true);
         }
     };
 
