@@ -65,7 +65,7 @@ namespace testing_internal
 
 }
 
-TEST(TestMagicPegBuilder, test_build_typ_str_mask) { // NOLINT(cert-err58-cpp)
+TEST(TestMagicPegAction, test_build_typ_str_mask) { // NOLINT(cert-err58-cpp)
     using testing_internal::make_exp;
 
     std::cout << "Testing test_build_typ_str_mask ..." << std::endl;
@@ -86,7 +86,7 @@ TEST(TestMagicPegBuilder, test_build_typ_str_mask) { // NOLINT(cert-err58-cpp)
     }
 }
 
-TEST(TestMagicPegBuilder, test_build_typ_num_mask) { // NOLINT(cert-err58-cpp)
+TEST(TestMagicPegAction, test_build_typ_num_mask) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing test_build_typ_num_mask ..." << std::endl;
     auto cases = std::list< std::pair< std::string, std::pair< std::shared_ptr< magic::ast::exp >, unsigned>> >{
             CASE("short", /, 20,),
@@ -106,7 +106,7 @@ TEST(TestMagicPegBuilder, test_build_typ_num_mask) { // NOLINT(cert-err58-cpp)
     }
 }
 
-TEST(TestMagicPegBuilder, test_build_relation_str) { // NOLINT(cert-err58-cpp)
+TEST(TestMagicPegAction, test_build_relation_str) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing test_build_relation_str ..." << std::endl;
     auto cases = std::list< std::pair< std::string, std::string> >{
             {R"(a\ relation\ string)", "a relation string"},

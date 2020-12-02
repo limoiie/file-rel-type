@@ -155,7 +155,7 @@ namespace testing_internal
     }
 }
 
-TEST(TestMagicPegBuilder, test_build_offset_general) { // NOLINT(cert-err58-cpp)
+TEST(TestMagicPegAction, test_build_offset_general) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing test_build_offset_general ..." << std::endl;
     auto cases = testing_internal::make_offset_indirect_exp();
 
@@ -171,7 +171,7 @@ TEST(TestMagicPegBuilder, test_build_offset_general) { // NOLINT(cert-err58-cpp)
     }
 }
 
-TEST(TestMagicPegBuilder, test_build_offset) { // NOLINT(cert-err58-cpp)
+TEST(TestMagicPegAction, test_build_offset) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing test_build_offset ..." << std::endl;
     auto cases = testing_internal::make_offset_indirect_exp();
     cases.splice(cases.end(), testing_internal::make_offset_relative_indirect_exp());
