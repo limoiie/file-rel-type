@@ -29,7 +29,7 @@ namespace magic::ast
                      unsigned const flag);
         };
 
-        std::shared_ptr< magic::ast::val > compute(std::shared_ptr< ctx_exp_t > const &ctx) override;
+        std::shared_ptr< magic::ast::val > compute_(std::shared_ptr< ctx_exp_t > const &ctx) override;
 
     protected:
         binop(char op, std::shared_ptr< exp > left, std::shared_ptr< exp > right);
@@ -59,7 +59,7 @@ namespace magic::ast
                   unsigned const flag);
 
     public:
-        std::shared_ptr< magic::ast::val > compute(std::shared_ptr< ctx_exp_t > const &ctx) override;
+        std::shared_ptr< magic::ast::val > compute_(std::shared_ptr< ctx_exp_t > const &ctx) override;
 
         bool operator==(binop_str const &other) const;
 

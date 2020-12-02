@@ -23,7 +23,7 @@ namespace magic::ast
 
         bool operator==(unop const &other) const;
 
-        std::shared_ptr< magic::ast::val > compute(std::shared_ptr< ctx_exp_t > const &ctx) override;
+        std::shared_ptr< magic::ast::val > compute_(std::shared_ptr< ctx_exp_t > const &ctx) override;
 
     protected:
         [[nodiscard]] bool equal_to(const exp &other) const override;

@@ -12,8 +12,7 @@
 #include <magic_peg/magic_peg_op_typ.h>
 #include <magic_peg/magic_peg_action.hpp>
 
-#include "magic_ast/elem/val_sign_typ.h"
-#include "magic_ast/elem/str_flag_t.h"
+#include "../test_pegtl_helper.hpp"
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
@@ -21,25 +20,8 @@ using namespace np_relation;
 
 #define PAIR(NUM) { #NUM, NUM }
 
-#define CASE(TYP, OP, NUM, FLAGS) { TYP#OP#NUM#FLAGS,   {testing_internal::make_exp(TYP, #OP, NUM), convert_flags(#FLAGS)}}
-
-static
-auto ph_exp() {
-    auto const default_val = magic::ast::var::builder::make(0u);
-    return magic::ast::num::builder::make_ptr(val_sign_typ_t::default_(), default_val);
-}
-
-template< class Rule >
-magic::peg::action::state_magic_build parse_magic(std::string const &stmt) {
-    auto st = magic::peg::action::state_magic_build{};
-    tao::pegtl::memory_input in(stmt, __FUNCTION__);
-
-    st.stk_exp.push(ph_exp());
-
-    parse< exact< Rule >,
-           magic::peg::action::action_magic >(in, st);
-    return st;
-}
+#define CASE1(TYP, OP, NUM, FLAGS) { #TYP#OP#NUM#FLAGS,   {testing_internal::make_exp(#TYP, #OP, NUM), convert_flags(#FLAGS)}}
+#define CASE2(OFF, TYP) { #OFF " " TYP, testing_internal::create_case(OFF, TYP)}
 
 namespace testing_internal
 {
@@ -48,6 +30,13 @@ namespace testing_internal
     using ::magic::ast::num;
     using ::magic::ast::unop;
     using ::magic::ast::binop;
+
+    std::vector< std::shared_ptr< magic::ast::exp > >
+    create_case(uint32_t offset, std::string const &typ) {
+        auto sign_typ = parse_sign_typ(typ);
+        auto off_exp = make_num(offset);
+        return {off_exp, magic::ast::unop::builder::make_ptr('*', off_exp, sign_typ)};
+    }
 
     std::shared_ptr< exp > make_exp(std::string const &typ, std::string const &op, long long int num) {
         auto left_inner = ph_exp();  // make a placeholder for the offset
@@ -70,17 +59,17 @@ TEST(TestMagicPegAction, test_build_typ_str_mask) { // NOLINT(cert-err58-cpp)
 
     std::cout << "Testing test_build_typ_str_mask ..." << std::endl;
     auto cases = std::list< std::pair< std::string, std::pair< std::shared_ptr< magic::ast::exp >, unsigned>> >{
-            CASE("string", /, 20,),
-            CASE("string", /, 20, wl),
-            CASE("string", /, 20, /w/l),
+            CASE1(string, /, 20,),
+            CASE1(string, /, 20, wl),
+            CASE1(string, /, 20, /w/l),
     };
 
     for (auto const &pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
-        auto out = parse_magic< seq<
+        auto out = parse_magic_init_with_default_offset< seq<
                 np_type::formal::formal_str_typ, opt< np_deref::str_mask >
-        >>(pair.first);
+        > >(pair.first);
         ASSERT_EQ(*out.stk_exp.top(), *pair.second.first);
         ASSERT_EQ(out.flag, pair.second.second);
     }
@@ -89,42 +78,41 @@ TEST(TestMagicPegAction, test_build_typ_str_mask) { // NOLINT(cert-err58-cpp)
 TEST(TestMagicPegAction, test_build_typ_num_mask) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing test_build_typ_num_mask ..." << std::endl;
     auto cases = std::list< std::pair< std::string, std::pair< std::shared_ptr< magic::ast::exp >, unsigned>> >{
-            CASE("short", /, 20,),
-            CASE("long", +, 20,),
-            CASE("long", ~&, 20,),
-            CASE("ulong", +, 20,),
+            CASE1(short, /, 20,),
+            CASE1(long, +, 20,),
+            CASE1(long, ~&, 20,),
+            CASE1(ulong, +, 20,),
+    };
+
+    for (auto const &pair : cases) {
+        std::cout << "  Case: " << pair.first << std::endl;
+
+        auto out = parse_magic_init_with_default_offset< seq<
+                np_type::formal::formal_num_typ, opt< np_deref::num_mask >
+        > >(pair.first);
+        ASSERT_EQ(*out.stk_exp.top(), *pair.second.first);
+        ASSERT_EQ(out.flag, pair.second.second);
+    }
+}
+
+TEST(TestMagicPegAction, test_deref_val_off) { // NOLINT(cert-err58-cpp)
+    std::cout << "Testing" << __FUNCTION__ << " ..." << std::endl;
+    auto cases = std::list< std::pair< std::string, std::vector< std::shared_ptr< magic::ast::exp > > > >{
+            CASE2(20, "short"),
+            CASE2(30, "quad"),
     };
 
     for (auto const &pair : cases) {
         std::cout << "  Case: " << pair.first << std::endl;
 
         auto out = parse_magic< seq<
-                np_type::formal::formal_num_typ, opt< np_deref::num_mask >
-        >>(pair.first);
-        ASSERT_EQ(*out.stk_exp.top(), *pair.second.first);
-        ASSERT_EQ(out.flag, pair.second.second);
-    }
-}
+                np_offset::exp, ___, sor< np_deref::nan_typ, np_deref::num_typ > > >(pair.first);
+        std::cout << "    - Expect - OFF: " << out.e_off->to_string() << std::endl;
+        std::cout << "    - Output - OFF: " << pair.second[0]->to_string() << std::endl;
+        std::cout << "    - Expect - VAL: " << out.e_val->to_string() << std::endl;
+        std::cout << "    - Output - VAL: " << pair.second[1]->to_string() << std::endl;
 
-TEST(TestMagicPegAction, test_build_relation_str) { // NOLINT(cert-err58-cpp)
-    std::cout << "Testing test_build_relation_str ..." << std::endl;
-    auto cases = std::list< std::pair< std::string, std::string> >{
-            {R"(a\ relation\ string)", "a relation string"},
-            {R"(a\r\ relation\t\ string)", "a\r relation\t string"},
-            {R"(a\b\ relation\n\ string)", "a\b relation\n string"},
-            {R"(a\ \xAB\ relation\t\ string)", "a \xAB relation\t string"},
-            {R"(a\ \10\ relation\t\ string)", "a \x08 relation\t string"},
-            {R"(a\ \17\ relation\t\ string)", "a \x0F relation\t string"},
-            {R"(\xAB\xAC\xDF\x1D\x12)", "\xAB\xAC\xDF\x1D\x12"},
-            {R"(\001\002\010\020\007)", "\x01\x02\x08\x10\x07"},
-    };
-
-    for (auto const &pair : cases) {
-        std::cout << "  Case: " << pair.first << std::endl;
-
-        auto out = parse_magic< ::string >(pair.first);
-        auto str = std::dynamic_pointer_cast<magic::ast::num>(out.stk_exp.top());
-
-        ASSERT_EQ(std::string_view(str->inner->data.s), pair.second);
+        ASSERT_EQ(*out.e_off, *pair.second[0]);
+        ASSERT_EQ(*out.e_val, *pair.second[1]);
     }
 }

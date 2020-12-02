@@ -8,7 +8,7 @@
 
 namespace magic::ast
 {
-    std::shared_ptr< magic::ast::val > magic::ast::binop::compute(std::shared_ptr< ctx_exp_t > const &ctx) {
+    std::shared_ptr< val > binop::compute_(std::shared_ptr< ctx_exp_t > const &ctx) {
         return compute_binop(ctx, this);
     }
 
@@ -43,7 +43,7 @@ namespace magic::ast
             : binop(op, std::move(left), std::move(right), typ), flag(flag) {
     }
 
-    std::shared_ptr< val > magic::ast::binop_str::compute(std::shared_ptr< ctx_exp_t > const &ctx) {
+    std::shared_ptr< val > binop_str::compute_(std::shared_ptr< ctx_exp_t > const &ctx) {
         return compute_binop_str(ctx, this);
     }
 

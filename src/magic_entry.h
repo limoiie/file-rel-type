@@ -17,7 +17,11 @@ struct magic_entry {
 
     std::string to_string() const;
 
-    std::shared_ptr< magic::ast::exp > exp;
+    magic::ast::p_exp_t exp;
+
+    magic::ast::p_exp_t e_off;
+    magic::ast::p_exp_t e_val;
+
     size_t level;
     std::string description;
     unsigned type_code;

@@ -28,7 +28,7 @@ namespace magic::ast
 
     p_val_t compute_binop(p_ctx const &ctx, binop *e) {
         auto left_v = e->left->compute(ctx);
-        auto right_v = e->left->compute(ctx);
+        auto right_v = e->right->compute(ctx);
         return ::compute_binop(e->op, left_v, right_v);
     }
 

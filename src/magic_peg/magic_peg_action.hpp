@@ -52,6 +52,9 @@ namespace magic::peg::action
             stk_typ.push(nullptr);
             typ = nullptr;
 
+            e_off = nullptr;
+            e_val = nullptr;
+
             description.clear();
             type_code = 0;
         }
@@ -74,6 +77,9 @@ namespace magic::peg::action
         std::stack< char > stk_opt;
         std::shared_ptr< val_sign_typ_t > typ;
 
+        magic::ast::p_exp_t e_off;
+        magic::ast::p_exp_t e_val;
+
         unsigned flag;
         bool has_range;
         size_t level;
@@ -90,6 +96,13 @@ namespace magic::peg::action
             static void apply(const ActionInput &in, state_magic_build &st) {
                 auto const op = in.peek_char() != '(' ? in.peek_char() : '*';
                 st.stk_opt.push(op);
+                st.stk_typ.push(nullptr);
+            }
+        };
+
+        struct [[maybe_unused]] push_default_relation_operator {
+            static void apply0(state_magic_build &st) {
+                st.stk_opt.push('=');
                 st.stk_typ.push(nullptr);
             }
         };
@@ -222,6 +235,17 @@ namespace magic::peg::action
     };
 
     template<>
+    struct [[maybe_unused]] action_magic< np_deref::_typ_end > {
+        // once finish matching the formal type, the top exp should be the de-referenced value
+        // and its inner should be the offset
+        static void apply0(state_magic_build &st) {
+            auto deref_val = std::dynamic_pointer_cast< unop >(st.stk_exp.top());
+            st.e_val = deref_val;
+            st.e_off = deref_val->inner;
+        }
+    };
+
+    template<>
     struct [[maybe_unused]] action_magic< np_deref::_number > {
         static void apply0(state_magic_build &st) {
             st.has_range = true;
@@ -271,25 +295,13 @@ namespace magic::peg::action
      */
 
     template<>
-    struct [[maybe_unused]] action_magic< ::np_relation::_default_opt > {
-        static void apply0(state_magic_build &st) {
-            st.stk_opt.push('=');
-            st.stk_typ.push(nullptr);
-        }
-    };
+    struct [[maybe_unused]] action_magic< ::np_relation::_default_opt > : internal::push_default_relation_operator {};
 
     template<>
-    struct [[maybe_unused]] action_magic< ::np_relation::_exp_str >
-            : internal::push_bin_exp_with_flag {
-        // todo: instead of pushing bin exp, store lhs and rhs
-        //   separately so that later processing can get the lhs,
-        //   which is the information in the memory
-    };
+    struct [[maybe_unused]] action_magic< ::np_relation::_exp_str > : internal::push_bin_exp_with_flag {};
 
     template<>
-    struct [[maybe_unused]] action_magic< ::np_relation::_exp_num >
-            : internal::push_bin_exp {
-    };
+    struct [[maybe_unused]] action_magic< ::np_relation::_exp_num > : internal::push_bin_exp {};
 
     template<>
     struct [[maybe_unused]] action_magic< ::np_desc::desc > {
@@ -310,28 +322,43 @@ namespace magic::peg::action
 
     template<>
     struct [[maybe_unused]] action_magic< ::magic_line > {
-        template< class ActionInput >
-        static void apply(ActionInput &in, state_magic_build &st) {
+        static void apply0(state_magic_build &st) {
+            auto entry = make_magic_entry(st);
+            if (have_prev_entry(st, entry)) {
+                bind_with_prev_entry(st, entry);
+            }
+            st.current_entry = entry;
+        }
+
+        static p_magic_tree_t make_magic_entry(state_magic_build &st) {
             assert(st.stk_exp.size() == 1);
             assert(st.stk_opt.empty());
             assert(st.stk_typ.empty());
 
-            auto entry = std::make_shared< tree_node< magic_entry > >(
+            auto entry = std::make_shared< magic_tree_t >(
                     std::make_shared< magic_entry >(
                             std_::pop(st.stk_exp), st.level, st.description, st.type_code));
 
-            st.reset_line_status();
+            entry->val->e_off = st.e_off;
+            entry->val->e_val = st.e_val;
 
-            if (entry->val->level == 0) {  // entry the first line of a magic tree
+            st.reset_line_status();
+            return entry;
+        }
+
+        static bool have_prev_entry(state_magic_build &st, p_magic_tree_t &entry) {
+            if (entry->val->level == 0) {  // entry is the first line of a magic tree
                 if (st.current_entry != nullptr) {  // push current tree root if there is one
                     st.magic_trees.emplace_back(st.current_entry->root());
                 }
-                st.current_entry = entry;
-                return;
+                return false;
             }
+            return true;
+        }
 
+        static void bind_with_prev_entry(state_magic_build &st, p_magic_tree_t &entry) {
             assert(st.current_entry != nullptr);
-            // level continues one by one, or backwards
+            // level either continues one by one, or backwards to a higher parent
             assert(st.current_entry->val->level + 1 >= entry->val->level);
 
             // find the parent entry
@@ -341,7 +368,6 @@ namespace magic::peg::action
             // bind with the parent entry
             st.current_entry->children.push_back(entry);
             entry->parent = st.current_entry;
-            st.current_entry = entry;
         }
 
     };

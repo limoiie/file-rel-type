@@ -10,10 +10,11 @@ add_executable(test_all
     magic_ast/eval/test_type_lift.cpp
     magic_ast/eval/test_val_fetcher.cpp
     magic_ast/test_read_number.cpp
-    magic_peg_action/test_deref_type_action.cpp
-    magic_peg_action/test_description_type_code.cpp
+    magic_peg_action/test_1_offset_action.cpp
+    magic_peg_action/test_2_deref_type_action.cpp
+    magic_peg_action/test_3_relation_action.cpp
+    magic_peg_action/test_4_description_type_code.cpp
     magic_peg_action/test_file_action.cpp
-    magic_peg_action/test_offset_action.cpp
     test_magic_peg.cpp
     test_magic_peg_predefine.cpp
     test_magic_peg_predefine_action.cpp

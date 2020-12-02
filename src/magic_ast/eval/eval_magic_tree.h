@@ -7,7 +7,8 @@
 
 #include "../../magic_tree.h"
 
-namespace magic::ast {
+namespace magic::ast
+{
     class ctx_exp_t;
 }
 
@@ -19,7 +20,7 @@ public:
 
     eval_magic_tree(std::istream &ss);
 
-    std::shared_ptr< result_t > eval(p_magic_tree_t const& tree);
+    std::shared_ptr< result_t > eval(p_magic_tree_t const &tree);
 
 private:
     std::shared_ptr< magic::ast::ctx_exp_t > ctx_;

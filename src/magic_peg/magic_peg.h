@@ -51,8 +51,10 @@ namespace np_offset
 
 namespace np_deref
 {   /// region de-reference mask (additional computation)
-    struct nan_typ : np_type::formal::formal_nan_typ {};
-    struct num_typ : np_type::formal::formal_num_typ {};
+    struct _typ_end : success {};
+
+    struct nan_typ : seq< np_type::formal::formal_nan_typ, _typ_end > {};
+    struct num_typ : seq< np_type::formal::formal_num_typ, _typ_end > {};
 
     struct _number : number {};
 

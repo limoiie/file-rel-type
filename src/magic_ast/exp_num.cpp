@@ -16,7 +16,7 @@ namespace magic::ast
         return exp::equal_to(other) && *inner == *other.inner;
     }
 
-    std::shared_ptr< val > num::compute(std::shared_ptr< ctx_exp_t > const &ctx) {
+    std::shared_ptr< val > num::compute_(std::shared_ptr< ctx_exp_t > const &ctx) {
         return compute_num(ctx, this);
     }
 

@@ -10,26 +10,14 @@
 #include <tao/pegtl/contrib/unescape.hpp>
 
 #include <magic_peg/magic_peg.h>
-#include <magic_peg/magic_peg_op_typ.h>
 #include <magic_peg/magic_peg_action.hpp>
 
-#include "magic_ast/elem/val_sign_typ.h"
-#include "magic_peg/magic_peg_op_typ_action.h"
+#include "../test_pegtl_helper.hpp"
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
 
 #define PAIR(NUM) { #NUM, NUM }
-
-template< class Rule >
-magic::peg::action::state_magic_build parse_magic(std::string const &stmt) {
-    auto st = magic::peg::action::state_magic_build{};
-    tao::pegtl::memory_input in(stmt, __FUNCTION__);
-
-    parse< exact< Rule >,
-           magic::peg::action::action_magic >(in, st);
-    return st;
-}
 
 namespace testing_internal
 {

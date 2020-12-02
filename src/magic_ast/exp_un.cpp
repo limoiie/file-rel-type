@@ -26,7 +26,7 @@ namespace magic::ast
         return equal_to(other);
     }
 
-    std::shared_ptr< magic::ast::val > magic::ast::unop::compute(std::shared_ptr< ctx_exp_t > const &ctx) {
+    std::shared_ptr< magic::ast::val > magic::ast::unop::compute_(std::shared_ptr< ctx_exp_t > const &ctx) {
         return compute_unop(ctx, this);
     }
 

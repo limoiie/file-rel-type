@@ -11,19 +11,19 @@
 
 namespace magic::ast
 {
-    struct num : public magic::ast::exp {
+    struct num : public exp {
         struct builder {
-            static std::shared_ptr< num > make_ptr(val_sign_typ_t typ, magic::ast::var const &data);
+            static std::shared_ptr< num > make_ptr(val_sign_typ_t typ, var const &data);
 
         };
 
     private:
-        explicit num(std::shared_ptr< magic::ast::val > inner);
+        explicit num(std::shared_ptr< val > inner);
 
     public:
         bool operator==(num const &other) const;
 
-        std::shared_ptr< magic::ast::val > compute(std::shared_ptr< ctx_exp_t > const & /*unused*/) override;
+        std::shared_ptr< val > compute_(std::shared_ptr< ctx_exp_t > const & /*unused*/) override;
 
     protected:
         [[nodiscard]] bool equal_to(const exp &other) const override;
@@ -31,7 +31,7 @@ namespace magic::ast
         std::string to_string_() const override;
 
     public:
-        std::shared_ptr< magic::ast::val > inner;
+        std::shared_ptr< val > inner;
 
     };
 
