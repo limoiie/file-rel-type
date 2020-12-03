@@ -12,7 +12,7 @@ std::map< char, str_flag_t > const &map_flag() {
             { 'c', str_flag_t::STRING_IGNORE_LOWERCASE},
             { 'C', str_flag_t::STRING_IGNORE_UPPERCASE},
             { 's', str_flag_t::REGEX_OFFSET_START},
-            { 'T', str_flag_t::STRING_TEXT_TEST},
+            { 't', str_flag_t::STRING_TEXT_TEST},
             { 'b', str_flag_t::STRING_BIN_TEST},
             { 'B', str_flag_t::PSTRING_1_BE},
             { 'B', str_flag_t::PSTRING_1_LE},
