@@ -69,7 +69,7 @@ namespace np_deref
 namespace np_relation
 {
     struct _default_opt : success {};
-    struct _default_exp : seq< one< 'x' >, at< blank > > {};
+    struct _default_exp : seq< one< 'x' >, at< sor< blank, eolf > > > {};
 
     template< class Rule >
     struct _exp : seq< sor< np_opt::bin_cmpr, _default_opt >, Rule > {};
