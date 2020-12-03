@@ -22,7 +22,7 @@ struct tree_node : std::enable_shared_from_this< tree_node< Val > > {
     p_node_t root() {
         auto v = this->shared_from_this();
         while (v->parent != nullptr) {
-            v = parent;
+            v = v->parent;
         }
         return v;
     }
