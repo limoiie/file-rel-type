@@ -20,7 +20,9 @@ struct odigit : range< '0', '7' > {};
 
 struct word_edge : sor< space, tao::pegtl::eof > {};
 
-struct escaped_one : one< '\'', '"', '?', '\\', 'a', 'b', 'f', 'n', 'r', 't', 'v', ' ' > {};
+struct escaped_one : one< '\'', '"', '?', '\\', 'a', 'b', 'f', 'n', 'r', 't', 'v', ' ',
+                          '+', '-', '*', '%', '~', '^', '&', '|', '<', '>', '=', '!' > {
+};
 
 struct escaped_oct_char : internal::rep_min_max< 1, 3, odigit > {};
 
@@ -53,7 +55,9 @@ namespace action
 
     struct unescape_one
             : tao::pegtl::unescape::unescape_c<
-                    escaped_one, '\'', '"', '?', '\\', '\a', '\b', '\f', '\n', '\r', '\t', '\v', ' ' > {
+                    escaped_one,
+                    '\'', '"', '?', '\\', '\a', '\b', '\f', '\n', '\r', '\t', '\v', ' ',
+                    '+', '-', '*', '%', '~', '^', '&', '|', '<', '>', '=', '!' > {
     };
 
     struct unescape_oct_char {
