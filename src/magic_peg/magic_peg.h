@@ -70,7 +70,7 @@ namespace np_relation
     struct _default_exp : seq< one< 'x' >, at< sor< blank, eolf > > > {};
 
     template< class Rule >
-    struct _exp : seq< sor< np_opt::bin_cmpr, _default_opt >, Rule > {};
+    struct _exp : seq< sor< np_opt::bin_cmpr, _default_opt >, __, Rule > {};
 
     struct _exp_str : sor< _default_exp, _exp< ::string > > {};
     struct _exp_num : sor< _default_exp, _exp< ::number > > {};
