@@ -288,13 +288,14 @@ namespace magic::peg::action
     template<>
     struct [[maybe_unused]] action_magic< np_opt::bin_cmpr > : internal::push_operator {};
 
-    /* todo: implementation
-     struct [[maybe_unused]] action_magic< ::np_relation::_default_exp > {
-         static void apply0() {
-             // mark as always true but also keep the original value
-         }
-     }
-     */
+    template<>
+    struct [[maybe_unused]] action_magic< ::np_relation::_default_exp > {
+        static void apply0(state_magic_build &st) {
+            // wrap the exp with unop 'x' which always returns true
+            internal::push_operator_< 'x' >::apply0(st);
+            internal::push_un_exp::apply0(st);
+        }
+    };
 
     template<>
     struct [[maybe_unused]] action_magic< ::np_relation::_default_opt > : internal::push_default_relation_operator {};

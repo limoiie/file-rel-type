@@ -33,6 +33,11 @@ namespace internal
         return inner;
     }
 
+    inline
+    p_val_t compute_unop_orc() {
+        return val::builder::default_true_ptr();
+    }
+
     template< std::size_t S, bool IsUnsigned >
     p_val_t
     compute_unop_(char const op, p_val_t const &inner, val_sign_typ_t const &typ, p_ctx_t const &ctx) {
@@ -40,6 +45,7 @@ namespace internal
             case '*': return compute_unop_def< S, IsUnsigned >(inner, typ, ctx);
             case '&': return compute_unop_rel(inner, ctx);
             case '~': return compute_unop_inv< S >(inner);
+            case 'x': return compute_unop_orc();
             default: break;
         }
 
