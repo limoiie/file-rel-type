@@ -18,8 +18,6 @@
 #include "../utils/tao/pegtl/line.hpp"
 #include "../utils/tao/pegtl/switcher.hpp"
 
-using namespace tao::pegtl;
-
 struct number_ : contrib::integer::signed_integer {};
 struct string_ : word_with_hex_oct {};
 

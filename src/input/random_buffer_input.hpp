@@ -68,12 +68,13 @@ struct random_buffer_input {
             return true;
         }
         if (iter_ + amount - 1 >= buffer_end()) {
-            throw std::overflow_error("require beyond end of buffer!");
+            //throw std::overflow_error("require beyond end of buffer!");
+            return false;
         }
 
         auto const need_to_read = amount - buffer_occupied();
         auto const to_read = std::min(buffer_free(), std::max(need_to_read, Chunk));
-        if (auto const read = reader_(buffer_written_end(), to_read)) {
+        if (auto const read = reader_(buffer_written_end_(), to_read)) {
             buffer_size_ += read;
             return true;
         }
@@ -117,8 +118,19 @@ struct random_buffer_input {
         return seek_(target_pos);
     }
 
-    [[nodiscard]] char const *current() {
+    [[nodiscard]] char const *current() const {
         return iter_;
+    }
+
+    /**
+     * the end of the written buffer
+     */
+    [[nodiscard]] char const *buffer_written_end() const {
+        return buffer_.get() + buffer_size_;
+    }
+
+    [[nodiscard]] size_t written_len() const {
+        return buffer_written_end() - current();
     }
 
 private:
@@ -167,14 +179,7 @@ private:
     /**
      * the end of the written buffer
      */
-    [[nodiscard]] char const *buffer_written_end() const {
-        return buffer_.get() + buffer_size_;
-    }
-
-    /**
-     * the end of the written buffer
-     */
-    [[nodiscard]] char *buffer_written_end() {
+    [[nodiscard]] char *buffer_written_end_() {
         return buffer_.get() + buffer_size_;
     }
 

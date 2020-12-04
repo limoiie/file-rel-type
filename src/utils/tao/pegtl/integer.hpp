@@ -12,10 +12,10 @@
 #include <tao/pegtl/contrib/integer.hpp>
 #include <tao/pegtl/contrib/if_then.hpp>
 
-using namespace tao::pegtl;
-
 namespace TAO_PEGTL_NAMESPACE::contrib::integer
 {
+    using namespace tao::pegtl;
+
     struct sign : one< '+', '-' > {};
     struct prefix_0x : string< '0', 'x' > {};
 

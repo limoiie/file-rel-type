@@ -10,7 +10,7 @@
 #include <utility>
 #include <string_view>
 
-constexpr unsigned MAX_STRING_LEN = 96;
+constexpr unsigned MAX_STRING_LEN = 95;
 
 namespace magic::ast
 {
@@ -23,7 +23,7 @@ namespace magic::ast
         float_t f;
         double_t d;
 
-        char s[MAX_STRING_LEN];
+        char s[MAX_STRING_LEN + 1];
 
         uint8_t hs[2];
         uint8_t hl[4];
@@ -63,9 +63,7 @@ namespace magic::ast
         void set(float_t  v) { f = v; }
         void set(double_t v) { d = v; }
 
-        void set(std::string_view v) {
-            std::copy(v.begin(), v.end(), s);
-        }
+        void set(std::string_view v);
 
     private:
         var() = default;

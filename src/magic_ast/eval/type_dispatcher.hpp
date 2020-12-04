@@ -77,7 +77,7 @@ namespace internal
  */
 template< template< std::size_t, std::size_t, class... > class Fn, class ...As, class ...Ps >
 auto dispatch_by_2sizes_ex(std::size_t const from, std::size_t const to, Ps &&... ps) {
-    return internal::dispatch_by_2sizes_ex< Fn, 2, As... >({from, to}, ids<>(), std::forward< Ps >(ps)...);
+    return ::internal::dispatch_by_2sizes_ex< Fn, 2, As... >({from, to}, ids<>(), std::forward< Ps >(ps)...);
 }
 
 /**
@@ -87,7 +87,7 @@ auto dispatch_by_2sizes_ex(std::size_t const from, std::size_t const to, Ps &&..
 template< template< std::size_t ... > class Fn, std::size_t C, class ...Ps >
 auto dispatch_by_sizes(std::vector< std::size_t > const &ss, Ps &&...ps) {
     assert(ss.size() == C);
-    return internal::dispatch_by_sizes_< Fn, C >(ss, ids<>(), std::forward< Ps >(ps)...);
+    return ::internal::dispatch_by_sizes_< Fn, C >(ss, ids<>(), std::forward< Ps >(ps)...);
 }
 
 /**
@@ -98,7 +98,7 @@ template< class... Ss >
 struct dispatcher_by_sizes {
     template< template< std::size_t ... > class Fn, class ...Ps >
     static auto dispatch(Ss ...s, Ps &&...ps) {
-        return internal::dispatch_by_sizes_< Fn, sizeof...(Ss) >({s...}, ids<>(), std::forward< Ps >(ps)...);
+        return ::internal::dispatch_by_sizes_< Fn, sizeof...(Ss) >({s...}, ids<>(), std::forward< Ps >(ps)...);
     }
 
 };

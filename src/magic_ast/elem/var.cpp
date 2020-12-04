@@ -35,11 +35,7 @@ magic::ast::var magic::ast::var::builder::make(double val, magic::ast::var v) {
 }
 
 magic::ast::var magic::ast::var::builder::make(std::string_view val, magic::ast::var v) {
-    if (val.size() > MAX_STRING_LEN - 1) {
-        val = val.substr(0, MAX_STRING_LEN - 1);
-    }
-    std::copy(val.cbegin(), val.cend(), v.s);
-    v.s[val.size()] = '\0';
+    v.set(val);
     return v;
 }
 
@@ -49,4 +45,12 @@ magic::ast::var magic::ast::var::builder::make() {
 
 std::shared_ptr< magic::ast::var > magic::ast::var::builder::make_ptr() {
     return make_ptr((uint64_t) 0);
+}
+
+void magic::ast::var::set(std::string_view val) {
+    if (val.size() > MAX_STRING_LEN) {
+        val = val.substr(0, MAX_STRING_LEN);
+    }
+    std::copy(val.cbegin(), val.cend(), s);
+    s[val.size()] = '\0';
 }
