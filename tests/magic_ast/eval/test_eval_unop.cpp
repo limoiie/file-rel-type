@@ -18,7 +18,7 @@ namespace testing_internal
     create_case_for_def(std::string const &typ_string, std::string const &mem, Int const offset, Int const v) {
         auto typ = parse_sign_typ(typ_string);
 
-        auto inner_typ = val_sign_typ_t{FILE_LONG, typ.is_unsigned};
+        auto inner_typ = val_sign_typ_t{FILE_QUAD, typ.is_unsigned};
         auto inner = std::make_shared< val >(inner_typ, var::builder::make((make_uint_t< sizeof(Int) >) offset));
 
         auto out_typ = val_sign_typ_t{erase_endian(typ.typ), typ.is_unsigned};

@@ -26,6 +26,7 @@ TEST(TestMagicPegAction, test_build_relation_str) { // NOLINT(cert-err58-cpp)
             {R"(a\ \17\ relation\t\ string)",  "a \x0F relation\t string"},
             {R"(\xAB\xAC\xDF\x1D\x12)",        "\xAB\xAC\xDF\x1D\x12"},
             {R"(\001\002\010\020\007)",        "\x01\x02\x08\x10\x07"},
+            {R"(\001\0\0\0\0)",                "\x01\x00\x00\x00\x00"},
     };
 
     for (auto const &pair : cases) {

@@ -3,8 +3,10 @@ find_package(GTest CONFIG REQUIRED)
 include_directories(../src)
 
 add_executable(test_all
+    domain_path.h
     input/test_random_input.cpp
     magic_ast/eval/test_eval_binop.cpp
+    magic_ast/eval/test_eval_magic_tree.cpp
     magic_ast/eval/test_eval_unop.cpp
     magic_ast/eval/test_type_cast.cpp
     magic_ast/eval/test_type_lift.cpp
@@ -15,6 +17,7 @@ add_executable(test_all
     magic_peg_action/test_3_relation_action.cpp
     magic_peg_action/test_4_description_type_code.cpp
     magic_peg_action/test_file_action.cpp
+    ../src/utils/print_memory.h
     test_magic_peg.cpp
     test_magic_peg_predefine.cpp
     test_magic_peg_predefine_action.cpp

@@ -29,7 +29,7 @@ namespace testing_internal
 
     std::shared_ptr< exp > make_num(int const n) {
         return num::builder::make_ptr(
-                {FILE_LONG, false},
+                {FILE_QUAD, false},
                 var::builder::make((uint32_t)n)
         );
     }

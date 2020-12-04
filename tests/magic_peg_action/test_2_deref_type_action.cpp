@@ -13,7 +13,7 @@
 #include <magic_ast/eval/eval_exp.h>
 
 #include "../test_pegtl_helper.hpp"
-#include "../print_memory.h"
+#include "utils/print_memory.h"
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
@@ -141,7 +141,7 @@ TEST(TestMagicPegAction, test_deref_val_off_cache_eval) { // NOLINT(cert-err58-c
         auto const &rule_str = pair.first.first;
         auto const &mem_str = pair.first.second;
 
-        std::cout << "  Case: offset - " << rule_str << ", memory - " << print_memory(mem_str) << std::endl;
+        std::cout << "  Case: offset - " << rule_str << ", memory - " << memory_to(mem_str) << std::endl;
 
         auto st = parse_magic< seq<
                 np_offset::exp, ___, sor< np_deref::nan_typ, np_deref::num_typ > > >(rule_str);

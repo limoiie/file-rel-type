@@ -10,10 +10,8 @@
 #include <tao/pegtl/contrib/unescape.hpp>
 
 #include <magic_peg/magic_peg.h>
-#include <magic_peg/magic_peg_op_typ.h>
 
 #include "test_pegtl_helper.hpp"
-#include "magic_peg/magic_peg_op_typ_action.h"
 
 using namespace tao::pegtl;
 using namespace tao::pegtl::contrib;
@@ -238,13 +236,16 @@ namespace test_magic_line
     TEST(TestMagicPeg, test_magic_line) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing test_magic_line ..." << std::endl;
         auto cases = std::list< std::pair< std::string, bool>>{
-                {">0x24\t\tstring\t\t>\\0\tmusician: \"%s\"",                      true},
-                {">>>>0x4D\tbeshort\t\t0x000\t(2GDM v",                            true},
-                {">>>(16.s)\tulelong\t\t>0\t\\b, at 0x%x",                         true},
-                {">>>>(16.s+4)\tulelong\t\t>0\t%u bytes",                          true},
-                {">>>>>(&-8.l)\tstring\t\tRIFF",                                   true},
-                {"0\tstring\t4OP\\x1a\t\tIBK instrument data, 4 operators",        true},
-                {">18\tlelong\t\t^02\n>>18\tlelong\t\t&01\t\tstatic object,|30\n", false}
+                {">3\tuleshort\tx\t\t\\b, version 0x%x|3031",                    true},
+                {">6\tubyte\t\t>0",                                              true},
+                {">0x24\t\tstring\t\t>\\0\tmusician: \"%s\"",                    true},
+                {">>>>0x4D\tbeshort\t\t0x000\t(2GDM v",                          true},
+                {">>>(16.s)\tulelong\t\t>0\t\\b, at 0x%x",                       true},
+                {">>>>(16.s+4)\tulelong\t\t>0\t%u bytes",                        true},
+                {">>>>>(&-8.l)\tstring\t\tRIFF",                                 true},
+                {">>>>(0x3c.l+0xf7)\tbyte\t\tx",                                 true},
+                {"0\tstring\t4OP\\x1a\t\tIBK instrument data, 4 operators",      true},
+                {">18\tlelong\t\t^02\n>>18\tlelong\t\t&01\t\tstatic object,|30", false}
         };
 
         for (auto const &pair : cases) {
@@ -261,6 +262,14 @@ namespace test_magic_file
     TEST(TestMagicPeg, test_magic_file) { // NOLINT(cert-err58-cpp)
         std::cout << "Testing" << __FUNCTION__ << " ..." << std::endl;
         auto cases = std::list< std::pair< std::string, bool>>{
+                {
+                    "0\tstring/b\tKCF\t\tFreeDOS KEYBoard Layout collection|3031\n"
+                    "# only version=0x100 found\n"
+                    ">3\tuleshort\tx\t\t\\b, version 0x%x|3031\n"
+                    "# length of string containing author,info and special characters\n"
+                    ">6\tubyte\t\t>0",
+                    true
+                },
                 {
                         "#----\n"
                         "\n"

@@ -41,7 +41,7 @@ namespace testing_internal
             if (!res) {
                 ensure_state();
             }
-        } catch (std::overflow_error &err) {
+        } catch (std::overflow_error &) {
             ensure_state();
 
             in.discard();
