@@ -62,7 +62,7 @@ namespace magic::peg::action
         /// file status -----------------------------------------------------
 
         // one file may contain several magic trees
-        std::list< p_magic_tree_t > magic_trees;
+        std::vector< p_magic_tree_t > magic_trees;
 
         /// tree status -----------------------------------------------------
 
@@ -100,9 +100,10 @@ namespace magic::peg::action
             }
         };
 
-        struct [[maybe_unused]] push_default_relation_operator {
+        template< unsigned char Op >
+        struct [[maybe_unused]] push_operator_ {
             static void apply0(state_magic_build &st) {
-                st.stk_opt.push('=');
+                st.stk_opt.push(Op);
                 st.stk_typ.push(nullptr);
             }
         };
@@ -299,7 +300,7 @@ namespace magic::peg::action
     };
 
     template<>
-    struct [[maybe_unused]] action_magic< ::np_relation::_default_opt > : internal::push_default_relation_operator {};
+    struct [[maybe_unused]] action_magic< ::np_relation::_default_opt > : internal::push_operator_< '=' > {};
 
     template<>
     struct [[maybe_unused]] action_magic< ::np_relation::_exp_str > : internal::push_bin_exp_with_flag {};
@@ -326,7 +327,9 @@ namespace magic::peg::action
 
     template<>
     struct [[maybe_unused]] action_magic< ::magic_line > {
-        static void apply0(state_magic_build &st) {
+        template<class ActionInput>
+        static void apply(ActionInput &in, state_magic_build &st) {
+            //std::cout << " -> " << in.string_view() << std::endl;
             auto entry = make_magic_entry(st);
             if (have_prev_entry(st, entry)) {
                 bind_with_prev_entry(st, entry);
@@ -351,7 +354,7 @@ namespace magic::peg::action
         }
 
         static bool have_prev_entry(state_magic_build &st, p_magic_tree_t &entry) {
-            if (entry->val->level == 0) {  // entry is the first line of a magic tree
+            if (entry->val->level == 0) {  // entry is the first line of a magic tree, so it has no prev entry
                 if (st.current_entry != nullptr) {  // push current tree root if there is one
                     st.magic_trees.emplace_back(st.current_entry->root());
                 }

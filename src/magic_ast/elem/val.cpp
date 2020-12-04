@@ -5,6 +5,9 @@
 #include "val.h"
 #include "val_typ_name.h"
 
+#include "../eval/type_cast.hpp"
+#include "../../utils/print_memory.h"
+
 namespace magic::ast
 {
     val::val(val_sign_typ_t typ, var const &data)
@@ -37,7 +40,7 @@ namespace magic::ast
     std::string val::to_string() const {
         auto fn_val = [this]() {
             switch (format_of(typ.typ)) {
-                case FILE_FMT_STR: return std::string(data.s);
+                case FILE_FMT_STR: return memory_to_human_friendly(std::string(data.s));
                 case FILE_FMT_INT:
                 case FILE_FMT_QUAD:
                     switch (size_of_typ(typ.typ)) {
@@ -54,5 +57,23 @@ namespace magic::ast
         };
         return fn_val() + "-" + typ.to_string() + "";
     }
-    
+
+    p_val_t make_bool(bool const true_or_false) {
+        return std::make_shared< val >(
+                val_sign_typ_t{FILE_QUAD, false},
+                var::builder::make((uint64_t) true_or_false));
+    }
+
+    p_val_t val::builder::default_true_ptr() {
+        return make_bool(true);
+    }
+
+    p_val_t val::builder::default_false_ptr() {
+        return make_bool(false);
+    }
+
+    bool is_val_true(const p_val_t &v) {
+        return dispatch_by< int_getter >(size_of_typ(v->typ.typ), v->typ.is_unsigned, v->data) != 0;
+    }
+
 }

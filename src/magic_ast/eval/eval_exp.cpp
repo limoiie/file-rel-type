@@ -32,9 +32,10 @@ namespace magic::ast
         return ::compute_binop(e->op, left_v, right_v);
     }
 
-    p_val_t compute_binop_str(p_ctx const &ctx, binop_str *) {
-        // todo: need implementation
-        return nullptr;
+    p_val_t compute_binop_str(p_ctx const &ctx, binop_str *e) {
+        auto left_v = e->left->compute(ctx);
+        auto right_v = e->right->compute(ctx);
+        return ::compute_binop_str(e->op, left_v, right_v, e->flag);
     }
 
 }

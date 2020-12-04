@@ -20,6 +20,13 @@ namespace magic::ast
     using p_val_t = std::shared_ptr< val >;
 
     struct val {
+        struct builder {
+            static p_val_t default_true_ptr();
+
+            static p_val_t default_false_ptr();
+
+        };
+
         val_sign_typ_t typ;
         var data;
 
@@ -30,8 +37,10 @@ namespace magic::ast
         bool operator!=(const val &rhs) const;
 
         std::string to_string() const;
-        
+
     };
+
+    bool is_val_true(p_val_t const& v);
 
 }
 

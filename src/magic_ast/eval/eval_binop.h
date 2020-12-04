@@ -11,4 +11,6 @@ using magic::ast::p_val_t;
 
 p_val_t compute_binop(char const op, p_val_t const &lhs, p_val_t const &rhs);
 
+p_val_t compute_binop_str(char const op, p_val_t const& lhs, p_val_t const &rhs, unsigned const flag);
+
 #endif //FILE_REL_TYPE_SRC_MAGIC_AST_EVAL_EVAL_BINOP_H_
