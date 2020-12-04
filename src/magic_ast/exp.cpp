@@ -22,7 +22,7 @@ namespace magic::ast
     }
 
     std::string exp::to_string() const {
-        return "< " + to_string_() + ":" + typ.to_string() + " >";
+        return "(" + to_string_() + ":" + typ.to_string() + ")";
     }
 
     bool exp::equal_to(exp const &other) const {

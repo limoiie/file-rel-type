@@ -174,7 +174,7 @@ namespace TAO_PEGTL_NAMESPACE::contrib::integer
             struct to_integer< signed_decimal > {
                 template< class ActionInput >
                 static void apply(ActionInput const &in, state_to_integer< Int > &st) {
-                    static_assert(std::is_signed_v< Int >);
+                    //static_assert(std::is_signed_v< Int >);
                     if (st.is_negative) {
                         st.val = ~st.val + 1;
                     }

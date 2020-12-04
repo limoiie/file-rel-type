@@ -74,8 +74,8 @@ struct caster_int< 8 > {
 
 template< std::size_t S, bool IsUnsigned >
 struct [[maybe_unused]] int_getter {
-    static auto on_dispatch(var &&v) {
-        return caster_int< S >::get_< IsUnsigned >(std::forward< var >(v));
+    static auto on_dispatch(var const &v) {
+        return (uint64_t) caster_int< S >::template get_< IsUnsigned >(v);
     }
 
 };

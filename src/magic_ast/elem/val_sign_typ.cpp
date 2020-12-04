@@ -12,7 +12,7 @@ val_sign_typ_t::val_sign_typ_t(val_typ_t typ, bool is_unsigned)
 
 val_sign_typ_t val_sign_typ_t::default_() {
     return {
-            FILE_LONG, false
+            FILE_QUAD, false
     };
 }
 

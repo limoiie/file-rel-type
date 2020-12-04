@@ -175,11 +175,12 @@ namespace magic::peg::action
 
     template<>
     struct [[maybe_unused]] action_magic< number_ >
-            : to_integer_switcher< int64_t > {
+            : to_integer_switcher< uint64_t > {
         template< class ParseInput >
-        static void success(const ParseInput &, state_to_integer< int64_t > &s, state_magic_build &st) {
+        static void success(const ParseInput &, state_to_integer< uint64_t > &s, state_magic_build &st) {
+            auto const is_unsigned = !s.is_negative;  // unsigned once positive
             st.stk_exp.push(num::builder::make_ptr(
-                    {FILE_LONG, false},
+                    {FILE_QUAD, is_unsigned},
                     var::builder::make((uint64_t) s.val)
             ));
         }
