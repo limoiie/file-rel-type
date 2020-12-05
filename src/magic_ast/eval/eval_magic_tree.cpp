@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "eval_exp.h"
+#include "../../utils/log.h"
 
 eval_magic_tree::eval_magic_tree(std::istream &ss)
         : ctx_(std::make_shared< magic::ast::ctx_exp_t >(ss)) {
@@ -17,32 +18,40 @@ eval_magic_tree::eval_magic_tree(std::istream &ss)
  * the right. If one node is evaluated as false, all of its children will be skipped.
  */
 bool eval_magic_tree::eval(p_magic_tree_t const &tree) { // NOLINT(misc-no-recursion)
-    if (tree == nullptr) return true;
+    if (tree == nullptr) {
+        return true;
+    }
 
-    auto success = false;
     auto const &entry = tree->val;
-    std::cout << "    computing " << entry->to_string() << "..." << std::endl;
+    logs::debug("\tcomputing {}...", entry->to_string());
 
-    auto res = entry->exp->compute(ctx_);
-    std::cout << "      offset: " << entry->e_off->cached_result()->to_string() << std::endl;
-    std::cout << "      value: " << entry->e_val->cached_result()->to_string() << std::endl;
+    magic::ast::p_val_t res = nullptr;
+    try {
+        res = entry->exp->compute(ctx_);
+        logs::debug("\t off: {}", entry->e_off->cached_result()->to_string());
+        logs::debug("\t val: {}", entry->e_val->cached_result()->to_string());
+    } catch (std::exception &e) {
+        logs::debug("Failed to compute while evaluating: {}", e.what());
+    }
 
-    if (is_val_true(res)) {
-        result_chain_.emplace_back(std::make_shared< entry_result_t >(
-                entry->e_off->cached_result(),
-                entry->e_val->cached_result(),
-                entry->description,
-                entry->type_code));
+    if (!is_val_true(res)) {
+        return false;
+    }
 
-        if (tree->children.empty()) {
-            success = true;
-        } else {
-            for (auto &child : tree->children) {
-                if (eval(child)) {
-                    success = true;
-                }
-            }
+    // we say 'matched' if the entry evaluated as true has info-payload, such as
+    // description or type code
+    auto matched = !entry->description.empty() || !entry->type_code;
+    result_chain_.emplace_back(std::make_shared< entry_result_t >(
+            entry->e_off->cached_result(),
+            entry->e_val->cached_result(),
+            entry->description,
+            entry->type_code));
+    //std::cout << "    -> results size: " << result_chain_.size() << std::endl;
+
+    for (auto &child : tree->children) {
+        if (eval(child)) {
+            matched = true;
         }
     }
-    return success;
+    return matched;
 }
