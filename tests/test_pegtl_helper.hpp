@@ -17,8 +17,10 @@ namespace testing_internal
 {
     template< class Int >
     auto make_num(Int val, val_sign_typ_t typ = val_sign_typ_t::default_()) {
+        typ.is_unsigned = val >= 0;
+        typ.typ = int_type_of(sizeof(Int));
         return magic::ast::num::builder::make_ptr(
-                typ, magic::ast::var::builder::make(val));
+                typ, magic::ast::var::builder::make((std::make_unsigned_t< Int >) val));
     }
 
     static auto ph_exp() {
@@ -59,7 +61,7 @@ parse_magic_init_with_default_offset(std::string const &stmt) {
     st.stk_exp.push(testing_internal::ph_exp());
 
     parse< tao::pegtl::contrib::exact< Rule >,
-            magic::peg::action::action_magic >(in, st);
+           magic::peg::action::action_magic >(in, st);
     return st;
 }
 

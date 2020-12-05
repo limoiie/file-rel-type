@@ -9,6 +9,8 @@
 
 using magic::ast::val;
 using magic::ast::var;
+using magic::ast::unop;
+using magic::ast::num;
 using magic::ast::ctx_exp_t;
 
 namespace testing_internal
@@ -131,10 +133,8 @@ TEST(TestEvalUnOp, test_eval_unop_inv) { // NOLINT(cert-err58-cpp)
 TEST(TestEvalUnOp, test_eval_unop_xxx) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing" << __FUNCTION__ << " ..." << std::endl;
     auto cases = std::list< std::pair< p_val_t, p_val_t >>{
-            testing_internal::create_case_for_xxx(nullptr),
-            testing_internal::create_case_for_xxx(nullptr),
-            testing_internal::create_case_for_xxx(nullptr),
-            testing_internal::create_case_for_xxx(nullptr),
+            testing_internal::create_case_for_xxx(val::builder::default_true_ptr()),
+            testing_internal::create_case_for_xxx(val::builder::default_false_ptr()),
     };
 
     for (auto const &pair : cases) {

@@ -27,29 +27,29 @@ namespace testing_internal
     using magic::ast::unop;
     using magic::ast::binop;
 
-    std::shared_ptr< exp > make_num(int const n) {
-        return num::builder::make_ptr(
-                {FILE_QUAD, false},
-                var::builder::make((uint32_t)n)
-        );
-    }
+    //std::shared_ptr< exp > make_num(int64_t const n) {
+    //    return num::builder::make_ptr(
+    //            {FILE_QUAD, false},
+    //            var::builder::make((uint64_t) n)
+    //    );
+    //}
 
     std::shared_ptr< exp > make_num_core(int const l, char const op, int const r,
-                                         int const inverse, int const indir_op = false) {
-        std::shared_ptr<exp> right = make_num(r);
-        std::shared_ptr<exp> left = make_num(l);
+                                         bool const inverse, bool const indir_op = false) {
+        std::shared_ptr< exp > right = make_num< int64_t >(r);
+        std::shared_ptr< exp > left = make_num< int64_t >(l);
         if (indir_op) {
             right = unop::builder::make_ptr('*', right, right->typ);
         }
         auto inner_typ = lift_type(left->typ, right->typ);
-        std::shared_ptr<exp> inner = binop::builder::make_ptr(op, left, right, inner_typ);
+        std::shared_ptr< exp > inner = binop::builder::make_ptr(op, left, right, inner_typ);
         if (inverse)
             inner = unop::builder::make_ptr('~', inner, inner->typ);
         return inner;
     }
 
-    std::shared_ptr< unop > make_unop_rel(int const n) {
-        auto inner = make_num((uint32_t)n);
+    std::shared_ptr< unop > make_unop_rel(int64_t const n) {
+        auto inner = make_num< int64_t >(n);
         return unop::builder::make_ptr('&', inner, inner->typ);
     }
 
@@ -57,8 +57,8 @@ namespace testing_internal
         return unop::builder::make_ptr('&', inner, inner->typ);
     }
 
-    std::shared_ptr< unop > make_unop_def(int const n) {
-        auto inner = make_num((uint32_t)n);
+    std::shared_ptr< unop > make_unop_def(int64_t const n) {
+        auto inner = make_num< int64_t >(n);
         return unop::builder::make_ptr('*', inner, inner->typ);
     }
 
@@ -151,8 +151,8 @@ TEST(TestMagicPegAction, test_build_offset_general) { // NOLINT(cert-err58-cpp)
         std::cout << "  Case: " << pair.first << std::endl;
 
         auto st = parse_magic< np_offset::exp >(pair.first);
-        auto const& left = *st.stk_exp.top();
-        auto const& right = *pair.second;
+        auto const &left = *st.stk_exp.top();
+        auto const &right = *pair.second;
         std::cout << "    l: " << left.to_string() << std::endl;
         std::cout << "    r: " << right.to_string() << std::endl;
         ASSERT_EQ(*st.stk_exp.top(), *pair.second);
@@ -168,6 +168,8 @@ TEST(TestMagicPegAction, test_build_offset) { // NOLINT(cert-err58-cpp)
         std::cout << "  Case: " << pair.first << std::endl;
 
         auto st = parse_magic< np_offset::exp >(pair.first);
+        std::cout << "    Expect: " << pair.second->to_string() << std::endl;
+        std::cout << "    Output: " << st.stk_exp.top()->to_string() << std::endl;
         ASSERT_EQ(*st.stk_exp.top(), *pair.second);
     }
 }

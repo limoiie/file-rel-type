@@ -133,8 +133,8 @@ namespace test_typ_relation
                 {R"(\0\1\013\17)",  true},
                 {R"(A\ Text)",      true},
                 {R"(A\ Text\\)",    true},
-                {R"(\x1be \xaf)",   false},  // must 1-2 bits hex
-                {R"(\0\1\2013\17)", false},  // must 1-3 bits oct
+                {R"(\x1be\ \xaf)",  true},
+                {R"(\0\1\2013\17)", true},
                 {R"(zz Text)",      false},
                 {R"(a\hzText)",     false},
                 {R"(\hzText)",      false},
@@ -263,12 +263,12 @@ namespace test_magic_file
         std::cout << "Testing" << __FUNCTION__ << " ..." << std::endl;
         auto cases = std::list< std::pair< std::string, bool>>{
                 {
-                    "0\tstring/b\tKCF\t\tFreeDOS KEYBoard Layout collection|3031\n"
-                    "# only version=0x100 found\n"
-                    ">3\tuleshort\tx\t\t\\b, version 0x%x|3031\n"
-                    "# length of string containing author,info and special characters\n"
-                    ">6\tubyte\t\t>0",
-                    true
+                        "0\tstring/b\tKCF\t\tFreeDOS KEYBoard Layout collection|3031\n"
+                        "# only version=0x100 found\n"
+                        ">3\tuleshort\tx\t\t\\b, version 0x%x|3031\n"
+                        "# length of string containing author,info and special characters\n"
+                        ">6\tubyte\t\t>0",
+                        true
                 },
                 {
                         "#----\n"

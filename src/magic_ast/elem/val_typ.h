@@ -70,4 +70,6 @@ bool is_string_typ(val_typ_t typ);
 
 size_t size_of_typ(val_typ_t typ);
 
+val_typ_t int_type_of(unsigned size);
+
 #endif //FILE_REL_TYPE_SRC_VAL_TYP_H_

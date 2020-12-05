@@ -35,7 +35,7 @@ namespace testing_internal
     std::vector< std::shared_ptr< magic::ast::exp > >
     create_case(uint32_t offset, std::string const &typ) {
         auto sign_typ = parse_sign_typ(typ);
-        auto off_exp = make_num(offset);
+        auto off_exp = make_num< int64_t >(offset);
         return {off_exp, magic::ast::unop::builder::make_ptr('*', off_exp, sign_typ)};
     }
 
@@ -54,9 +54,9 @@ namespace testing_internal
     }
 
     std::pair< std::pair< std::string, std::string >, std::pair< val, val > >
-    create_case_for_cache_eval(int offset, int value) {
-        auto rule_str = std::to_string(offset) + std::string(" long");
-        auto mem_str = std::string(offset, '0') + std::string((char const *) (void *) &value, sizeof(value));
+    create_case_for_cache_eval(int64_t offset, int64_t value) {
+        auto rule_str = std::to_string(offset) + std::string(" quad");
+        auto mem_str = std::string((size_t) offset, '0') + std::string((char const *) (void *) &value, sizeof(value));
         auto val_off = val{val_sign_typ_t::default_(), magic::ast::var::builder::make((uint32_t) offset)};
         auto val_val = val{val_sign_typ_t::default_(), magic::ast::var::builder::make((uint32_t) value)};
         return {
@@ -151,7 +151,7 @@ TEST(TestMagicPegAction, test_deref_val_off_cache_eval) { // NOLINT(cert-err58-c
         st.stk_exp.top()->compute(ctx);
 
         std::cout << "    Expect - Off: " << st.e_off->cached_result()->to_string() << std::endl;
-        std::cout << "    Expect - Off: " << pair.second.first.to_string() << std::endl;
+        std::cout << "    Output - Off: " << pair.second.first.to_string() << std::endl;
         ASSERT_EQ(*st.e_off->cached_result(), pair.second.first);
 
         std::cout << "    Expect - Val: " << st.e_val->cached_result()->to_string() << std::endl;

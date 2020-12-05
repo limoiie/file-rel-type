@@ -4,6 +4,8 @@
 
 #include "val_typ.h"
 
+#include <stdexcept>
+
 #include "val_typ_name.h"
 
 bool is_number_typ(val_typ_t const typ) {
@@ -63,4 +65,15 @@ size_t size_of_typ(val_typ_t typ) {
 
         default: return (size_t) ~(size_t) 0;
     }
+}
+
+val_typ_t int_type_of(unsigned const size) {
+    switch (size) {
+        case 1: return FILE_BYTE;
+        case 2: return FILE_SHORT;
+        case 4: return FILE_LONG;
+        case 8: return FILE_QUAD;
+        default: break;
+    }
+    throw std::runtime_error("Failed to create integer type: invalid type size!");
 }

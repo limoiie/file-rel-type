@@ -36,6 +36,8 @@ namespace testing_internal
     }
 
     void test(std::filesystem::path const &rule_path, std::filesystem::path const &doc_path) {
+        logs::logger->set_level(spdlog::level::info);
+
         tao::pegtl::file_input in(rule_path.u8string());
         auto st = magic::peg::action::state_magic_build();
         tao::pegtl::parse< contrib::exact< magic_file >, magic::peg::action::action_magic >(in, st);
@@ -77,8 +79,6 @@ TEST(TestEvalMagicTree, test_eval_magic_tree_doc) { // NOLINT(cert-err58-cpp)
 
 TEST(TestEvalMagicTree, test_eval_magic_tree_pic) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing" << __FUNCTION__ << " ..." << std::endl;
-
-    logs::logger->set_level(spdlog::level::info);
 
     auto docs = std::vector< std::filesystem::path >{
             test_resource_path() / "picture" / "A.png",

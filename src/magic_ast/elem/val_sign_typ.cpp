@@ -17,8 +17,7 @@ val_sign_typ_t val_sign_typ_t::default_() {
 }
 
 bool val_sign_typ_t::operator==(const val_sign_typ_t &rhs) const {
-    return typ == rhs.typ &&
-           is_unsigned == rhs.is_unsigned;
+    return typ == rhs.typ;  // comparing will ignore the sign
 }
 
 bool val_sign_typ_t::operator!=(const val_sign_typ_t &rhs) const {

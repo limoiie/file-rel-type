@@ -14,6 +14,14 @@ TEST(TestMagicPeg, test_file_builder_only_matching) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing" << __FUNCTION__ << " ..." << std::endl;
     auto cases = std::list< std::pair< std::string, bool > >{
             {
+                    "0\tstring\t\\x8bBACKUP\\x20\n"
+                    "# actually 128 nul bytes\n"
+                    ">0xa\tstring\t\\0\\0\\0\\0\\0\\0\\0\\0\n"
+                    ">>0x9\tubyte\tx\tDOS 3.3 backup control file, sequence %d|3163\n"
+                    ">>0x8a\tubyte\t0xff\t\\b, last disk",
+                    true
+            },
+            {
                     "0\tstring\t\tMM\\x00\\x2a\tTIFF image data, big-endian|2414\n"
                     "!:strength +70\n"
                     "!:mime\timage/tiff\n"
@@ -100,7 +108,7 @@ TEST(TestMagicPeg, test_file_builder_only_matching) { // NOLINT(cert-err58-cpp)
 
         memory_input in(pair.first, __FUNCTION__);
         auto st = magic::peg::action::state_magic_build();
-        auto out = parse< contrib::exact< magic_file >, magic::peg::action::action_magic >(in, st);
+        auto out = parse< contrib::exact< magic_file > >(in);
 
         for (auto &tree : st.magic_trees) {
             print_tree_node(tree);
