@@ -55,8 +55,8 @@ namespace internal
                 throw std::domain_error("Failed to fetch value: type size is bigger than the buffer!");
             }
         }
-        auto const len = std::min(in.written_len(), MAX_STRING_LEN);
-        std::copy(in.current(), in.current() + len, v.s);
+        v.s.len = std::min(in.written_len(), MAX_STRING_LEN);
+        std::copy(in.current(), in.current() + v.s.len, v.s.s);
 
         switch (typ) {
             case FILE_STRING:

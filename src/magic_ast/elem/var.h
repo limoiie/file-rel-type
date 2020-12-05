@@ -14,6 +14,23 @@ constexpr unsigned MAX_STRING_LEN = 95;
 
 namespace magic::ast
 {
+    struct str {
+        unsigned len;
+        char s[MAX_STRING_LEN + 1];
+
+        std::string string() const {
+            return std::string(s, len);
+        }
+
+        std::string_view string_view() const {
+            return std::string_view(s, len);
+        }
+
+        std::string_view string_view(unsigned const l) const {
+            return std::string_view(s, l);
+        }
+    };
+
     union var {
         uint8_t b;
         uint16_t h;
@@ -23,7 +40,8 @@ namespace magic::ast
         float_t f;
         double_t d;
 
-        char s[MAX_STRING_LEN + 1];
+        str s;
+        //char s[MAX_STRING_LEN + 1];
 
         uint8_t hs[2];
         uint8_t hl[4];
@@ -56,11 +74,11 @@ namespace magic::ast
 
         };
 
-        void set(uint8_t  v) { b = v; }
+        void set(uint8_t v) { b = v; }
         void set(uint16_t v) { h = v; }
         void set(uint32_t v) { l = v; }
         void set(uint64_t v) { q = v; }
-        void set(float_t  v) { f = v; }
+        void set(float_t v) { f = v; }
         void set(double_t v) { d = v; }
 
         void set(std::string_view v);

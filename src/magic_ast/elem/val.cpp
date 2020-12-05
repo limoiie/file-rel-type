@@ -17,7 +17,9 @@ namespace magic::ast
     bool val::operator==(val const &rhs) const {
         if (typ != rhs.typ) return false;
         switch (format_of(typ.typ)) {
-            case FILE_FMT_STR: return std::string_view(data.s) == std::string_view(rhs.data.s);
+            case FILE_FMT_STR:
+                return std::string_view(data.s.s, data.s.len) ==
+                       std::string_view(rhs.data.s.s, rhs.data.s.len);
             case FILE_FMT_INT:
             case FILE_FMT_QUAD:
                 switch (size_of_typ(typ.typ)) {
@@ -40,7 +42,7 @@ namespace magic::ast
     std::string val::to_string() const {
         auto fn_val = [this]() {
             switch (format_of(typ.typ)) {
-                case FILE_FMT_STR: return memory_to_human_friendly(std::string(data.s));
+                case FILE_FMT_STR: return memory_to_human_friendly(data.s.string_view());
                 case FILE_FMT_INT:
                 case FILE_FMT_QUAD:
                     switch (size_of_typ(typ.typ)) {

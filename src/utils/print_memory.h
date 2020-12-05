@@ -38,7 +38,7 @@ std::string memory_to(std::string const& mem) {
 }
 
 inline
-std::string memory_to_human_friendly(std::string const& mem) {
+std::string memory_to_human_friendly(std::string_view const& mem) {
     std::string s;
     for (unsigned char c : mem) {
         if (c == '\\') {

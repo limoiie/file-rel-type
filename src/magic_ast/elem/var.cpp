@@ -4,6 +4,8 @@
 
 #include "var.h"
 
+#include "../../utils/log.h"
+
 magic::ast::var magic::ast::var::builder::make(uint8_t val, magic::ast::var v) {
     v.b = val;
     return v;
@@ -49,8 +51,10 @@ std::shared_ptr< magic::ast::var > magic::ast::var::builder::make_ptr() {
 
 void magic::ast::var::set(std::string_view val) {
     if (val.size() > MAX_STRING_LEN) {
+        logs::debug("Warning: set to var a string whose size exceeds MAX_STRING_LEN", val.size());
         val = val.substr(0, MAX_STRING_LEN);
     }
-    std::copy(val.cbegin(), val.cend(), s);
-    s[val.size()] = '\0';
+    std::copy(val.cbegin(), val.cend(), s.s);
+    s.len = val.size();
+    s.s[s.len] = '\0';
 }

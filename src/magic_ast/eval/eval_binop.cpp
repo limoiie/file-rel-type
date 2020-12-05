@@ -56,9 +56,9 @@ namespace internal
         assert(lhs->typ == rhs->typ);
         auto v = var::builder::make();
         auto &res_v = caster_int< 8 >::template get_< true >(v);
-        auto const l = strnlen_s(rhs->data.s, MAX_STRING_LEN);
-        auto const &lhs_v = std::string_view(lhs->data.s, l);
-        auto const &rhs_v = std::string_view(rhs->data.s, l);
+        // todo: compare size first
+        auto const &lhs_v = lhs->data.s.string_view(rhs->data.s.len);
+        auto const &rhs_v = rhs->data.s.string_view();
 
         // todo: handle the string flags
         std::cerr << "Warning - NotImplemented: Handle the string flags in compute_binop_str_!!!" << std::endl;
