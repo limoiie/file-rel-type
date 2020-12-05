@@ -60,6 +60,11 @@ namespace testing_internal
                 std::make_shared< val >(typ, var::builder::make((uint_t) ~(uint_t) v))
         };
     }
+
+    std::pair< p_val_t, p_val_t >
+    create_case_for_xxx(p_val_t const &in_val) {
+        return {in_val, val::builder::default_true_ptr()};
+    }
 }
 
 TEST(TestEvalUnOp, test_eval_unop_def) { // NOLINT(cert-err58-cpp)
@@ -119,6 +124,23 @@ TEST(TestEvalUnOp, test_eval_unop_inv) { // NOLINT(cert-err58-cpp)
         std::cout << "  Case: ~" << pair.first->to_string() << " -> " << pair.second->to_string() << std::endl;
 
         auto out = ::compute_unop('~', pair.first, pair.first->typ, nullptr);
+        ASSERT_EQ(*out, *pair.second);
+    }
+}
+
+TEST(TestEvalUnOp, test_eval_unop_xxx) { // NOLINT(cert-err58-cpp)
+    std::cout << "Testing" << __FUNCTION__ << " ..." << std::endl;
+    auto cases = std::list< std::pair< p_val_t, p_val_t >>{
+            testing_internal::create_case_for_xxx(nullptr),
+            testing_internal::create_case_for_xxx(nullptr),
+            testing_internal::create_case_for_xxx(nullptr),
+            testing_internal::create_case_for_xxx(nullptr),
+    };
+
+    for (auto const &pair : cases) {
+        std::cout << "  Case: x" << pair.first->to_string() << " -> " << pair.second->to_string() << std::endl;
+
+        auto out = ::compute_unop('x', pair.first, pair.first->typ, nullptr);
         ASSERT_EQ(*out, *pair.second);
     }
 }
