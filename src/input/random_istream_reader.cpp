@@ -43,7 +43,7 @@ std::size_t random_istream_reader::size() {
     if (origin_pos == -1) stream.clear();
     auto const size = stream.seekg(0, std::ios_base::end).tellg();
     stream.seekg(origin_pos);
-    return size;
+    return (std::size_t) size;
 }
 
 void random_istream_reader::clear() {
