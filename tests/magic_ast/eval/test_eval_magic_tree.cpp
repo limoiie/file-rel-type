@@ -62,10 +62,17 @@ namespace testing_internal
 TEST(TestEvalMagicTree, test_eval_magic_tree_pdf) { // NOLINT(cert-err58-cpp)
     std::cout << "Testing" << __FUNCTION__ << " ..." << std::endl;
 
-    auto const doc_path = test_resource_path() / "pdf" / "A.pdf";
-    auto const rule_path = test_resource_path() / "magic" / "pdf";
+    auto docs = std::vector< std::filesystem::path >{
+            test_resource_path() / "pdf" / "A.pdf",
+            test_resource_path() / "pdf" / "B.pdf",
+    };
 
-    testing_internal::test(rule_path, doc_path);
+    for (auto const& doc_path : docs) {
+        logs::info("");
+        logs::info("Testing {}...", doc_path.u8string());
+        auto const rule_path = test_resource_path() / "magic" / "pdf";
+        testing_internal::test(rule_path, doc_path);
+    }
 }
 
 TEST(TestEvalMagicTree, test_eval_magic_tree_doc) { // NOLINT(cert-err58-cpp)
@@ -90,8 +97,8 @@ TEST(TestEvalMagicTree, test_eval_magic_tree_pic) { // NOLINT(cert-err58-cpp)
     };
 
     for (auto const& doc_path : docs) {
+        logs::info("");
         logs::info("Testing {}...", doc_path.u8string());
-
         auto const rule_path = test_resource_path() / "magic" / "images";
         testing_internal::test(rule_path, doc_path);
     }

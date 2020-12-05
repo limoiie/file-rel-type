@@ -61,7 +61,7 @@ namespace internal
         auto const &rhs_v = rhs->data.s.string_view();
 
         // todo: handle the string flags
-        std::cerr << "Warning - NotImplemented: Handle the string flags in compute_binop_str_!!!" << std::endl;
+        //std::cerr << "Warning - NotImplemented: Handle the string flags in compute_binop_str_!!!" << std::endl;
 
         auto maker = [&](uint64_t const) {
             return std::make_shared< val >(val_sign_typ_t{FILE_QUAD, false}, v);
