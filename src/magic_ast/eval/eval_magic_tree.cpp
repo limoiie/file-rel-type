@@ -4,8 +4,6 @@
 
 #include "eval_magic_tree.h"
 
-#include <iostream>
-
 #include "eval_exp.h"
 #include "../../utils/log.h"
 
