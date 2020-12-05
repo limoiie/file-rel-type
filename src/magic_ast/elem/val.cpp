@@ -73,6 +73,7 @@ namespace magic::ast
     }
 
     bool is_val_true(const p_val_t &v) {
+        if (v == nullptr) return false;
         return dispatch_by< int_getter >(size_of_typ(v->typ.typ), v->typ.is_unsigned, v->data) != 0;
     }
 
