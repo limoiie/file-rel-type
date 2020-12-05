@@ -9,6 +9,7 @@
 #include <tao/pegtl/contrib/unescape.hpp>
 
 #include "integer.hpp"
+#include "rep_min_max_or_more.hpp"
 
 using namespace tao::pegtl;
 
@@ -24,9 +25,9 @@ struct escaped_one : one< '\'', '"', '?', '\\', 'a', 'b', 'f', 'n', 'r', 't', 'v
                           '+', '-', '*', '%', '~', '^', '&', '|', '<', '>', '=', '!' > {
 };
 
-struct escaped_oct_char : internal::rep_min_max< 1, 3, odigit > {};
+struct escaped_oct_char : contrib::rep_min_max_or_more< 1, 3, odigit > {};
 
-struct escaped_hex_char : internal::rep_min_max< 1, 2, xdigit > {};
+struct escaped_hex_char : contrib::rep_min_max_or_more< 1, 2, xdigit > {};
 
 struct escaped_with_hex_oct
         : sor<

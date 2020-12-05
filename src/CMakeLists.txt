@@ -63,6 +63,7 @@ add_library(magic
     utils/tao/pegtl/exact.hpp
     utils/tao/pegtl/integer.hpp
     utils/tao/pegtl/line.hpp
+    utils/tao/pegtl/rep_min_max_or_more.hpp
     utils/tao/pegtl/switcher.hpp
     utils/tree.hpp
     utils/type_traits/make_int_type.hpp
