@@ -1,4 +1,5 @@
 find_package(pegtl CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
 add_library(magic
     magic_entry.cpp
@@ -71,6 +72,7 @@ target_link_libraries(magic
 
 add_executable(file_rel_type
     main.cpp
+    utils/log.h
     )
 
 target_link_libraries(file_rel_type

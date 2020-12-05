@@ -12,6 +12,7 @@
 #include <tao/pegtl.hpp>
 #include <tao/pegtl/contrib/unescape.hpp>
 
+#include "../utils/log.h"
 #include "../utils/tree.hpp"
 #include "../utils/stl_container_helper.h"
 
@@ -329,7 +330,7 @@ namespace magic::peg::action
     struct [[maybe_unused]] action_magic< ::magic_line > {
         template<class ActionInput>
         static void apply(ActionInput &in, state_magic_build &st) {
-            //std::cout << " -> " << in.string_view() << std::endl;
+            //logs::trace(" -> {}", in.string_view());
             auto entry = make_magic_entry(st);
             if (have_prev_entry(st, entry)) {
                 bind_with_prev_entry(st, entry);
